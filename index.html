@@ -1,118 +1,116 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>🎟️ Boletos disponibles - Rifa Bicis de Montaña</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rifa Bicicletas - Patronato</title>
   <style>
     body {
-      font-family: sans-serif;
-      background: #f2f2f2;
-      text-align: center;
-      padding: 20px;
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to bottom, #e0f7fa, #fff);
+      color: #333;
     }
-    h2 {
-      margin-bottom: 20px;
-    }
-    .boletos {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 6px;
-    }
-    .boleto {
-      padding: 8px 14px;
-      background: green;
+    header {
+      background-color: #1976d2;
       color: white;
-      border: none;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
+      text-align: center;
+      padding: 20px 10px;
     }
-    .ocupado {
-      background: gray;
-      cursor: not-allowed;
+    h1 {
+      margin: 0;
+      font-size: 2.2em;
     }
-    details {
-      margin-top: 40px;
-      max-width: 700px;
-      margin-left: auto;
-      margin-right: auto;
-      background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+    .container {
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+    .premio {
+      margin: 20px 0;
       padding: 15px;
+      border: 2px solid #1976d2;
+      border-radius: 10px;
+      background: #f0f8ff;
     }
-    summary {
-      font-size: 18px;
-      font-weight: bold;
+    .premio h2 {
+      margin-top: 0;
+      color: #1976d2;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    .button-container {
+      text-align: center;
+      margin-top: 40px;
+    }
+    .boton {
+      background-color: #ffca28;
+      color: #000;
+      font-size: 1.2em;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 8px;
       cursor: pointer;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    .boton:hover {
+      background-color: #ffc107;
+    }
+    footer {
+      text-align: center;
+      font-size: 0.9em;
+      color: #666;
+      margin-top: 40px;
+      padding: 20px 10px;
     }
   </style>
 </head>
 <body>
-  <h2>📋 Boletos disponibles - Rifa Bicis de Montaña</h2>
-  <div class="boletos" id="boletos">Cargando...</div>
+  <header>
+    <h1>🎉 Gran Rifa de Bicicletas de Montaña 🚴‍♂️</h1>
+    <p>📅 Sorteo: Viernes 30 de mayo &nbsp; | &nbsp; 📞 WhatsApp: 327...</p>
+  </header>
 
-  <details>
-    <summary>ℹ️ Reglas del Sorteo – Bicis de Montaña</summary>
-    <div style="text-align: left; padding-top: 10px;">
-      <p><strong>📅 Fecha del sorteo:</strong> Viernes 30 de mayo</p>
-
-      <p><strong>🏆 Premios:</strong></p>
-      <p><strong>1. Bicicleta Olympus (seminueva)</strong><br>
-      • Cuadro de aluminio<br>
-      • Freno hidráulico trasero<br>
-      • Rines aluminio aerodinámicos R26<br>
-      • Suspensión delantera de aire con bloqueo manual<br>
-      • Transmisión 7x2<br>
-      • Llantas seminuevas</p>
-
-      <p><strong>2. Bicicleta Rising (seminueva)</strong><br>
-      • Suspensión delantera de aire con bloqueo manual<br>
-      • Transmisión 10x1<br>
-      • Frenos hidráulicos delanteros y traseros<br>
-      • Llantas seminuevas<br>
-      • Rines aluminio R26<br>
-      • Maza tronadora</p>
-
-      <p><strong>📞 Contacto WhatsApp:</strong> 327 102 3282</p>
-
-      <p><strong>📝 Regla especial:</strong><br>
-      Atención ⚠️ Comparte nuestra rifa.<br>
-      Por <em>cada número con el que participes</em> (uno por día, aunque no sean seguidos),<br>
-      y <strong>si resultas ganador</strong>, ¡te llevas también otra bicicleta seminueva!<br>
-      📦 Premio adicional: una bicicleta <strong>Mercurio 26</strong> (ganadora de competencia local).<br>
-      ✅ El envío será <strong>GRATIS a todo México</strong>.</p>
+  <div class="container">
+    <div class="premio">
+      <h2>🏆 1er Premio: Bicicleta OLYMPUS (seminueva)</h2>
+      <ul>
+        <li>Cuadro de aluminio</li>
+        <li>Freno hidráulico trasero</li>
+        <li>Rines aluminio aerodinámicos R26</li>
+        <li>Suspensión delantera de aire con control manual (bloqueo con chicote y palanca)</li>
+        <li>Transmisión 7x2</li>
+        <li>Llantas seminuevas</li>
+      </ul>
     </div>
-  </details>
 
-  <script>
-    const URL_SHEET = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/pub?output=csv";
-    const URL_FORMULARIO = "https://docs.google.com/forms/d/e/1FAIpQLSfyzWjekOZ3DtirImqSxKZJC7RVr_erc5FYn1EMtCdyQLmTjQ/viewform?usp=pp_url&entry.359823867=";
+    <div class="premio">
+      <h2>🥈 2do Premio: Bicicleta RISING (seminueva)</h2>
+      <ul>
+        <li>Suspensión de aire delantera con bloqueador manual</li>
+        <li>Transmisión 10x1</li>
+        <li>Frenos hidráulicos delanteros y traseros</li>
+        <li>Llantas seminuevas</li>
+        <li>Rines de aluminio R26</li>
+        <li>Maza tronadora</li>
+      </ul>
+    </div>
 
-    fetch(URL_SHEET)
-      .then(res => res.text())
-      .then(csv => {
-        const filas = csv.trim().split("\n").slice(1);
-        const ocupados = filas.map(f => f.split(",")[0].padStart(3, "0"));
-        const contenedor = document.getElementById("boletos");
-        contenedor.innerHTML = "";
-        for (let i = 0; i < 1000; i++) {
-          const num = i.toString().padStart(3, "0");
-          const btn = document.createElement("button");
-          btn.className = "boleto";
-          btn.textContent = num;
-          if (ocupados.includes(num)) {
-            btn.classList.add("ocupado");
-            btn.disabled = true;
-          } else {
-            btn.onclick = () => {
-              window.open(URL_FORMULARIO + num, "_blank");
-            };
-          }
-          contenedor.appendChild(btn);
-        }
-      });
-  </script>
+    <div class="premio">
+      <h2>🥉 3er Premio: ¡Todo es para el ganador!</h2>
+      <p><strong>Atención:</strong> Comparte nuestra rifa. Con cada número que vayas a participar (uno por día, aunque no sean seguidos) y si resultas ganador, <strong>te llevas otra bicicleta seminueva marca <u>Mercurio 26</u></strong>, recientemente estrenada, <strong>ganadora de una competencia local</strong>.</p>
+      <p><strong>¡Además, el envío es gratis a todo México! 🇲🇽</strong></p>
+    </div>
+
+    <div class="button-container">
+      <a href="seleccion.html" class="boton">🎟️ Seleccionar Mis Boletos</a>
+    </div>
+  </div>
+
+  <footer>
+    Gracias por apoyar esta noble causa. ¡Mucha suerte a todos los participantes!
+  </footer>
 </body>
 </html>
