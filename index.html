@@ -879,7 +879,17 @@
         boleto.style.display = keywords.includes(input) ? "block" : (input === "" ? "block" : "none");
       });
     }
-  </script>
+  <script>
+function filtrar() {
+  const input = document.getElementById('buscador').value.toLowerCase();
+  const boletos = document.querySelectorAll('.boleto');
+  boletos.forEach(boleto => {
+    const texto = boleto.textContent.toLowerCase();
+    boleto.parentElement.style.display = texto.includes(input) ? '' : 'none';
+  });
+}
+</script>
+
 </body>
 </html>
 
