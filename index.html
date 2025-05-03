@@ -1,121 +1,103 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sorteo Bicis de Montaña</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rifa Bicis de Montaña</title>
   <style>
     body {
-      background-color: #002147; /* Azul marino institucional */
+      background-color: #001f3f;
+      color: #ffffff;
       font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
       padding: 20px;
-      color: #333;
     }
-    .marco-externo {
-      background-color: #f9c642; /* Amarillo dorado institucional */
-      padding: 10px;
-      border-radius: 12px;
-    }
-    .marco-interno {
-      background: #ffffff;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px #ccc;
-    }
-    h1, h2 {
-      text-align: center;
-      color: #002147;
-    }
-    .premio {
-      margin-top: 20px;
-    }
-    .premio strong {
-      display: block;
+    h1 {
+      color: #FFD700;
       margin-bottom: 5px;
-      color: #000;
     }
-    .premio ul {
-      margin-top: 5px;
-      padding-left: 20px;
+    h2 {
+      color: #ffffff;
+      font-weight: normal;
     }
-    .nota, .whatsapp {
+    .bicicleta {
+      border: 2px solid #FFD700;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 20px 0;
+      background-color: #003366;
+    }
+    .bicicleta img {
+      max-width: 100%;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+    .whatsapp-btn {
+      display: inline-block;
       margin-top: 30px;
-      text-align: center;
-    }
-    .whatsapp a {
-      color: green;
-      font-weight: bold;
+      background-color: #25D366;
+      color: white;
+      padding: 12px 20px;
       text-decoration: none;
-    }
-    p.destacado {
-      text-align: center;
-      margin-top: 20px;
       font-size: 18px;
-      color: #002147;
+      border-radius: 8px;
       font-weight: bold;
+    }
+    .nota {
+      font-size: 15px;
+      margin-top: 30px;
+      color: #FFD700;
     }
   </style>
 </head>
 <body>
-  <div class="marco-externo">
-    <div class="marco-interno">
-      <h1>🎉 SORTEO – BICIS DE MONTAÑA</h1>
-      <h2>📅 Fecha: Viernes 30 de mayo 2025</h2>
+  <div class="container">
+    <h1>🎉 SORTEO – BICIS DE MONTAÑA</h1>
+    <h2>📅 Fecha: Viernes 30 de mayo 2025</h2>
+    <p><strong>🏆 Premios para un solo ganador:</strong></p>
 
-      <p class="destacado">
-        Esta vez estamos apoyando a un joven de 14 años<br>
-        que está emprendiendo en el deporte del ciclismo.<br>
-        Necesita una bicicleta más super para ir a la competencia estatal.<br>
-        ¡Gracias por ser parte de esta causa!
-      </p>
-
-      <div class="premio">
-        <strong>🎁 1. Bicicleta Olympus (seminueva)</strong>
-        <ul>
-          <li>Cuadro de aluminio</li>
-          <li>Freno hidráulico trasero</li>
-          <li>Rines aluminio aerodinámicos R26</li>
-          <li>Suspensión de aire con bloqueo manual</li>
-          <li>Transmisión 7x2</li>
-          <li>Llantas seminuevas</li>
-        </ul>
-      </div>
-
-      <div class="premio">
-        <strong>🎁 2. Bicicleta Rising (seminueva)</strong>
-        <ul>
-          <li>Suspensión de aire delantera con bloqueo</li>
-          <li>Transmisión 10x1</li>
-          <li>Frenos hidráulicos (delantero y trasero)</li>
-          <li>Rines aluminio R26</li>
-          <li>Maza tronadora</li>
-          <li>Llantas seminuevas</li>
-        </ul>
-      </div>
-
-      <div class="premio">
-        <strong>🎁 3.er PREMIO: Bicicleta Mercurio 26</strong>
-        <ul>
-          <li>Básica, ganada recientemente en una competencia local</li>
-        </ul>
-      </div>
-
-      <div class="nota">
-        📝 <strong>Este Premio adicional te lo llevas si compartes esta publicación en redes sociales.</strong><br>
-        (Una compartida por número por día). ¡No olvides escribir tu número participante al compartir!
-      </div>
-
-      <div class="nota">
-        📦 <strong>Envío GRATIS a todo México</strong> si compartiste la publicación. 🛵📬
-      </div>
-
-      <div class="whatsapp">
-        📲 <strong>¿Dudas o quieres tu número?</strong><br>
-        <a href="https://wa.me/5213271023282" target="_blank">
-          Escríbenos por WhatsApp aquí
-        </a>
-      </div>
+    <div class="bicicleta">
+      <h3>🎁 1. Bicicleta Olympus (seminueva)</h3>
+      <ul style="text-align: left;">
+        <li>Cuadro de aluminio</li>
+        <li>Freno hidráulico trasero</li>
+        <li>Rines aluminio aerodinámicos R26</li>
+        <li>Suspensión de aire con bloqueo manual</li>
+        <li>Transmisión 7x2</li>
+        <li>Llantas seminuevas</li>
+      </ul>
+      <img src="https://raw.githubusercontent.com/RIFAS-CON-CAUSA/BICIS-MONTANA-EQUIPADAS/main/las%202%20bicis.jpeg" alt="Bicicleta Olympus">
     </div>
+
+    <div class="bicicleta">
+      <h3>🎁 2. Bicicleta Rising (seminueva)</h3>
+      <ul style="text-align: left;">
+        <li>Suspensión de aire delantera con bloqueo</li>
+        <li>Transmisión 10x1</li>
+        <li>Frenos hidráulicos (delantero y trasero)</li>
+        <li>Rines aluminio R26</li>
+        <li>Maza tronadora</li>
+        <li>Llantas seminuevas</li>
+      </ul>
+      <img src="https://raw.githubusercontent.com/RIFAS-CON-CAUSA/BICIS-MONTANA-EQUIPADAS/main/Rising.jpeg" alt="Bicicleta Rising">
+    </div>
+
+    <div class="bicicleta">
+      <h3>🎁 3.er Premio adicional: Bicicleta Mercurio 26 (básica, ganada recientemente en una competencia local)</h3>
+      <p>📝 Este premio es para quien comparta la publicación en redes sociales (una compartida por número, por día).</p>
+    </div>
+
+    <p class="nota">📦 Además, ¡envío GRATIS a todo México si compartiste!<br>Recuerda escribir tu número participante en la publicación que compartas.</p>
+
+    <a class="whatsapp-btn" href="https://wa.me/523277000000?text=Hola%2C%20quiero%20informes%20de%20la%20rifa%20de%20bicis." target="_blank">
+      📲 Pedir informes por WhatsApp
+    </a>
   </div>
 </body>
 </html>
