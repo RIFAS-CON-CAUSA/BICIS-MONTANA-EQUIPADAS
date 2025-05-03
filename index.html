@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rifa con Causa – Bicis Montaña</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, yellow 10px, white calc(100% - 10px), green 10px);
+      border-top: 10px solid yellow;
+      border-bottom: 10px solid green;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #ffffff;
+      border: 5px solid green;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    h1 {
+      color: green;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    .boton-panel {
+      display: inline-block;
+      padding: 15px 30px;
+      background-color: yellow;
+      color: green;
+      font-size: 18px;
+      font-weight: bold;
+      border: 3px solid green;
+      border-radius: 10px;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+
+    .boton-panel:hover {
+      background-color: #d3d300;
+    }
+
+    .whatsapp-float {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #25D366;
+      color: white;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      text-decoration: none;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      z-index: 999;
+    }
+
+    .whatsapp-float:hover {
+      background-color: #1ebc5c;
+    }
+
+    .nota {
+      font-size: 14px;
+      color: #555;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎉 ¡Rifa con Causa! 🎉</h1>
+    <p>Participa por <strong>dos bicicletas de montaña equipadas</strong>, ayudando a una buena causa.</p>
+    <p>El sorteo se realizará el <strong>viernes 30 de mayo</strong>.</p>
+
+    <a class="boton-panel" href="panel-boletos-rifa.html">
+      🎟️ VER BOLETOS DISPONIBLES
+    </a>
+
+    <p class="nota">Haz clic en el botón para consultar o apartar tus boletos disponibles directamente en el sistema.</p>
+  </div>
+
+  <!-- Botón flotante de WhatsApp -->
+  <a class="whatsapp-float" href="https://wa.me/3270000000" target="_blank" title="Solicitar informes por WhatsApp">
+    🟢
+  </a>
+</body>
+</html>
