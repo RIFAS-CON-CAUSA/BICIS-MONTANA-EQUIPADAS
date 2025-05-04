@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ingreso por Roles | Rifa de Bicis Mayo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom right, #f0f8ff, #d0f0c0);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .login-box {
+      background-color: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      text-align: center;
+    }
+    input[type="password"], select {
+      padding: 10px;
+      width: 100%;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #28a745;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    .mensaje {
+      margin-top: 10px;
+      color: #dc3545;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>Ingreso por Rol</h2>
+    <select id="rol">
+      <option value="">Selecciona tu rol</option>
+      <option value="admin-bicis">Administrador Bicis</option>
+      <option value="verificador-miriam">Verificador Miriam</option>
+      <option value="verificador-carlos">Verificador Carlos</option>
+      <option value="verificador-jorge">Verificador Jorge</option>
+    </select>
+    <input type="password" id="clave" placeholder="Contraseña">
+    <button onclick="verificarAcceso()">Entrar</button>
+    <div class="mensaje" id="mensaje"></div>
+  </div>
+
+  <script>
+    const accesos = {
+      "admin-bicis": "admin2024",
+      "verificador-miriam": "clave1",
+      "verificador-carlos": "clave2",
+      "verificador-jorge": "clave3"
+    };
+
+    function verificarAcceso() {
+      const rol = document.getElementById('rol').value;
+      const clave = document.getElementById('clave').value;
+      const mensaje = document.getElementById('mensaje');
+
+      if (accesos[rol] && accesos[rol] === clave) {
+        mensaje.style.color = 'green';
+        mensaje.innerText = 'Bienvenido ' + rol;
+
+        if (rol === 'admin-bicis') {
+          window.location.href = 'panel-admin-bicis.html';
+        } else {
+          window.location.href = 'panel-boletos-bicis.html';
+        }
+      } else {
+        mensaje.style.color = '#dc3545';
+        mensaje.innerText = 'Acceso denegado. Verifica tus datos.';
+      }
+    }
+  </script>
+</body>
+</html>
