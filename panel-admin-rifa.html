@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Panel Login de Rifa</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom right, #f2f2f2, #e0ffe0);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .login-box {
+      background: white;
+      border: 3px solid green;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      border: none;
+      background-color: #28a745;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>Acceso al Panel de la Rifa</h2>
+    <input type="text" id="usuario" placeholder="Usuario o Rol" autocomplete="off" />
+    <input type="password" id="clave" placeholder="Contraseña" />
+    <button onclick="verificarAcceso()">Ingresar</button>
+    <div id="mensaje" class="error"></div>
+  </div>
+
+  <script>
+    const accesos = {
+      "adminrifa": "admin2024",
+      "verificador miriam": "clave1",
+      "verificador carlos": "clave2",
+      "verificador jorge": "clave3"
+    };
+
+    function verificarAcceso() {
+      const usuario = document.getElementById("usuario").value.toLowerCase();
+      const clave = document.getElementById("clave").value;
+      const mensaje = document.getElementById("mensaje");
+
+      if (accesos[usuario] && accesos[usuario] === clave) {
+        alert("Bienvenido " + usuario);
+        if (usuario === "adminrifa") {
+          window.location.href = "panel-admin-rifa.html"; // Aquí puedes cambiarlo por el panel general
+        } else {
+          window.location.href = "panel-boletos-rifa.html"; // Redirección para verificadores
+        }
+      } else {
+        mensaje.textContent = "Acceso denegado. Verifica tus datos.";
+      }
+    }
+  </script>
+</body>
+</html>
