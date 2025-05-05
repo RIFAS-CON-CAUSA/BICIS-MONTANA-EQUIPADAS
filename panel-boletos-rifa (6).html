@@ -1,0 +1,586 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Boletos de la rifa de bicicletas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f2f2f2;
+        }
+        .titulo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .titulo img {
+            height: 70px;
+        }
+        .leyenda {
+            margin: 20px 0;
+        }
+        .leyenda span {
+            margin: 0 10px;
+            font-weight: bold;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 15px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .boleto {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        .boleto:hover {
+            transform: scale(1.05);
+        }
+        .numeros {
+            font-size: 11px;
+            margin-bottom: 5px;
+            color: white;
+        }
+        .apartado {
+            background-color: #FFC107 !important;
+        }
+        .no-disponible {
+            background-color: #F44336 !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="titulo">
+    <img src="https://raw.githubusercontent.com/RIFAS-CON-CAUSA/BICIS-MONTANA-EQUIPADAS/main/las%202%20bicis.jpeg" alt="bicis">
+    <h2>Boletos de la rifa de bicicletas</h2>
+</div>
+
+<div>
+    <h3>TOCA EL BOLETO QUE TE AGRADE Y RELLENA TUS DATOS</h3>
+</div>
+
+<div class="leyenda">
+    <span style="color: green;">🟩 Disponible</span>
+    <span style="color: orange;">🟨 Apartado</span>
+    <span style="color: red;">🟥 No disponible</span>
+</div>
+
+<div class="grid">
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=1'">
+        <div class="numeros">047-140-291-312-446-458-572-594-665-879</div>
+        1
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=2'">
+        <div class="numeros">028-097-099-444-581-673-758-846-884-929</div>
+        2
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=3'">
+        <div class="numeros">198-263-365-385-443-529-590-678-829-978</div>
+        3
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=4'">
+        <div class="numeros">096-323-403-439-484-556-827-920-987-996</div>
+        4
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=5'">
+        <div class="numeros">024-199-206-247-288-424-456-457-906-988</div>
+        5
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=6'">
+        <div class="numeros">115-184-272-349-659-697-777-857-959-968</div>
+        6
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=7'">
+        <div class="numeros">026-218-222-227-258-278-654-657-756-806</div>
+        7
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=8'">
+        <div class="numeros">061-204-215-225-271-341-364-455-630-955</div>
+        8
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=9'">
+        <div class="numeros">089-100-277-357-400-575-613-785-855-932</div>
+        9
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=10'">
+        <div class="numeros">037-105-209-245-452-792-820-873-887-984</div>
+        10
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=11'">
+        <div class="numeros">030-071-207-389-471-473-636-696-698-979</div>
+        11
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=12'">
+        <div class="numeros">111-117-321-414-441-461-524-564-595-733</div>
+        12
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=13'">
+        <div class="numeros">052-180-191-268-302-541-563-624-907-974</div>
+        13
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=14'">
+        <div class="numeros">005-053-088-358-715-775-790-919-943-944</div>
+        14
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=15'">
+        <div class="numeros">058-104-173-196-208-243-430-510-602-964</div>
+        15
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=16'">
+        <div class="numeros">162-174-178-193-307-326-432-466-592-949</div>
+        16
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=17'">
+        <div class="numeros">036-042-066-260-382-551-658-826-845-915</div>
+        17
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=18'">
+        <div class="numeros">311-317-329-538-686-710-714-749-809-836</div>
+        18
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=19'">
+        <div class="numeros">008-012-412-523-600-769-818-837-852-921</div>
+        19
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=20'">
+        <div class="numeros">048-112-166-189-282-356-687-701-905-940</div>
+        20
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=21'">
+        <div class="numeros">056-129-221-249-313-500-506-621-663-859</div>
+        21
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=22'">
+        <div class="numeros">084-092-126-192-255-383-420-814-847-886</div>
+        22
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=23'">
+        <div class="numeros">175-261-314-380-381-465-634-740-782-786</div>
+        23
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=24'">
+        <div class="numeros">359-405-407-485-493-571-618-620-639-709</div>
+        24
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=25'">
+        <div class="numeros">121-156-163-179-486-609-695-795-815-952</div>
+        25
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=26'">
+        <div class="numeros">016-102-280-295-301-319-352-741-803-956</div>
+        26
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=27'">
+        <div class="numeros">144-244-297-309-445-477-830-946-947-981</div>
+        27
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=28'">
+        <div class="numeros">093-181-508-608-612-691-718-805-900-938</div>
+        28
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=29'">
+        <div class="numeros">137-353-417-488-527-642-670-783-839-983</div>
+        29
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=30'">
+        <div class="numeros">269-276-345-436-504-614-615-623-726-913</div>
+        30
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=31'">
+        <div class="numeros">055-203-234-363-547-734-761-872-885-951</div>
+        31
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=32'">
+        <div class="numeros">078-303-372-409-517-647-652-755-850-969</div>
+        32
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=33'">
+        <div class="numeros">031-091-168-286-533-567-651-706-817-874</div>
+        33
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=34'">
+        <div class="numeros">230-355-410-427-554-676-864-896-918-989</div>
+        34
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=35'">
+        <div class="numeros">013-051-087-265-287-361-683-711-945-995</div>
+        35
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=36'">
+        <div class="numeros">002-095-152-392-395-513-514-586-675-679</div>
+        36
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=37'">
+        <div class="numeros">399-415-425-469-470-520-532-565-973-992</div>
+        37
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=38'">
+        <div class="numeros">073-149-190-274-401-421-557-561-605-953</div>
+        38
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=39'">
+        <div class="numeros">020-083-281-370-376-468-519-692-725-924</div>
+        39
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=40'">
+        <div class="numeros">139-296-386-434-568-577-655-798-853-883</div>
+        40
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=41'">
+        <div class="numeros">142-236-238-540-548-604-693-721-957-998</div>
+        41
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=42'">
+        <div class="numeros">059-086-219-267-338-440-459-462-536-674</div>
+        42
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=43'">
+        <div class="numeros">113-176-188-328-333-495-521-688-821-928</div>
+        43
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=44'">
+        <div class="numeros">132-153-308-316-331-408-472-475-789-942</div>
+        44
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=45'">
+        <div class="numeros">040-064-069-183-233-330-454-463-732-991</div>
+        45
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=46'">
+        <div class="numeros">001-067-106-449-552-574-668-672-762-935</div>
+        46
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=47'">
+        <div class="numeros">041-133-360-413-617-619-750-838-863-965</div>
+        47
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=48'">
+        <div class="numeros">025-185-223-262-379-562-597-640-680-958</div>
+        48
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=49'">
+        <div class="numeros">110-119-254-334-569-589-599-629-763-828</div>
+        49
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=50'">
+        <div class="numeros">147-200-335-388-442-476-553-601-656-971</div>
+        50
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=51'">
+        <div class="numeros">004-324-435-480-487-546-796-807-862-954</div>
+        51
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=52'">
+        <div class="numeros">134-141-177-186-525-682-694-708-960-1000</div>
+        52
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=53'">
+        <div class="numeros">079-197-235-332-543-610-784-892-914-963</div>
+        53
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=54'">
+        <div class="numeros">374-378-390-391-626-703-759-811-841-934</div>
+        54
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=55'">
+        <div class="numeros">072-150-239-240-336-422-724-835-898-923</div>
+        55
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=56'">
+        <div class="numeros">160-201-216-293-322-419-606-664-667-986</div>
+        56
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=57'">
+        <div class="numeros">123-164-502-503-578-671-719-903-910-937</div>
+        57
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=58'">
+        <div class="numeros">171-231-285-289-320-451-526-735-962-994</div>
+        58
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=59'">
+        <div class="numeros">130-170-259-354-362-387-528-573-822-861</div>
+        59
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=60'">
+        <div class="numeros">125-535-559-570-729-764-824-858-870-897</div>
+        60
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=61'">
+        <div class="numeros">050-116-214-226-232-627-781-917-941-977</div>
+        61
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=62'">
+        <div class="numeros">124-237-298-481-560-576-596-638-754-833</div>
+        62
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=63'">
+        <div class="numeros">033-136-290-306-448-498-737-753-787-813</div>
+        63
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=64'">
+        <div class="numeros">034-046-065-253-464-549-645-689-800-876</div>
+        64
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=65'">
+        <div class="numeros">082-118-155-158-213-342-522-622-757-875</div>
+        65
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=66'">
+        <div class="numeros">029-250-478-479-511-684-747-770-797-812</div>
+        66
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=67'">
+        <div class="numeros">035-039-076-182-431-450-633-739-842-848</div>
+        67
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=68'">
+        <div class="numeros">043-074-397-489-509-588-666-751-825-993</div>
+        68
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=69'">
+        <div class="numeros">098-151-339-367-534-603-616-738-765-927</div>
+        69
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=70'">
+        <div class="numeros">007-010-080-090-169-256-305-343-438-505</div>
+        70
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=71'">
+        <div class="numeros">205-251-310-460-491-530-583-628-723-975</div>
+        71
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=72'">
+        <div class="numeros">195-283-294-474-515-539-580-632-731-868</div>
+        72
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=73'">
+        <div class="numeros">032-217-371-411-482-650-669-681-699-802</div>
+        73
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=74'">
+        <div class="numeros">006-264-279-384-453-558-743-760-823-936</div>
+        74
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=75'">
+        <div class="numeros">038-062-108-398-423-716-799-819-840-902</div>
+        75
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=76'">
+        <div class="numeros">011-284-318-393-406-426-483-566-644-982</div>
+        76
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=77'">
+        <div class="numeros">015-049-157-299-544-832-877-881-890-922</div>
+        77
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=78'">
+        <div class="numeros">070-212-241-246-531-653-779-844-865-967</div>
+        78
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=79'">
+        <div class="numeros">003-014-159-337-728-843-851-867-948-966</div>
+        79
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=80'">
+        <div class="numeros">300-327-348-394-496-516-705-768-860-999</div>
+        80
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=81'">
+        <div class="numeros">107-122-242-366-368-545-637-643-660-685</div>
+        81
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=82'">
+        <div class="numeros">172-494-499-507-542-690-713-866-925-970</div>
+        82
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=83'">
+        <div class="numeros">437-631-648-661-702-772-780-849-894-901</div>
+        83
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=84'">
+        <div class="numeros">060-120-210-248-257-275-598-745-930-950</div>
+        84
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=85'">
+        <div class="numeros">019-068-347-351-492-512-555-582-649-700</div>
+        85
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=86'">
+        <div class="numeros">022-063-103-165-373-707-746-788-882-899</div>
+        86
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=87'">
+        <div class="numeros">018-081-270-344-377-416-593-625-766-888</div>
+        87
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=88'">
+        <div class="numeros">094-101-148-273-518-720-727-752-767-972</div>
+        88
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=89'">
+        <div class="numeros">135-154-228-252-304-315-325-810-893-904</div>
+        89
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=90'">
+        <div class="numeros">075-127-346-402-404-635-677-834-909-990</div>
+        90
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=91'">
+        <div class="numeros">009-021-027-085-161-501-773-776-816-891</div>
+        91
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=92'">
+        <div class="numeros">054-109-187-350-418-447-584-662-791-976</div>
+        92
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=93'">
+        <div class="numeros">211-340-369-375-717-722-801-831-869-871</div>
+        93
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=94'">
+        <div class="numeros">292-579-591-748-771-856-889-908-911-916</div>
+        94
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=95'">
+        <div class="numeros">023-145-497-537-587-611-730-736-794-939</div>
+        95
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=96'">
+        <div class="numeros">138-194-202-396-585-712-744-778-878-912</div>
+        96
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=97'">
+        <div class="numeros">057-114-128-433-467-641-704-880-931-961</div>
+        97
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=98'">
+        <div class="numeros">146-167-224-428-429-646-793-804-895-997</div>
+        98
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=99'">
+        <div class="numeros">044-045-131-143-220-266-550-742-854-926</div>
+        99
+    </button>
+    
+    <button class="boleto" onclick="window.location.href='registro.html?id=100'">
+        <div class="numeros">017-077-229-490-607-774-808-933-980-985</div>
+        100
+    </button>
+    
+</div>
+
+</body>
+</html>
