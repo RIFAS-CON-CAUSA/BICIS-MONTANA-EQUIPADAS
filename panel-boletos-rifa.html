@@ -582,7 +582,8 @@
     
 </div>
 <script>
-  fetch(https://script.google.com/macros/s/AKfycbxJ_yAdTG2y-AKsBdsja5TZRPrlMa_lbRY80wgCMb3pqmdIgYRM6xndsKpMrcGCKXY/exec)
+fetch("https://script.google.com/macros/s/AKfycbxJ_yAdTG2y-AKsBdsja5TZRPrlMa_lbRY80wgCMb3pqmdIgYRM6xndsKpMrcGCKXY/exec", {
+
     .then(response => response.json())
     .then(data => {
       data.forEach(boleto => {
