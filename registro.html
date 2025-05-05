@@ -70,14 +70,14 @@
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({
-      ID: idboleto,
-      Nombre: nombre,
-      Telefono: telefono,
-      Poblacion: poblacion,
-      Estado: "Apartado"
-    })
-  });
+  body: JSON.stringify({
+  idboleto: idboleto,
+  Nombre: nombre,
+  Telefono: telefono,
+  Poblacion: poblacion,
+  Estado: "Apartado"
+})
+});
 
   alert(`¡Tu boleto #${idboleto} ha sido apartado correctamente!\nEl administrador revisará tu pago para confirmar.`);
   window.location.href = "panel-boletos-rifa.html";
