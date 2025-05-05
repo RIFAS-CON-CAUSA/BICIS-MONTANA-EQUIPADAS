@@ -581,6 +581,23 @@
     </button>
     
 </div>
+<script>
+  fetch(https://script.google.com/macros/s/AKfycbxJ_yAdTG2y-AKsBdsja5TZRPrlMa_lbRY80wgCMb3pqmdIgYRM6xndsKpMrcGCKXY/exec)
+    .then(response => response.json())
+    .then(data => {
+      data.forEach(boleto => {
+        const button = document.querySelector(`button[onclick*="id=${boleto.ID}"]`);
+        if (button) {
+          if (boleto.Estado === 'Apartado') {
+            button.classList.add('apartado');
+          } else if (boleto.Estado === 'No disponible') {
+            button.classList.add('no-disponible');
+          }
+        }
+      });
+    })
+    .catch(error => console.error('Error al cargar los datos:', error));
+</script>
 
 </body>
 </html>
