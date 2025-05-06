@@ -72,28 +72,24 @@
       }
 
       fetch("https://script.google.com/macros/s/AKfycbykd-_FQAOpWmbxl2yTPWWq_gQNbRcbXH5QkHtoI30DKbc-XTU6GtOaSzynMwSls6RZ/exec", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          idboleto: idboleto,
-          Nombre: nombre,
-          Telefono: telefono,
-          Poblacion: poblacion,
-          Estado: "Apartado"
-        })
-      })
-      .then(response => response.text())
-      .then(data => {
-        alert(`✅ ¡Tu boleto #${idboleto} ha sido apartado correctamente!\nEl administrador revisará tu pago para confirmar.`);
-        window.location.href = "panel-boletos-rifa.html";
-      })
-      .catch(error => {
-        console.error("Error:", error);
-        alert("❌ Hubo un error al apartar tu boleto. Intenta nuevamente.");
-      });
-    }
-  </script>
-</body>
-</html>
+  method: "POST",
+  mode: "no-cors",  // <- esto evita el error CORS
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    idboleto: idboleto,
+    Nombre: nombre,
+    Telefono: telefono,
+    Poblacion: poblacion,
+    Estado: "Apartado"
+  })
+})
+.then(() => {
+  alert(`✅ ¡Tu boleto #${idboleto} ha sido apartado correctamente!`);
+  window.location.href = "panel-boletos-rifa.html";
+})
+.catch(error => {
+  console.error("Error:", error);
+  alert("❌ Hubo un error al apartar tu boleto. Intenta nuevamente.");
+});
