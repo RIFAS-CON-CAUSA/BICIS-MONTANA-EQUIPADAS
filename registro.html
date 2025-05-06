@@ -1,22 +1,109 @@
-fetch("https://script.google.com/macros/s/AKfycbykd-_FQAOpWmbxl2yTPWWq_gQNbRcbXH5QkHtoI30DKbc-XTU6GtOaSzynMwSls6RZ/exec", {
-  method: "POST",
-  mode: "no-cors",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    idboleto: idboleto,
-    Nombre: nombre,
-    Telefono: telefono,
-    Poblacion: poblacion,
-    Estado: "Apartado"
-  })
-})
-.then(() => {
-  alert(`✅ ¡Tu boleto #${idboleto} ha sido apartado correctamente!`);
-  window.location.href = "panel-boletos-rifa.html";
-})
-.catch(error => {
-  console.error("Error:", error);
-  alert("❌ Hubo un error al apartar tu boleto. Intenta nuevamente.");
-});
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro de Boleto</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f3fbe6;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 40px;
+    }
+
+    .contenedor {
+      background-color: white;
+      padding: 20px 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      text-align: left;
+      width: 300px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #1d3c10;
+    }
+
+    label {
+      font-weight: bold;
+      margin-top: 10px;
+      display: block;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      width: 100%;
+      background-color: #2d7928;
+      color: white;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background-color: #aaa;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="contenedor">
+    <h2>Registro de Boleto</h2>
+    <form id="formulario-registro" onsubmit="enviarFormulario(event)">
+      <label>Nombre:</label>
+      <input type="text" id="nombre" required>
+
+      <label>Teléfono:</label>
+      <input type="text" id="telefono" required>
+
+      <label>Población:</label>
+      <input type="text" id="poblacion" required>
+
+      <button type="submit" id="btnEnviar">🎟️ Apartar Boleto</button>
+    </form>
+  </div>
+
+  <script>
+    function enviarFormulario(e) {
+      e.preventDefault();
+
+      const params = new URLSearchParams(window.location.search);
+      const idboleto = params.get("id");
+
+      const nombre = document.getElementById("nombre").value.trim();
+      const telefono = document.getElementById("telefono").value.trim();
+      const poblacion = document.getElementById("poblacion").value.trim();
+
+      if (!nombre || !telefono || !poblacion || !idboleto) {
+        alert("Por favor, completa todos los campos.");
+        return;
+      }
+
+      // Desactivar botón mientras se procesa
+      const boton = document.getElementById("btnEnviar");
+      boton.disabled = true;
+      boton.textContent = "⏳ Enviando...";
+
+      fetch("https://script.google.com/macros/s/AKfycbykd-_FQAOpWmbxl2yTPWWq_gQNbRcbXH5QkHtoI30DKbc-XTU6GtOaSzynMwSls6RZ/exec", {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          idboleto: idboleto,
+
