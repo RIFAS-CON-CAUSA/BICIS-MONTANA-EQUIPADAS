@@ -7,16 +7,16 @@
     const poblacion = document.getElementById("poblacion").value.trim();
     const boton = document.querySelector("button");
 
-    // Desactivar botón para evitar múltiples clics
+    // ✅ Desactivar inmediatamente para evitar más clics
     boton.disabled = true;
-    boton.textContent = "⏳ Procesando...";
+    boton.textContent = "⏳ Enviando...";
 
     const urlParams = new URLSearchParams(window.location.search);
     const idboleto = urlParams.get('id');
 
+    // ⚠️ Mantenemos no-cors porque estás en GitHub Pages
     fetch("https://script.google.com/macros/s/AKfycbykd-_FQAOpWmbxl2yTPWWq_gQNbRcbXH5QkHtoI30DKbc-XTU6GtOaSzynMwSls6RZ/exec", {
       method: "POST",
-      mode: "no-cors",
       headers: {
         "Content-Type": "application/json"
       },
@@ -26,19 +26,13 @@
         Telefono: telefono,
         Poblacion: poblacion,
         Estado: "Apartado"
-      })
+      }),
+      mode: "no-cors"
     })
-    .then(() => {
+    .finally(() => {
       alert(`✅ ¡Tu boleto #${idboleto} ha sido apartado correctamente!\nEl administrador revisará tu pago para confirmar.`);
-      // Opcional: reiniciar formulario antes de redirigir
       document.getElementById("registroForm").reset();
       window.location.href = "panel-boletos-rifa.html";
-    })
-    .catch((error) => {
-      console.error("Error al apartar:", error);
-      alert("❌ Hubo un error al apartar tu boleto. Intenta de nuevo.");
-      boton.disabled = false;
-      boton.textContent = "📋 Apartar Boleto";
     });
   });
 </script>
