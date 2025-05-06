@@ -3,24 +3,67 @@
 <head>
   <meta charset="UTF-8">
   <title>Registro de Boleto</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f1f8e9;
+      padding: 20px;
+    }
+    form {
+      max-width: 400px;
+      margin: auto;
+      background: #ffffff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+    }
+    label {
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #2E7D32;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #1B5E20;
+    }
+  </style>
 </head>
 <body>
-  <h2>Registro de Boleto</h2>
+  <h2 style="text-align:center;">Registro de Boleto</h2>
   <form onsubmit="enviarFormulario(); return false;">
-    <label>Nombre:</label><br>
-    <input type="text" id="nombre" required><br>
-    <label>Teléfono:</label><br>
-    <input type="text" id="telefono" required><br>
-    <label>Población:</label><br>
-    <input type="text" id="poblacion" required><br><br>
-    <button type="submit">Apartar Boleto</button>
+    <label>Nombre:</label>
+    <input type="text" id="nombre" required>
+
+    <label>Teléfono:</label>
+    <input type="tel" id="telefono" required>
+
+    <label>Población:</label>
+    <input type="text" id="poblacion" required>
+
+    <button type="submit">📨 Apartar Boleto</button>
   </form>
 
   <script>
     function enviarFormulario() {
-      const nombre = document.getElementById("nombre").value;
-      const telefono = document.getElementById("telefono").value;
-      const poblacion = document.getElementById("poblacion").value;
+      const nombre = document.getElementById("nombre").value.trim();
+      const telefono = document.getElementById("telefono").value.trim();
+      const poblacion = document.getElementById("poblacion").value.trim();
       const idboleto = new URLSearchParams(window.location.search).get('id');
 
       if (!nombre || !telefono || !poblacion || !idboleto) {
@@ -28,9 +71,8 @@
         return;
       }
 
-      fetch("https://script.google.com/macros/s/AKfycbxJ_yAdTG2Y-AKS8dsJa5TZRP1Ma_1bRY8WwgCMb3pqmdTgYRM6xndsKpMrGCGKXY/exec", {
+      fetch("https://script.google.com/macros/s/AKfycbykd-_FQAOpWmbxl2yTPWWq_gQNbRcbXH5QkHtoI30DKbc-XTU6GtOaSzynMwSls6RZ/exec", {
         method: "POST",
-        mode: "cors",
         headers: {
           "Content-Type": "application/json"
         },
@@ -44,12 +86,12 @@
       })
       .then(response => response.text())
       .then(data => {
-        alert(`¡Tu boleto #${idboleto} ha sido apartado correctamente!\nEl administrador revisará tu pago para confirmar.`);
+        alert(`✅ ¡Tu boleto #${idboleto} ha sido apartado correctamente!\nEl administrador revisará tu pago para confirmar.`);
         window.location.href = "panel-boletos-rifa.html";
       })
       .catch(error => {
         console.error("Error:", error);
-        alert("Hubo un error al apartar tu boleto. Intenta nuevamente.");
+        alert("❌ Hubo un error al apartar tu boleto. Intenta nuevamente.");
       });
     }
   </script>
