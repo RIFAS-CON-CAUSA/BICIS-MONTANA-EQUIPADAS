@@ -1,38 +1,109 @@
-<script>
-  document.getElementById("registroForm").addEventListener("submit", function(event) {
-    event.preventDefault();
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Boleto</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f1f9e8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 400px;
+    }
+    label {
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0 15px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    button {
+      width: 100%;
+      background-color: #2e7d32;
+      color: white;
+      padding: 10px;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #1b5e20;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Registro de Boleto</h2>
+    <form id="formulario">
+      <label for="nombre">Nombre:</label>
+      <input type="text" id="nombre" required>
 
-    const nombre = document.getElementById("nombre").value.trim();
-    const telefono = document.getElementById("telefono").value.trim();
-    const poblacion = document.getElementById("poblacion").value.trim();
-    const boton = document.querySelector("button");
+      <label for="telefono">Teléfono:</label>
+      <input type="text" id="telefono" required>
 
-    // ✅ Desactivar inmediatamente para evitar más clics
-    boton.disabled = true;
-    boton.textContent = "⏳ Enviando...";
+      <label for="poblacion">Población:</label>
+      <input type="text" id="poblacion" required>
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const idboleto = urlParams.get('id');
+      <button type="submit">🎚 Apartar Boleto</button>
+    </form>
+  </div>
 
-    // ⚠️ Mantenemos no-cors porque estás en GitHub Pages
-    fetch("https://script.google.com/macros/s/AKfycbykd-_FQAOpWmbxl2yTPWWq_gQNbRcbXH5QkHtoI30DKbc-XTU6GtOaSzynMwSls6RZ/exec", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        idboleto: idboleto,
-        Nombre: nombre,
-        Telefono: telefono,
-        Poblacion: poblacion,
-        Estado: "Apartado"
-      }),
-      mode: "no-cors"
-    })
-    .finally(() => {
-      alert(`✅ ¡Tu boleto #${idboleto} ha sido apartado correctamente!\nEl administrador revisará tu pago para confirmar.`);
-      document.getElementById("registroForm").reset();
-      window.location.href = "panel-boletos-rifa.html";
+  <script>
+    window.addEventListener("DOMContentLoaded", function() {
+      document.getElementById('formulario').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const nombre = document.getElementById("nombre").value;
+        const telefono = document.getElementById("telefono").value;
+        const poblacion = document.getElementById("poblacion").value;
+        const idboleto = new URLSearchParams(window.location.search).get('id');
+
+        if (!nombre || !telefono || !poblacion || !idboleto) {
+          alert("Por favor completa todos los campos.");
+          return;
+        }
+
+        fetch("https://script.google.com/macros/s/AKfycbykd-_FQAOpWmbxl2yTPWWq_gQNbRcbXH5QkHtoI30DKbc-XTU6GtOaSzynMwSls6RZ/exec", {
+          method: "POST",
+          mode: "cors",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            idboleto: idboleto,
+            Nombre: nombre,
+            Telefono: telefono,
+            Poblacion: poblacion,
+            Estado: "Apartado"
+          })
+        })
+        .then(response => response.text())
+        .then(data => {
+          alert(`¡Tu boleto #${idboleto} ha sido apartado correctamente!\nEl administrador revisará tu pago para confirmar.`);
+          document.getElementById("formulario").reset();
+          window.location.href = "panel-boletos-rifa.html";
+        })
+        .catch(error => {
+          console.error("Error:", error);
+          alert("Hubo un error al apartar tu boleto. Intenta nuevamente.");
+        });
+      });
     });
-  });
-</script>
+  </script>
+</body>
+</html>
