@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Boletos de la rifa</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f3fbe6;
+    }
+
+    .titulo {
+      margin: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 10px;
+      max-width: 1000px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .boleto {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 60px;
+      font-size: 18px;
+    }
+
+    .apartado {
+      background-color: #FFC107 !important;
+    }
+
+    .no-disponible {
+      background-color: #F44336 !important;
+      cursor: not-allowed;
+    }
+
+    .mensaje-final {
+      margin-top: 40px;
+      font-size: 18px;
+      color: #333;
+      text-align: center;
+    }
+
+    .boton-inicio {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #004aad;
+      color: white;
+      font-weight: bold;
+      border-radius: 10px;
+      text-decoration: none;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .boton-inicio:hover {
+      background-color: #002f6c;
+    }
+  </style>
+</head>
+
+<body>
+  <a class="boton-inicio" href="index.html">⬅️ Volver al inicio</a>
+
+  <div class="titulo">
+    <h2>RIFA – ELIGE TU BOLETO</h2>
+    <h2>ES SEGURO QUE ALGUIEN QUE COMPRE UN BOLETO SE GANARÁ LAS TRES BICIS PERRONAS</h2>
+    <p>🟩 Disponible | 🟨 Apartado | 🟥 No disponible</p>
+  </div>
+
+  <div class="grid" id="contenedor-boletos">
+    <!-- Aquí se insertarán los boletos -->
+  </div>
+
+  <div class="mensaje-final">
+    🏆 <strong>¡Gracias por apoyar esta gran causa!</strong><br><br>
+    Cada boleto es una oportunidad para impulsar el deporte, motivar a la juventud<br>
+    y fomentar una vida activa y saludable. <br><br>
+    ¡Entrarle a la rifa es creer en los sueños, en las bicis perronas… y en ti mismo! 🚴‍♂️💪
+  </div>
+
+  <script>
+    const urlScript = 'https://script.google.com/macros/s/AKfycbykd-_FQAOpWmbxl2yTPWWq_gQNbRcbXH5QkHtoI30DKbc-XTU6GtOaSzynMwSls6RZ/exec';
+    const contenedor = document.getElementById('contenedor-boletos');
+
+    fetch(urlScript)
+      .then(res => res.json())
+      .then(data => {
+        const boletosApartados = new Set();
+        const boletosVendidos = new Set();
+
+        data.forEach(reg => {
+          if (reg.Estado === "Apartado") boletosApartados.add(reg.idboleto);
+          if (reg.Estado === "Vendido") boletosVendidos.add(reg.idboleto);
+        });
+
+        for (let i = 1; i <= 100; i++) {
+          const btn = document.createElement("button");
+          btn.className = "boleto";
+          btn.textContent = i;
+
+          if (boletosVendidos.has(String(i))) {
+            btn.classList.add("no-disponible");
+            btn.disabled = true;
+          } else if (boletosApartados.has(String(i))) {
+            btn.classList.add("apartado");
+          }
+
+          btn.onclick = () => window.location.href = `registro.html?id=${i}`;
+
+          contenedor.appendChild(btn);
+        }
+      })
+      .catch(err => {
+        console.error("Error al cargar boletos:", err);
+        alert("Hubo un problema al cargar los boletos. Intenta más tarde.");
+      });
+  </script>
+</body>
+</html>
