@@ -3,36 +3,81 @@
 <head>
   <meta charset="UTF-8">
   <title>Registro de Boleto</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f7e8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .formulario {
+      background-color: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 15px rgba(0,0,0,0.1);
+      width: 320px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      width: 100%;
+      background-color: #388e3c;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #2e7d32;
+    }
+  </style>
 </head>
-<body style="font-family: Arial, sans-serif; background-color: #f4fbe7; text-align: center; padding: 40px;">
-  <h2>Registro de Boleto</h2>
+<body>
+  <div class="formulario">
+    <h2>Registro de Boleto</h2>
+    <form id="registroForm">
+      <label for="nombre">Nombre:</label>
+      <input type="text" id="nombre" required>
 
-  <form onsubmit="enviarFormulario(); return false;" style="display: inline-block; padding: 20px; background-color: white; border-radius: 10px;">
-    <label><strong>Nombre:</strong></label><br>
-    <input type="text" id="nombre" required style="width: 100%; padding: 8px;"><br><br>
+      <label for="telefono">Teléfono:</label>
+      <input type="tel" id="telefono" required>
 
-    <label><strong>Teléfono:</strong></label><br>
-    <input type="text" id="telefono" required style="width: 100%; padding: 8px;"><br><br>
+      <label for="poblacion">Población:</label>
+      <input type="text" id="poblacion" required>
 
-    <label><strong>Población:</strong></label><br>
-    <input type="text" id="poblacion" required style="width: 100%; padding: 8px;"><br><br>
-
-    <button type="submit" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px;">
-      🧾 Apartar Boleto
-    </button>
-  </form>
+      <button type="submit">📋 Apartar Boleto</button>
+    </form>
+  </div>
 
   <script>
-    function enviarFormulario() {
+    document.getElementById("registroForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+
       const nombre = document.getElementById("nombre").value;
       const telefono = document.getElementById("telefono").value;
       const poblacion = document.getElementById("poblacion").value;
-      const idboleto = new URLSearchParams(window.location.search).get('id');
 
-      if (!nombre || !telefono || !poblacion || !idboleto) {
-        alert("Por favor completa todos los campos.");
-        return;
-      }
+      const urlParams = new URLSearchParams(window.location.search);
+      const idboleto = urlParams.get('id');
 
       fetch("https://script.google.com/macros/s/AKfycbykd-_FQAOpWmbxl2yTPWWq_gQNbRcbXH5QkHtoI30DKbc-XTU6GtOaSzynMwSls6RZ/exec", {
         method: "POST",
@@ -52,11 +97,11 @@
         alert(`✅ ¡Tu boleto #${idboleto} ha sido apartado correctamente!\nEl administrador revisará tu pago para confirmar.`);
         window.location.href = "panel-boletos-rifa.html";
       })
-      .catch(error => {
-        console.error("Error:", error);
-        alert("❌ Hubo un error al apartar tu boleto. Intenta nuevamente.");
+      .catch((error) => {
+        console.error("Error al apartar:", error);
+        alert("❌ Hubo un error al apartar tu boleto. Intenta de nuevo.");
       });
-    }
+    });
   </script>
 </body>
 </html>
