@@ -2,60 +2,58 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Boletos de la rifa</title>
+  <title>Panel de Boletos</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      text-align: center;
       background-color: #f3fbe6;
+      padding: 20px;
+      text-align: center;
     }
-
-    .titulo {
-      margin: 20px;
-    }
-
     .grid {
       display: grid;
       grid-template-columns: repeat(10, 1fr);
       gap: 10px;
-      max-width: 1000px;
-      margin: auto;
-      padding: 20px;
+      max-width: 1200px;
+      margin: 20px auto;
     }
-
     .boleto {
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .boleto:hover {
+      transform: scale(1.05);
+    }
+    .disponible {
       background-color: #4CAF50;
       color: white;
-      padding: 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 60px;
-      font-size: 18px;
     }
-
     .apartado {
-      background-color: #FFC107 !important;
+      background-color: #FFC107;
+      color: black;
     }
-
     .no-disponible {
-      background-color: #F44336 !important;
-      cursor: not-allowed;
+      background-color: #F44336;
+      color: white;
     }
-
+    .numeros {
+      font-size: 11px;
+      margin-bottom: 4px;
+    }
+    .leyenda {
+      margin-top: 10px;
+    }
     .mensaje-final {
-      margin-top: 40px;
-      font-size: 18px;
-      color: #333;
-      text-align: center;
+      margin-top: 30px;
+      font-size: 16px;
     }
-
     .boton-inicio {
       display: inline-block;
-      margin-top: 20px;
+      margin-bottom: 20px;
       padding: 10px 20px;
       background-color: #004aad;
       color: white;
@@ -64,25 +62,22 @@
       text-decoration: none;
       box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
     }
-
     .boton-inicio:hover {
       background-color: #002f6c;
     }
   </style>
 </head>
-
 <body>
   <a class="boton-inicio" href="index.html">⬅️ Volver al inicio</a>
 
-  <div class="titulo">
-    <h2>RIFA – ELIGE TU BOLETO</h2>
-    <h2>ES SEGURO QUE ALGUIEN QUE COMPRE UN BOLETO SE GANARÁ LAS TRES BICIS PERRONAS</h2>
-    <p>🟩 Disponible | 🟨 Apartado | 🟥 No disponible</p>
+  <h2>RIFA – ELIGE TU BOLETO</h2>
+  <h3>ES SEGURO QUE ALGUIEN QUE COMPRE UN BOLETO SE GANARÁ LAS TRES BICIS PERRONAS</h3>
+
+  <div class="leyenda">
+    🟩 Disponible | 🟨 Apartado | 🟥 No disponible
   </div>
 
-  <div class="grid" id="contenedor-boletos">
-    <!-- Aquí se insertarán los boletos -->
-  </div>
+  <div id="contenedorBoletos" class="grid"></div>
 
   <div class="mensaje-final">
     🏆 <strong>¡Gracias por apoyar esta gran causa!</strong><br><br>
@@ -92,41 +87,50 @@
   </div>
 
   <script>
-    const urlScript = 'https://script.google.com/macros/s/AKfycbykd-_FQAOpWmbxl2yTPWWq_gQNbRcbXH5QkHtoI30DKbc-XTU6GtOaSzynMwSls6RZ/exec';
-    const contenedor = document.getElementById('contenedor-boletos');
+    const urlDatos = "https://script.google.com/macros/s/AKfycbzcO6N3MWaENgKcEVkb79lTPkWRqftALD-al-ZrzftHsRgLNgq2M6KKqZ9OmHWxrye_/exec";
 
-    fetch(urlScript)
-      .then(res => res.json())
-      .then(data => {
-        const boletosApartados = new Set();
-        const boletosVendidos = new Set();
+    // Generar 100 bloques de números aleatorios fijos
+    const boletosNumeros = Array.from({ length: 100 }, (_, i) => {
+      const base = i * 10;
+      return Array.from({ length: 10 }, (_, j) => Math.floor(1 + Math.random() * 999)).join('-');
+    });
 
-        data.forEach(reg => {
-          if (reg.Estado === "Apartado") boletosApartados.add(reg.idboleto);
-          if (reg.Estado === "Vendido") boletosVendidos.add(reg.idboleto);
-        });
+    function cargarBoletos() {
+      fetch(urlDatos)
+        .then(res => res.json())
+        .then(data => {
+          const contenedor = document.getElementById("contenedorBoletos");
+          contenedor.innerHTML = "";
 
-        for (let i = 1; i <= 100; i++) {
-          const btn = document.createElement("button");
-          btn.className = "boleto";
-          btn.textContent = i;
+          for (let i = 1; i <= 100; i++) {
+            const registro = data.find(b => parseInt(b.idboleto) === i);
+            let clase = "disponible";
+            if (registro) {
+              clase = registro.Estado === "Apartado" ? "apartado" : "no-disponible";
+            }
 
-          if (boletosVendidos.has(String(i))) {
-            btn.classList.add("no-disponible");
-            btn.disabled = true;
-          } else if (boletosApartados.has(String(i))) {
-            btn.classList.add("apartado");
+            const boton = document.createElement("button");
+            boton.className = `boleto ${clase}`;
+            boton.innerHTML = `
+              <div class="numeros">${boletosNumeros[i - 1]}</div>
+              ${i}
+            `;
+            if (clase === "disponible") {
+              boton.onclick = () => window.location.href = `registro.html?id=${i}`;
+            } else {
+              boton.style.cursor = "not-allowed";
+            }
+
+            contenedor.appendChild(boton);
           }
+        })
+        .catch(err => {
+          console.error("Error al cargar boletos:", err);
+          alert("Hubo un problema al cargar los boletos. Intenta más tarde.");
+        });
+    }
 
-          btn.onclick = () => window.location.href = `registro.html?id=${i}`;
-
-          contenedor.appendChild(btn);
-        }
-      })
-      .catch(err => {
-        console.error("Error al cargar boletos:", err);
-        alert("Hubo un problema al cargar los boletos. Intenta más tarde.");
-      });
+    window.onload = cargarBoletos;
   </script>
 </body>
 </html>
