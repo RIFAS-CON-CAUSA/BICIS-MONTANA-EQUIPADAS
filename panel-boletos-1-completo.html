@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Boletos - Bloque 1</title>
+  <style>
+    body { font-family: Arial; text-align: center; padding: 20px; background: #ffffff; }
+    #panel { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 20px; }
+    .boleto { display: flex; flex-direction: column; align-items: center; border: 2px solid #ccc; padding: 10px; border-radius: 10px; background: #f9f9f9; }
+    .numeros { font-size: 12px; margin-bottom: 6px; color: #34495e; }
+    button { padding: 10px; font-size: 16px; border: none; border-radius: 6px; cursor: pointer; color: white; width: 100%; }
+    .disponible { background-color: #2ecc71; }
+    .apartado { background-color: #f1c40f; }
+    .pagado { background-color: #e74c3c; }
+    .leyenda {
+      margin-top: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+    .leyenda div {
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      color: white;
+    }
+    .verde { background-color: #2ecc71; }
+    .amarillo { background-color: #f1c40f; color: black; }
+    .rojo { background-color: #e74c3c; }
+    .boton-inicio {
+      margin-top: 40px;
+      display: inline-block;
+      padding: 10px 24px;
+      font-size: 16px;
+      border-radius: 30px;
+      background-color: #1b5e20;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>RIFA – ELIGE TU BOLETO</h1>
+  <h2>ES SEGURO QUE ALGUIEN QUE COMPRE UN BOLETO SE GANARÁ LAS TRES BICIS PERRONAS</h2>
+  <h2>Panel de Boletos - Bloque 1 (Boletos 1 al 50)</h2>
+
+  <div class="leyenda">
+    <div class="verde">Disponible</div>
+    <div class="amarillo">Apartado</div>
+    <div class="rojo">Pagado</div>
+  </div>
+
+  <div id="panel"></div>
+
+  <p>¿Buscas del 51 al 100? 👉 <a href="panel-boletos-2.html">Ir al Bloque 2</a></p>
+  <div id="mensaje-causa">
+    🏆 ¡Gracias por apoyar esta gran causa!<br>
+    Cada boleto es una oportunidad para impulsar el deporte, motivar a la juventud<br>
+    y fomentar una vida activa y saludable.<br>
+    ¡Entrarle a la rifa es creer en los sueños, en las bicis perronas… y en ti mismo! 🚴‍♂️💪
+  </div>
+
+  <a class="boton-inicio" href="index.html">🏠 Ir al Inicio</a>
+
+  <script>
+
+const oportunidadesPorBoleto = [['228', '304', '433', '298', '456', '092', '006', '424', '159', '134'], ['262', '076', '102', '453', '185', '358', '370', '365', '444', '021'], ['109', '336', '216', '250', '149', '350', '245', '181', '220', '485'], ['381', '139', '402', '400', '449', '215', '315', '187', '317', '127'], ['306', '190', '353', '227', '015', '440', '327', '419', '048', '121'], ['341', '384', '093', '357', '004', '205', '484', '289', '018', '037'], ['414', '390', '487', '210', '045', '040', '486', '125', '177', '032'], ['396', '427', '474', '377', '299', '072', '488', '070', '441', '000'], ['268', '204', '213', '321', '254', '495', '241', '246', '059', '252'], ['096', '338', '108', '363', '322', '323', '129', '217', '078', '432'], ['176', '150', '418', '361', '349', '476', '461', '477', '123', '010'], ['146', '115', '095', '393', '020', '226', '282', '369', '055', '170'], ['138', '466', '081', '168', '075', '287', '426', '366', '057', '062'], ['380', '001', '392', '054', '475', '036', '090', '285', '105', '232'], ['019', '085', '340', '086', '005', '007', '116', '407', '249', '024'], ['049', '362', '131', '328', '073', '084', '260', '309', '386', '385'], ['344', '151', '329', '083', '167', '277', '458', '436', '038', '052'], ['044', '469', '211', '231', '355', '156', '281', '316', '283', '443'], ['406', '171', '314', '230', '397', '297', '136', '023', '388', '033'], ['141', '206', '130', '188', '272', '152', '179', '371', '242', '420'], ['184', '097', '043', '462', '351', '259', '120', '435', '201', '266'], ['378', '053', '118', '209', '212', '030', '428', '094', '457', '463'], ['445', '154', '253', '472', '263', '291', '360', '223', '025', '143'], ['051', '318', '248', '255', '202', '430', '332', '387', '200', '313'], ['165', '401', '274', '099', '058', '042', '144', '325', '373', '333'], ['132', '470', '244', '142', '174', '027', '157', '404', '479', '175'], ['234', '251', '022', '409', '416', '117', '450', '155', '112', '162'], ['491', '089', '394', '324', '031', '009', '166', '423', '411', '110'], ['335', '270', '307', '061', '161', '088', '460', '439', '172', '247'], ['399', '375', '119', '492', '431', '446', '063', '100', '080', '074'], ['348', '499', '345', '014', '319', '002', '104', '160', '214', '240'], ['368', '421', '296', '082', '408', '163', '064', '069', '292', '191'], ['236', '339', '114', '077', '403', '269', '295', '337', '008', '257'], ['192', '480', '467', '026', '133', '271', '482', '126', '137', '288'], ['494', '278', '256', '395', '178', '326', '113', '312', '229', '383'], ['182', '016', '147', '410', '489', '438', '331', '300', '189', '091'], ['276', '429', '111', '447', '382', '243', '391', '225', '471', '067'], ['056', '273', '103', '029', '459', '454', '367', '310', '199', '164'], ['041', '003', '218', '034', '222', '122', '208', '417', '342', '498'], ['279', '035', '238', '493', '265', '478', '013', '196', '303', '379'], ['496', '183', '412', '011', '442', '017', '405', '464', '465', '065'], ['359', '308', '481', '047', '197', '258', '293', '028', '046', '101'], ['068', '066', '098', '347', '290', '079', '374', '087', '354', '452'], ['294', '415', '050', '106', '224', '135', '173', '376', '372', '286'], ['490', '235', '352', '451', '346', '330', '193', '356', '145', '483'], ['275', '186', '153', '124', '221', '437', '239', '280', '237', '389'], ['301', '039', '343', '233', '169', '422', '311', '071', '434', '468'], ['284', '398', '302', '448', '473', '107', '140', '219', '180', '497'], ['060', '267', '195', '203', '425', '158', '261', '264', '320', '194'], ['364', '198', '128', '413', '305', '012', '334', '455', '207', '148']];
+
+    const panel = document.getElementById("panel");
+    for (let i = 1; i <= 50; i++) {
+      const div = document.createElement("div");
+      div.className = "boleto";
+
+      const nums = document.createElement("div");
+      nums.className = "numeros";
+      nums.textContent = oportunidadesPorBoleto[i - 1].join(" · ");
+
+      const boton = document.createElement("button");
+      boton.textContent = `Boleto #${i}`;
+      boton.className = "disponible";
+      boton.setAttribute("data-id", i);
+      boton.onclick = () => window.location.href = `registro.html?boleto=${i}`;
+
+      div.appendChild(nums);
+      div.appendChild(boton);
+      panel.appendChild(div);
+    }
+
+    fetch("https://script.google.com/macros/s/AKfycbz_dgyOatalQl0X9ejmawPzaWpZHH5ISFy66oWLHwMLm4HHA1T6m7XLi5mmFZgea9NZ/exec")
+      .then(res => res.json())
+      .then(data => {
+        data.forEach(boleto => {
+          const btn = document.querySelector(`button[data-id='${boleto.id}']`);
+          if (btn) {
+            btn.className = boleto.estado;
+            if (boleto.estado === 'pagado') btn.disabled = true;
+          }
+        });
+      });
+  </script>
+</body>
+</html>
