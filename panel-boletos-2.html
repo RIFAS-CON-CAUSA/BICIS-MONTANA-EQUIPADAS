@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Boletos - Bloque 2</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: bold;
+      color: #c0392b;
+      margin-bottom: 10px;
+    }
+    h2 {
+      color: #2c3e50;
+    }
+    #panel {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .boleto {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 2px solid #bdc3c7;
+      border-radius: 10px;
+      padding: 10px;
+      background: #f9f9f9;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .numeros {
+      font-size: 12px;
+      margin-bottom: 6px;
+      color: #34495e;
+    }
+    button {
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      color: white;
+      width: 100%;
+    }
+    .disponible { background-color: #2ecc71; }
+    .apartado { background-color: #f1c40f; }
+    .pagado { background-color: #e74c3c; }
+    #instruccion {
+      font-size: 18px;
+      margin-bottom: 10px;
+      background: #ecf0f1;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    #navegacion {
+      margin-top: 30px;
+      font-size: 16px;
+    }
+    #mensaje-causa {
+      margin-top: 40px;
+      font-size: 18px;
+      color: #2c3e50;
+      font-weight: bold;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>RIFA – ELIGE TU BOLETO<br>ES SEGURO QUE ALGUIEN QUE COMPRE UN BOLETO SE GANARÁ LAS TRES BICIS PERRONAS</h1>
+  <h2>Panel de Boletos - Bloque 2 (Boletos 51 al 100)</h2>
+  <div id="instruccion">
+    Cada boleto contiene 10 oportunidades únicas entre 500 y 999.<br>
+    Elige el boleto que desees dando clic sobre él. Los colores indican:
+    <br><b style="color:#2ecc71">Verde: Disponible</b>,
+    <b style="color:#f1c40f">Amarillo: Apartado</b>,
+    <b style="color:#e74c3c">Rojo: Pagado</b>.
+  </div>
+  <div id="panel"></div>
+  <div id="navegacion">
+    ¿Buscas del 1 al 50? 👉 <a href="panel-boletos-1.html">Ir al Bloque 1</a>
+  </div>
+  <div id="mensaje-causa">
+    🏆 ¡Gracias por apoyar esta gran causa!<br><br>
+    Cada boleto es una oportunidad para impulsar el deporte, motivar a la juventud<br>
+    y fomentar una vida activa y saludable.<br><br>
+    ¡Entrarle a la rifa es creer en los sueños, en las bicis perronas… y en ti mismo! 🚴‍♂️💪
+  </div>
+  <script>
+    const oportunidadesPorBoleto = [
+      ["614", "839", "733", "970", "737", "510", "959", "500", "981", "601"],
+      ["773", "847", "515", "819", "719", "512", "602", "818", "724", "578"],
+      ["656", "654", "952", "735", "942", "961", "622", "851", "501", "825"],
+      ["811", "936", "938", "732", "523", "507", "624", "506", "621", "544"],
+      ["905", "943", "870", "666", "591", "715", "589", "808", "998", "561"],
+      ["794", "932", "963", "587", "861", "873", "803", "564", "660", "786"],
+      ["848", "729", "967", "538", "979", "898", "833", "530", "768", "883"],
+      ["537", "752", "626", "634", "636", "951", "838", "638", "750", "741"],
+      ["648", "860", "862", "675", "508", "574", "994", "855", "734", "793"],
+      ["509", "615", "583", "637", "657", "694", "921", "828", "644", "623"],
+      ["829", "980", "642", "972", "600", "824", "949", "582", "805", "663"],
+      ["939", "667", "693", "832", "812", "655", "837", "632", "918", "701"],
+      ["944", "651", "874", "736", "744", "705", "513", "550", "760", "830"],
+      ["761", "540", "594", "958", "866", "788", "910", "748", "708", "625"],
+      ["950", "912", "616", "542", "769", "596", "669", "971", "524", "563"],
+      ["581", "821", "577", "546", "836", "762", "722", "742", "684", "853"],
+      ["661", "620", "982", "968", "718", "652", "852", "911", "770", "868"],
+      ["810", "739", "795", "767", "526", "807", "920", "900", "927", "613"],
+      ["996", "757", "954", "991", "643", "766", "592", "983", "713", "569"],
+      ["704", "904", "668", "688", "903", "629", "627", "619", "973", "877"],
+      ["700", "560", "679", "789", "710", "966", "631", "817", "618", "717"],
+      ["541", "692", "554", "791", "588", "570", "536", "503", "682", "562"],
+      ["843", "641", "844", "875", "539", "964", "857", "593", "584", "680"],
+      ["576", "702", "782", "650", "863", "919", "956", "834", "887", "730"],
+      ["884", "941", "665", "678", "962", "763", "977", "519", "548", "597"],
+      ["815", "916", "566", "888", "640", "522", "696", "714", "520", "907"],
+      ["845", "658", "955", "703", "645", "896", "531", "935", "606", "831"],
+      ["923", "517", "676", "790", "946", "897", "978", "505", "787", "630"],
+      ["690", "885", "711", "586", "775", "579", "778", "974", "892", "850"],
+      ["781", "673", "889", "926", "521", "995", "580", "749", "901", "893"],
+      ["571", "552", "945", "879", "842", "689", "933", "514", "865", "649"],
+      ["969", "559", "607", "635", "895", "856", "608", "854", "534", "937"],
+      ["928", "814", "813", "925", "533", "809", "738", "934", "929", "913"],
+      ["611", "975", "947", "999", "864", "993", "908", "605", "535", "801"],
+      ["547", "816", "976", "780", "511", "617", "743", "698", "567", "931"],
+      ["890", "746", "590", "504", "776", "960", "965", "532", "598", "674"],
+      ["953", "677", "558", "670", "849", "835", "603", "712", "731", "662"],
+      ["872", "988", "820", "758", "573", "646", "543", "878", "727", "599"],
+      ["595", "997", "914", "502", "683", "779", "894", "989", "695", "633"],
+      ["759", "940", "985", "880", "585", "930", "924", "555", "664", "785"],
+      ["823", "751", "802", "725", "948", "990", "755", "691", "806", "804"],
+      ["527", "827", "610", "772", "876", "774", "685", "792", "747", "902"],
+      ["723", "545", "753", "529", "720", "551", "841", "671", "986", "604"],
+      ["858", "917", "867", "826", "798", "882", "709", "572", "553", "915"],
+      ["565", "754", "777", "771", "745", "549", "653", "765", "800", "556"],
+      ["528", "609", "721", "869", "707", "699", "756", "728", "799", "686"],
+      ["628", "846", "557", "906", "881", "783", "922", "886", "957", "697"],
+      ["518", "740", "672", "984", "784", "716", "681", "639", "612", "726"],
+      ["706", "840", "516", "987", "891", "796", "797", "899", "764", "909"],
+      ["992", "575", "871", "822", "859", "568", "687", "647", "525", "659"]
+    ];
+    const panel = document.getElementById("panel");
+    for (let i = 1; i <= 50; i++) {
+      const div = document.createElement("div");
+      div.className = "boleto";
+
+      const nums = document.createElement("div");
+      nums.className = "numeros";
+      nums.textContent = oportunidadesPorBoleto[i - 1].join(" · ");
+
+      const boton = document.createElement("button");
+      boton.textContent = `Boleto #${50 + i}`;
+      boton.className = "disponible";
+      boton.onclick = () => alert(`Has seleccionado el boleto #${50 + i}`);
+
+      div.appendChild(nums);
+      div.appendChild(boton);
+      panel.appendChild(div);
+    }
+  </script>
+</body>
+</html>
