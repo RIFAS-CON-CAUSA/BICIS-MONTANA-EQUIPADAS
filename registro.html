@@ -82,7 +82,8 @@ const urlConsulta = "https://script.google.com/macros/s/AKfycbzcO6N3MWaENgKcEVkb
 const urlRegistro = "https://script.google.com/macros/s/AKfycbzcO6N3MWaENgKcEVkb79lTPkWRqftALD-al-ZrzftHsRgLNgq2M6KKqZ9OmHWxrye_/exec";
 
 const params = new URLSearchParams(window.location.search);
-const idboleto = params.get("id");
+const idboleto = params.get("boleto");
+
 
 async function enviarFormulario(e) {
   e.preventDefault();
