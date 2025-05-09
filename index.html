@@ -12,15 +12,6 @@
       padding: 0;
     }
 
-    .encabezado-causa {
-      background-color: #1976d2;
-      color: white;
-      text-align: center;
-      padding: 15px 20px;
-      font-size: 15px;
-      line-height: 1.5;
-    }
-
     .contenedor {
       max-width: 700px;
       margin: auto;
@@ -29,12 +20,22 @@
       background-color: #f4fff0;
       border-radius: 10px;
       box-sizing: border-box;
-      margin-bottom: 90px;
+      margin-bottom: 90px; /* deja espacio para el flotante */
     }
 
     h1, h2 {
       text-align: center;
       color: #1b5e20;
+    }
+
+    .texto-superior {
+      background-color: #1976d2;
+      color: white;
+      text-align: center;
+      padding: 15px 10px;
+      border-radius: 8px;
+      font-size: 15px;
+      margin-bottom: 20px;
     }
 
     .premio {
@@ -48,7 +49,7 @@
     .btn-ver {
       display: block;
       width: fit-content;
-      margin: 30px auto;
+      margin: 30px auto 10px;
       background-color: #2e7d32;
       color: white;
       font-weight: bold;
@@ -60,17 +61,17 @@
       text-align: center;
     }
 
-    .btn-facebook {
+    .enlace-facebook {
       display: block;
       width: fit-content;
-      margin: 10px auto;
+      margin: 10px auto 0;
       background-color: #2962ff;
       color: white;
-      font-weight: bold;
-      padding: 10px 20px;
+      padding: 10px 25px;
       border-radius: 30px;
+      text-align: center;
       text-decoration: none;
-      font-size: 15px;
+      font-weight: bold;
     }
 
     .btn-flotante {
@@ -89,20 +90,29 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.3);
       z-index: 999;
     }
+
+    img {
+      max-width: 100%;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
   </style>
 </head>
 <body>
 
-  <div class="encabezado-causa">
-    🥳 <strong>Gran Rifa de Bicicletas de Montaña 🚴</strong><br>
-    🏁 <strong>MOTIVEMOS A LOS JÓVENES AL DEPORTE, PORQUE EL DEPORTE ES SALUD.</strong><br>
-    🧡 Esta vez estamos apoyando a un joven de 14 años que está emprendiendo en este deporte del ciclismo.<br>
-    🔍 <strong>Necesita una bicicleta más super para ir a la competencia estatal.</strong>
-  </div>
-
   <div class="contenedor">
+    <div class="texto-superior">
+      <p>🥳 <strong>Gran Rifa de Bicicletas de Montaña</strong> 🚴</p>
+      <p>🏁 <strong>MOTIVEMOS A LOS JÓVENES AL DEPORTE, PORQUE EL DEPORTE ES SALUD.</strong></p>
+      <p>🧡 Esta vez estamos apoyando a un joven de 14 años que está emprendiendo en este deporte del ciclismo.</p>
+      <p>🔍 <strong>Necesita una bicicleta más super para ir a la competencia estatal.</strong></p>
+    </div>
+
     <h1>🎉 RIFA – BICIS MONTAÑA EQUIPADAS 🎉</h1>
     <h2>3 premios + envío gratis a todo México</h2>
+
+    <img src="https://github.com/RIFAS-CON-CAUSA/BICIS-MONTANA-EQUIPADAS/blob/main/las%202%20bicis.jpeg?raw=true" alt="Bicicletas">
+    <img src="https://github.com/RIFAS-CON-CAUSA/BICIS-MONTANA-EQUIPADAS/blob/main/Rising.jpeg?raw=true" alt="Bicicleta Rising">
 
     <div class="premio">
       <strong>🏆 1.er Premio: Bicicleta Olympus (seminueva)</strong>
@@ -130,13 +140,13 @@
 
     <div class="premio">
       <strong>🎁 3.er Premio adicional: Bicicleta Mercurio 26 (básica, ganada recientemente en una competencia local)</strong>
-      <p>📢 Este premio es para quien comparta la publicación en redes sociales (una compartida por número, una sola vez basta, hazlo uno cada día y te lo agradecemos).</p>
-      <p>📦 Además, ¡envío GRATIS a todo México si compartiste!</p>
+      <p>📢 Este premio te lo ganas... si compraste mas de 3 boletos y compartiste la publicación en facebook (una compartida por número, una sola vez basta, hazlo uno cada día y te lo agradecemos).</p>
+      <p>📦 Además, ¡envío GRATIS a todo México!</p>
       <p>Recuerda escribir tu número participante en la publicación que compartas.</p>
     </div>
 
     <a class="btn-ver" href="panel-boletos-1.html">🎫 Ver boletos disponibles</a>
-    <a class="btn-facebook" href="https://www.facebook.com/profile.php?id=61576286602097" target="_blank">🔵 Ir a la publicación en Facebook</a>
+    <a class="enlace-facebook" href="https://www.facebook.com/profile.php?id=61576286602097" target="_blank">🔵 hacemos tu rifa, mas info en Facebook</a>
   </div>
 
   <a class="btn-flotante" href="https://wa.me/523311571619" target="_blank">
