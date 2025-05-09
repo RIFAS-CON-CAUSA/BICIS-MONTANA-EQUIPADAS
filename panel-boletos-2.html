@@ -1,55 +1,84 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Panel de Boletos - Bloque 2</title>
+  <title>Panel Boletos - Bloque 2</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial; text-align: center; padding: 20px; }
+    body { font-family: Arial; text-align: center; padding: 20px; background-color: #f4fff0; }
+    h1 { color: #1b5e20; margin-bottom: 10px; }
+    h2 { color: #388e3c; margin-top: 5px; }
+    p { font-weight: bold; color: #444; margin-top: 10px; }
     #panel { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 20px; }
-    .boleto { display: flex; flex-direction: column; align-items: center; border: 2px solid #ccc; padding: 10px; border-radius: 10px; background: #f9f9f9; }
-    .numeros { font-size: 12px; margin-bottom: 6px; color: #34495e; }
-    button { padding: 10px; font-size: 16px; border: none; border-radius: 6px; cursor: pointer; color: white; width: 100%; }
+    .boleto {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 2px solid #ccc;
+      padding: 10px;
+      border-radius: 10px;
+      background: #f9f9f9;
+    }
+    .numeros {
+      font-size: 12px;
+      margin-bottom: 6px;
+      color: #34495e;
+    }
+    button {
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      color: white;
+      width: 100%;
+    }
     .disponible { background-color: #2ecc71; }
     .apartado { background-color: #f1c40f; }
-    .pagado { background-color: #e74c3c; }
-    .leyenda { margin: 20px auto; background: #eee; padding: 8px; display: inline-block; border-radius: 8px; }
-    .btn-index { background: #0a6012; color: white; padding: 10px 20px; border-radius: 12px; text-decoration: none; display: inline-block; margin-top: 20px; }
+    .pagado { background-color: #e74c3c; cursor: not-allowed; }
   </style>
 </head>
 <body>
   <h1>RIFA – ELIGE TU BOLETO</h1>
   <h2>ES SEGURO QUE ALGUIEN QUE COMPRE UN BOLETO SE GANARÁ LAS TRES BICIS PERRONAS</h2>
-  <h2>Panel de Boletos - Bloque 2 (Boletos 51 al 100)</h2>
-  <div class="leyenda">
-    <span style="color: white; background: #2ecc71; padding: 5px 10px; border-radius: 5px;">Verde: Disponible</span>
-    <span style="color: black; background: #f1c40f; padding: 5px 10px; border-radius: 5px;">Amarillo: Apartado</span>
-    <span style="color: white; background: #e74c3c; padding: 5px 10px; border-radius: 5px;">Rojo: Pagado</span>
-  </div>
+  <p>🟢 Verde: Disponible &nbsp;&nbsp;&nbsp; 🟡 Amarillo: Apartado &nbsp;&nbsp;&nbsp; 🔴 Rojo: Pagado</p>
   <div id="panel"></div>
-  <a href="index.html" class="btn-index">🏠 Ir al Inicio</a>
+  <p>¿Buscas del 1 al 50? 👉 <a href="panel-boletos-1.html">Ir al Bloque 1</a></p>
 
   <script>
-    const boletos = [[674, 712, 682, 797, 867, 556, 672, 932, 512, 857], [754, 851, 643, 562, 676, 616, 991, 615, 655, 827], [836, 995, 972, 669, 552, 881, 664, 583, 660, 731], [850, 539, 651, 768, 517, 842, 545, 705, 559, 898], [584, 595, 697, 631, 693, 863, 534, 952, 770, 931], [714, 684, 729, 596, 704, 893, 902, 937, 749, 543], [822, 858, 794, 825, 510, 907, 549, 864, 810, 733], [649, 815, 928, 603, 978, 579, 965, 611, 589, 744], [713, 634, 891, 680, 751, 801, 530, 513, 566, 947], [837, 535, 597, 979, 696, 758, 989, 818, 730, 807], [723, 717, 580, 789, 661, 614, 816, 819, 563, 925], [820, 567, 945, 511, 599, 803, 621, 874, 861, 953], [590, 604, 921, 901, 536, 553, 951, 943, 585, 840], [798, 756, 860, 688, 574, 503, 636, 897, 625, 996], [833, 740, 784, 526, 998, 834, 791, 687, 739, 934], [617, 686, 757, 824, 711, 912, 938, 890, 788, 918], [679, 646, 763, 971, 987, 662, 538, 799, 694, 766], [613, 570, 601, 602, 683, 823, 635, 778, 769, 853], [879, 645, 884, 892, 939, 576, 618, 509, 533, 963], [960, 620, 748, 507, 609, 871, 544, 741, 522, 948], [844, 809, 690, 911, 500, 572, 761, 967, 671, 523], [812, 647, 716, 866, 927, 654, 557, 970, 628, 923], [759, 887, 702, 882, 598, 942, 578, 856, 885, 828], [565, 913, 895, 605, 706, 608, 726, 955, 869, 870], [900, 719, 551, 922, 623, 974, 573, 588, 626, 624], [537, 718, 903, 843, 665, 564, 859, 668, 554, 894], [541, 875, 644, 984, 849, 633, 773, 689, 838, 600], [774, 808, 959, 629, 975, 640, 753, 977, 524, 776], [968, 525, 670, 771, 862, 873, 872, 896, 765, 752], [637, 969, 886, 720, 715, 519, 790, 663, 846, 677], [909, 785, 795, 811, 502, 728, 910, 725, 656, 854], [767, 555, 929, 926, 721, 936, 709, 673, 830, 992], [652, 782, 764, 966, 906, 904, 701, 899, 582, 504], [997, 743, 698, 916, 521, 657, 917, 593, 592, 772], [650, 514, 742, 981, 692, 876, 983, 835, 501, 547], [569, 946, 800, 648, 550, 806, 515, 813, 619, 685], [581, 667, 847, 804, 710, 745, 518, 976, 707, 880], [990, 956, 520, 703, 852, 817, 792, 542, 666, 738], [568, 732, 632, 675, 681, 658, 944, 964, 691, 587], [915, 908, 606, 638, 986, 659, 779, 924, 814, 708], [786, 594, 889, 586, 839, 993, 722, 506, 845, 950], [957, 571, 848, 949, 777, 532, 735, 558, 528, 980], [914, 841, 747, 607, 760, 610, 540, 653, 985, 746], [855, 994, 695, 829, 787, 954, 805, 734, 920, 505], [737, 793, 755, 546, 868, 802, 935, 508, 639, 642], [762, 531, 641, 796, 821, 736, 999, 832, 982, 826], [941, 727, 961, 591, 962, 529, 780, 877, 627, 577], [930, 878, 888, 783, 958, 933, 678, 630, 700, 516], [940, 724, 831, 548, 988, 575, 781, 905, 699, 622], [919, 527, 883, 865, 973, 775, 561, 750, 560, 612]];
-    const panel = document.getElementById("panel");
-    let contador = 51;
+    const oportunidadesPorBoleto = [];
+    let usados = new Set();
 
-    boletos.forEach(series => {
+    while (usados.size < 500) {
+      usados.add(String(500 + Math.floor(Math.random() * 500)).padStart(3, '0'));
+    }
+    const todos = Array.from(usados);
+
+    for (let i = 0; i < 50; i++) {
+      oportunidadesPorBoleto.push(todos.slice(i * 10, i * 10 + 10));
+    }
+
+    const panel = document.getElementById("panel");
+    for (let i = 51; i <= 100; i++) {
       const div = document.createElement("div");
       div.className = "boleto";
+
       const nums = document.createElement("div");
       nums.className = "numeros";
-      nums.textContent = series.map(n => String(n).padStart(3, '0')).join(" · ");
+      nums.textContent = oportunidadesPorBoleto[i - 51].join(" · ");
+
       const boton = document.createElement("button");
-      boton.textContent = `Boleto #${contador}`;
+      boton.textContent = `Boleto #${i}`;
       boton.className = "disponible";
-      boton.setAttribute("data-id", contador);
-      boton.onclick = () => window.location.href = `registro.html?boleto=${contador}`;
+      boton.setAttribute("data-id", i);
+      boton.onclick = () => {
+        window.location.href = `registro.html?id=${i}`;
+      };
+
       div.appendChild(nums);
       div.appendChild(boton);
       panel.appendChild(div);
-      contador++;
-    });
+    }
 
     fetch("https://script.google.com/macros/s/AKfycbz3izwDGnZJpKj2TUfIRPIcL29j1tlqduw6lpZW90UY5IQMUzi2ByNWAx5IX9igDi8D/exec")
       .then(res => res.json())
@@ -57,11 +86,27 @@
         data.forEach(boleto => {
           const btn = document.querySelector(`button[data-id='${boleto.id}']`);
           if (btn) {
-            btn.className = boleto.Estado.toLowerCase();
-            if (boleto.Estado.toLowerCase() === 'pagado') btn.disabled = true;
+            btn.className = boleto.estado;
+            if (boleto.estado === 'pagado') btn.disabled = true;
+            if (boleto.estado === 'apartado') btn.onclick = () => alert(`🚧 Boleto #${boleto.id} está apartado.`);
           }
         });
       });
   </script>
+
+  <a href="index.html" style="
+    display: block;
+    margin: 30px auto 0;
+    background-color: #1b5e20;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 16px;
+    text-decoration: none;
+    border: 2px solid #fdd835;
+    width: fit-content;">
+    🏠 Volver al inicio
+  </a>
 </body>
 </html>
