@@ -110,7 +110,7 @@
 
     <h1>🎉 RIFA – BICIS MONTAÑA EQUIPADAS 🎉</h1>
     <h2>3 premios + envío gratis a todo México</h2>
-      <h2>se rifa en base a la loteria nacional con los 3 ultimos numeros del premio mayor del dia 30 de mayo de 2025 </h2>
+    <h2>se rifa en base a la loteria nacional con los 3 ultimos numeros del premio mayor del dia 30 de mayo de 2025 </h2>
 
     <img src="https://github.com/RIFAS-CON-CAUSA/BICIS-MONTANA-EQUIPADAS/blob/main/las%202%20bicis.jpeg?raw=true" alt="Bicicletas">
     <img src="https://github.com/RIFAS-CON-CAUSA/BICIS-MONTANA-EQUIPADAS/blob/main/Rising.jpeg?raw=true" alt="Bicicleta Rising">
@@ -148,6 +148,22 @@
 
     <a class="btn-ver" href="panel-boletos-1.html">🎫 Ver boletos disponibles</a>
     <a class="enlace-facebook" href="https://www.facebook.com/profile.php?id=61576286602097" target="_blank">🔵 hacemos tu rifa, mas info en Facebook</a>
+
+    <button onclick="document.getElementById('modalBases').style.display='block'" style="display:block; margin:20px auto 0; background:#1976d2; color:white; padding:10px 20px; border:none; border-radius:30px; font-weight:bold; font-size:14px; cursor:pointer;">
+      📜 Bases del sorteo
+    </button>
+
+    <div id="modalBases" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
+      <div style="background:white; max-width:500px; margin:10% auto; padding:20px; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.3); font-family:Arial;">
+        <h3 style="margin-top:0; color:#2e7d32;">📜 Bases del sorteo</h3>
+        <ul style="padding-left:20px; line-height:1.5;">
+          <li>🔁 Si el número ganador resulta no pagado o no vendido, la rifa se repite en un plazo máximo de 8 días y vuelven a participar todos los boletos existentes.</li>
+          <li>📊 Si se llega el plazo de hacer la rifa y no se ha vendido el 80% de los boletos, el administrador podrá reprogramarla hasta por 15 días más.</li>
+        </ul>
+        <p style="margin-top:20px; font-style:italic; color:#555;">*Gracias. Nuestra misión: transparencia, respeto y calidad.*</p>
+        <button onclick="document.getElementById('modalBases').style.display='none'" style="margin-top:10px; background:#e53935; color:white; border:none; padding:8px 16px; border-radius:20px; font-weight:bold; cursor:pointer;">Cerrar</button>
+      </div>
+    </div>
   </div>
 
   <a class="btn-flotante" href="https://wa.me/523311571619" target="_blank">
