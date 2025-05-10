@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Panel de Boletos - Rifa con Causa</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0fff5;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      color: #1b5e20;
+    }
+    .indicadores {
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+    .indicadores span {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 10px;
+      margin: 5px;
+      color: white;
+    }
+    .disponible-label { background: #2ecc71; }
+    .apartado-label { background: #f1c40f; }
+    .pagado-label { background: #e74c3c; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .boleto {
+      background: #ffffff;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .numeros {
+      font-size: 13px;
+      margin-bottom: 8px;
+      color: #444;
+    }
+    .boton {
+      background-color: #2ecc71;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 14px;
+      cursor: pointer;
+      animation: rebote 0.8s ease;
+      transition: transform 0.2s;
+    }
+    .boton:hover {
+      transform: scale(1.1);
+    }
+    .apartado { background-color: #f1c40f !important; }
+    .pagado { background-color: #e74c3c !important; }
+
+    @keyframes rebote {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .volver {
+      margin-top: 30px;
+      display: inline-block;
+      background: #2e7d32;
+      color: white;
+      padding: 12px 25px;
+      text-decoration: none;
+      border-radius: 25px;
+      font-weight: bold;
+      border: 2px solid #fbc02d;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎫 RIFA – ELIGE TU BOLETO</h1>
+  <p>¡Del 000 al 999, sin repeticiones! Cada boleto tiene 10 oportunidades.</p>
+  
+  <div class="indicadores">
+    <span class="disponible-label">Disponible</span>
+    <span class="apartado-label">Apartado</span>
+    <span class="pagado-label">Pagado</span>
+  </div>
+
+  <div class="grid" id="panel"></div>
+
+  <a class="volver" href="index.html">⬅ Volver al inicio</a>
+
+  <script>
+    // Generar 1000 números del 000 al 999 sin repetir
+    const todos = Array.from({ length: 1000 }, (_, i) => i.toString().padStart(3, '0'));
+    todos.sort(() => Math.random() - 0.5); // aleatorizar
+
+    // Agrupar de 10 en 10
+    const boletos = [];
+    for (let i = 0; i < 100; i++) {
+      boletos.push(todos.slice(i * 10, (i + 1) * 10));
+    }
+
+    const panel = document.getElementById('panel');
+    boletos.forEach((grupo, index) => {
+      const div = document.createElement('div');
+      div.className = 'boleto';
+
+      const numeros = document.createElement('div');
+      numeros.className = 'numeros';
+      numeros.textContent = grupo.join(' · ');
+
+      const boton = document.createElement('button');
+      boton.textContent = `Boleto #${(index + 1).toString().padStart(3, '0')}`;
+      boton.className = 'boton disponible';
+      boton.dataset.boleto = index + 1;
+
+      boton.onclick = () => {
+        const id = boton.dataset.boleto;
+        window.location.href = `registro.html?boleto=${id}`;
+      };
+
+      div.appendChild(numeros);
+      div.appendChild(boton);
+      panel.appendChild(div);
+    });
+
+    // Traer estados desde Google Sheets o Firebase
+    fetch("https://script.google.com/macros/s/AKfycbwCCNRE5wOiKFGGPJbsvg0JlhP4zCEpJ0lmGMBjQ7A1I8EPtqrQp1hktrejsNL8sLyw/exec")
+      .then(res => res.json())
+      .then(data => {
+        data.forEach(b => {
+          const btn = document.querySelector(`.boton[data-boleto="${b.id}"]`);
+          if (btn) {
+            btn.classList.remove("disponible");
+            btn.classList.add(b.estado);
+            if (b.estado === "pagado") btn.disabled = true;
+          }
+        });
+      });
+  </script>
+</body>
+</html>
