@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Ingreso Administrativo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #f4f4f4;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .acceso {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+    input[type="password"] {
+      padding: 10px;
+      font-size: 16px;
+      width: 100%;
+      margin: 15px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #2e7d32;
+      color: white;
+      padding: 10px 25px;
+      border: none;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="acceso">
+    <h2>Acceso Administrativo</h2>
+    <input type="password" id="clave" placeholder="Ingresa la contraseña">
+    <button onclick="verificarClave()">Entrar</button>
+    <div id="mensaje" class="error"></div>
+  </div>
+
+  <script>
+    const CLAVE_CORRECTA = "admin2024"; // Puedes cambiar esta clave
+
+    function verificarClave() {
+      const claveIngresada = document.getElementById("clave").value;
+      const mensaje = document.getElementById("mensaje");
+
+      if (claveIngresada === CLAVE_CORRECTA) {
+        window.location.href = "panel-admin.html"; // redirige al verdadero panel
+      } else {
+        mensaje.textContent = "Clave incorrecta. Intenta nuevamente.";
+      }
+    }
+  </script>
+</body>
+</html>
