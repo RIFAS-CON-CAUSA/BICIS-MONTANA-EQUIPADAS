@@ -1,59 +1,69 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Boleto de Participación</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
+      background: #fdfdfd;
       font-family: Arial, sans-serif;
-      background-color: #f0fff4;
+      margin: 0;
       padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .recibo {
+      background: #ffffff;
+      border: 2px solid #1976d2;
+      padding: 25px;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 360px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .titulo {
       text-align: center;
-    }
-
-    .boleto {
-      max-width: 400px;
-      margin: auto;
-      background: white;
-      border: 4px dashed #4caf50;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    h1 {
-      color: #2e7d32;
-      font-size: 22px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #1976d2;
       margin-bottom: 10px;
     }
 
-    .dato {
+    .info {
+      margin: 10px 0;
       font-size: 16px;
-      margin: 8px 0;
-      color: #333;
     }
 
-    .numeros {
-      font-size: 18px;
+    .oportunidades {
+      margin-top: 20px;
+      padding: 10px;
+      background: #e3f2fd;
+      border-radius: 8px;
+      text-align: center;
       font-weight: bold;
-      color: #d32f2f;
-      margin: 15px 0;
+      font-size: 18px;
+      color: #0d47a1;
+      letter-spacing: 2px;
     }
 
-    .gracias {
-      margin-top: 20px;
-      font-size: 14px;
-      color: #444;
+    .agradecimiento {
+      margin-top: 30px;
+      font-size: 15px;
+      text-align: center;
       font-style: italic;
+      color: #555;
     }
 
-    .volver {
-      margin-top: 20px;
-      display: inline-block;
+    .boton {
+      display: block;
+      text-align: center;
+      margin: 25px auto 0;
+      padding: 10px 20px;
       background: #2e7d32;
       color: white;
-      padding: 10px 20px;
       border-radius: 20px;
       text-decoration: none;
       font-weight: bold;
@@ -61,29 +71,31 @@
   </style>
 </head>
 <body>
+  <div class="recibo">
+    <div class="titulo">BOLETO DE PARTICIPACIÓN</div>
+    <div class="info"><strong>Nombre:</strong> <span id="nombre"></span></div>
+    <div class="info"><strong>Folio:</strong> #<span id="folio"></span></div>
+    <div class="info"><strong>Fecha:</strong> <span id="fecha"></span></div>
 
-  <div class="boleto">
-    <h1>🎟️ BOLETO DE PARTICIPACIÓN</h1>
-    <div class="dato" id="folio"></div>
-    <div class="dato" id="nombre"></div>
-    <div class="numeros" id="oportunidades"></div>
-    <div class="gracias">
-      Gracias por apoyar esta causa. ¡Mucho éxito!
+    <div class="oportunidades" id="oportunidades"></div>
+
+    <div class="agradecimiento">
+      ¡Gracias por apoyar esta noble causa!
     </div>
+
+    <a class="boton" href="index.html">⬅ Volver al Inicio</a>
   </div>
 
-  <a class="volver" href="index.html">⬅ Volver al inicio</a>
-
   <script>
-    const url = new URLSearchParams(window.location.search);
-    const folio = url.get("folio") || "000";
-    const nombre = url.get("nombre") || "Nombre no registrado";
-    const oportunidades = url.get("op") || "";
+    const params = new URLSearchParams(window.location.search);
+    const nombre = params.get("nombre") || "Participante";
+    const folio = params.get("folio") || "000";
+    const op = (params.get("op") || "").split(",");
 
-    document.getElementById("folio").textContent = "Folio: " + folio;
-    document.getElementById("nombre").textContent = "Nombre: " + decodeURIComponent(nombre);
-    document.getElementById("oportunidades").textContent = "Oportunidades: " + oportunidades.split(",").join(" · ");
+    document.getElementById("nombre").textContent = nombre;
+    document.getElementById("folio").textContent = folio;
+    document.getElementById("fecha").textContent = new Date().toLocaleDateString("es-MX");
+    document.getElementById("oportunidades").textContent = op.join(" · ");
   </script>
-
 </body>
 </html>
