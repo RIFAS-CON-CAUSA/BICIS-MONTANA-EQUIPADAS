@@ -4,11 +4,6 @@
   <meta charset="UTF-8">
   <title>Registro de Boleto</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
   <style>
     body {
       background-color: #f4fce3;
@@ -78,6 +73,13 @@
     .volver:hover {
       background-color: #075607;
     }
+
+    .mensaje-final {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 14px;
+      color: #444;
+    }
   </style>
 </head>
 <body>
@@ -95,27 +97,14 @@
 
       <button type="submit" id="btnEnviar">🎟️ Apartar Boleto</button>
     </form>
-    <a class="volver" href="panel-boletos-1.html">⬅ Ir al Panel de Boletos 1</a>
+    <a class="volver" href="panel-boletos-1.html">⬅ Volver al Panel</a>
+    <div class="mensaje-final">Gracias por apoyar esta causa. <br>"Por una juventud más inducida al deporte... porque el deporte es salud".</div>
   </div>
 
   <script>
-    // Configuración Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
-      authDomain: "rifas-con-causa.firebaseapp.com",
-      projectId: "rifas-con-causa",
-      storageBucket: "rifas-con-causa.appspot.com",
-      messagingSenderId: "347417635634",
-      appId: "1:347417635634:web:3ddab8921d26707910452b"
-    };
-
-    // Inicializar Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-
+    const urlRegistro = "https://script.google.com/macros/s/AKfycbwCCNRE5wOiKFGGPJbsvg0JlhP4zCEpJ0lmGMBjQ7A1I8EPtqrQp1hktrejsNL8sLyw/exec";
     const params = new URLSearchParams(window.location.search);
-    const idboleto = params.get("id");
-
+    const idboleto = params.get("boleto");
 
     async function enviarFormulario(e) {
       e.preventDefault();
@@ -134,22 +123,31 @@
       boton.textContent = "⏳ Enviando...";
 
       try {
-        await db.collection("registroBoletos").add({
-          idboleto: idboleto,
-          Nombre: nombre,
-          Telefono: telefono,
-          Poblacion: poblacion,
-          Estado: "Apartado",
-          Fecha: new Date()
+        const res = await fetch(urlRegistro, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            idboleto: idboleto,
+            Nombre: nombre,
+            Telefono: telefono,
+            Poblacion: poblacion,
+            Estado: "Apartado"
+          })
         });
 
-        alert(`✅ ¡Tu boleto #${idboleto} ha sido apartado exitosamente! El sistema te da dos hrs para pagar o volverá a estar disponible. GRACIAS \n\n💳 Cuenta SPIN OXXO 4217 4701 5601 6160\n🔁 Clabe: 7289 6900 0143 3179 21    O si estas local a la peñita de jaltemba o zacualpan puedes pagar en directo con los organizadores de esta rifa`);
-        boton.textContent = "✔️ Apartado";
-        boton.disabled = true;
-
+        const data = await res.json();
+        if (data.status === "ok") {
+          alert(`✅ ¡Tu boleto #${idboleto} ha sido apartado exitosamente! Tienes dos horas para pagar. Si no se paga, se liberará automáticamente.`);
+          boton.textContent = "✔️ Apartado";
+          boton.disabled = true;
+        } else {
+          throw new Error("Error en la respuesta");
+        }
       } catch (error) {
         console.error("Error al registrar:", error);
-        alert("❌ Hubo un problema al registrar tu boleto. Intenta de nuevo.");
+        alert("Hubo un problema al registrar tu boleto. Intenta de nuevo.");
         boton.disabled = false;
         boton.textContent = "🎟️ Apartar Boleto";
       }
