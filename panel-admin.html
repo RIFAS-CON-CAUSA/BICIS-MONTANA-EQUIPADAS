@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel de Registros</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
+      authDomain: "rifas-con-causa.firebaseapp.com",
+      projectId: "rifas-con-causa",
+      storageBucket: "rifas-con-causa.appspot.com",
+      messagingSenderId: "347417635634",
+      appId: "1:347417635634:web:3ddab8921d26707910452b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.addEventListener("DOMContentLoaded", async () => {
+      const tabla = document.getElementById("tabla-boletos");
+      const tbody = document.getElementById("cuerpo-tabla");
+
+      const snapshot = await getDocs(collection(db, "boletos"));
+      let registros = [];
+      snapshot.forEach(doc => registros.push(doc.data()));
+
+      mostrarTabla(registros);
+
+      document.getElementById("filtro").addEventListener("input", e => {
+        const texto = e.target.value.toLowerCase();
+        const filtrados = registros.filter(r =>
+          r.nombre.toLowerCase().includes(texto) ||
+          r.poblacion.toLowerCase().includes(texto) ||
+          r.telefono.includes(texto) ||
+          String(r.idboleto).includes(texto) ||
+          r.estado.toLowerCase().includes(texto)
+        );
+        mostrarTabla(filtrados);
+      });
+    });
+
+    function mostrarTabla(data) {
+      const tbody = document.getElementById("cuerpo-tabla");
+      tbody.innerHTML = "";
+      data.forEach(r => {
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+          <td>#${r.idboleto}</td>
+          <td>${r.nombre}</td>
+          <td>${r.telefono}</td>
+          <td>${r.poblacion}</td>
+          <td>${r.estado}</td>
+          <td>${new Date(r.fecha).toLocaleString()}</td>
+        `;
+        tbody.appendChild(fila);
+      });
+    }
+  </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f8e9;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #2e7d32;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px auto 20px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      max-width: 400px;
+      display: block;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: center;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background: #a5d6a7;
+      color: #1b5e20;
+    }
+
+    tr:hover {
+      background: #f1f8e9;
+    }
+
+    .volver {
+      display: block;
+      margin: 30px auto;
+      text-align: center;
+      background: #2e7d32;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: bold;
+      width: fit-content;
+    }
+
+    @media (max-width: 600px) {
+      table, thead, tbody, th, td, tr {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h2>Panel de Boletos Registrados</h2>
+  <input type="text" id="filtro" placeholder="Buscar por nombre, teléfono, población, estado o boleto...">
+  <table id="tabla-boletos">
+    <thead>
+      <tr>
+        <th>Boleto</th>
+        <th>Nombre</th>
+        <th>Teléfono</th>
+        <th>Población</th>
+        <th>Estado</th>
+        <th>Fecha</th>
+      </tr>
+    </thead>
+    <tbody id="cuerpo-tabla"></tbody>
+  </table>
+  <a class="volver" href="index.html">⬅ Volver al Inicio</a>
+</body>
+</html>
