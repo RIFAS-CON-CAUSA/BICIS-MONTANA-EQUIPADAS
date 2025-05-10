@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Registro de Boleto</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     body {
       background-color: #f4fce3;
@@ -80,13 +80,13 @@
     <h2>Registro de Boleto</h2>
     <form id="formulario-registro" onsubmit="enviarFormulario(event)">
       <label>Nombre:</label>
-      <input type="text" id="nombre" required>
+      <input type="text" id="nombre" required />
 
       <label>Teléfono:</label>
-      <input type="text" id="telefono" required>
+      <input type="text" id="telefono" required />
 
       <label>Población:</label>
-      <input type="text" id="poblacion" required>
+      <input type="text" id="poblacion" required />
 
       <button type="submit" id="btnEnviar">🎟️ Apartar Boleto</button>
     </form>
@@ -94,9 +94,9 @@
   </div>
 
   <script>
-    const urlRegistro = "https://script.google.com/macros/s/AKfycbwCY1HUqQq4jkCkjNmNrvIKIlHQ8n6HCiaWPC7MKJxBFBP9B6mMNpZTjkAi-K8hmnLV/exec";
+    const urlRegistro = "https://script.google.com/macros/s/AKfycbwCCNRE5wOiKFGGPJbsvg0JlhP4zCEpJ0lmGMBjQ7A1I8EPtqrQp1hktrejsNL8sLyw/exec";
     const params = new URLSearchParams(window.location.search);
-    const idboleto = params.get("id"); // Confirmado que usas ?id= en la URL
+    const idboleto = params.get("id");
 
     async function enviarFormulario(e) {
       e.preventDefault();
@@ -132,14 +132,11 @@
         const data = await res.json();
 
         if (data.status === "ok") {
-          alert(`✅ ¡Tu boleto #${idboleto} ha sido apartado exitosamente! El sistema lo vuelve a poner disponible en dos hrs, Si no se paga,
-Cuenta SPIN OXXO: 4217 4701 5601 6160
-CLABE: 7289 6900 0143 3179 21
-O contáctanos para pago físico.`);
+          alert(`✅ ¡Tu boleto #${idboleto} ha sido apartado exitosamente! Tienes dos horas para pagar. Si no se paga, se pasa a "disponible". Cuenta: SPIN OXXO 4217 4701 5601 6160 — CLABE: 7289 6900 0143 3179 21`);
           boton.textContent = "✔️ Apartado";
           boton.disabled = true;
         } else {
-          throw new Error("Error en la respuesta del servidor.");
+          throw new Error("Error en la respuesta del servidor");
         }
 
       } catch (error) {
