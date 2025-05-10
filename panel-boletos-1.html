@@ -1,98 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Panel de Boletos - Rifa Bicis</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background-color: #f0fff0;
-      text-align: center;
-    }
-    h1 {
-      color: #1b5e20;
-    }
-    .leyenda {
-      background: #e8f5e9;
-      padding: 10px;
-      margin-bottom: 20px;
-      border-radius: 8px;
-    }
-    .leyenda span {
-      margin: 0 8px;
-      padding: 4px 10px;
-      border-radius: 20px;
-      color: white;
-      font-weight: bold;
-    }
-    .verde { background: #2ecc71; }
-    .amarillo { background: #f1c40f; }
-    .rojo { background: #e74c3c; }
-    #panel {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 15px;
-      margin-top: 20px;
-    }
-    .boleto {
-      border-radius: 10px;
-      padding: 10px;
-      background: #fff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-      transition: transform 0.2s ease;
-    }
-    .boleto:hover {
-      transform: scale(1.05);
-    }
-    .numeros {
-      font-size: 12px;
-      margin-bottom: 8px;
-      color: #555;
-    }
-    button {
-      width: 100%;
-      padding: 10px;
-      font-size: 14px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      color: white;
-      font-weight: bold;
-      transition: transform 0.1s;
-    }
-    button:active {
-      transform: scale(0.95);
-    }
-    .disponible { background: #2ecc71; }
-    .apartado { background: #f1c40f; }
-    .pagado { background: #e74c3c; }
-    .enlace-inicio {
-      display: inline-block;
-      margin-top: 30px;
-      background: #1b5e20;
-      padding: 10px 20px;
-      color: white;
-      border-radius: 25px;
-      text-decoration: none;
-      font-weight: bold;
-    }
-  </style>
-</head>
-<body>
-  <h1>RIFA – ELIGE TU BOLETO</h1>
-  <div class="leyenda">
-    <span class="verde">Disponible</span>
-    <span class="amarillo">Apartado</span>
-    <span class="rojo">Pagado</span>
-  </div>
-  <div id="panel"></div>
-  <a class="enlace-inicio" href="index.html">⬅ Volver al inicio</a>
-
+  <meta charset="UTF-8" />
+  <title>Panel Boletos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
@@ -106,57 +20,150 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const oportunidadesGeneradas = new Set();
-    function generarOportunidades(idboleto) {
-      const base = idboleto <= 50 ? 0 : 500;
-      const oportunidades = [];
-      while (oportunidades.length < 10) {
-        const num = String(base + Math.floor(Math.random() * 500)).padStart(3, '0');
-        if (!oportunidades.includes(num)) {
-          oportunidades.push(num);
-        }
+    const oportunidades = (base) => {
+      const lista = [];
+      const offset = base <= 50 ? 0 : 500;
+      for (let i = 0; i < 10; i++) {
+        lista.push(String(offset + (base * 10 + i) % 500).padStart(3, '0'));
       }
-      return oportunidades;
-    }
+      return lista;
+    };
 
-    async function cargarBoletos() {
-      const contenedor = document.getElementById("panel");
+    window.addEventListener("DOMContentLoaded", async () => {
+      const panel = document.getElementById("panel");
+
       for (let i = 1; i <= 100; i++) {
-        const id = i.toString().padStart(3, '0');
-        const oportunidades = generarOportunidades(i);
         const div = document.createElement("div");
         div.className = "boleto";
 
         const nums = document.createElement("div");
         nums.className = "numeros";
-        nums.textContent = oportunidades.join(" · ");
+        nums.textContent = oportunidades(i).join(" · ");
 
         const boton = document.createElement("button");
-        boton.textContent = `Boleto #${id}`;
+        boton.textContent = `#${String(i).padStart(3, '0')}`;
+        boton.dataset.id = i;
         boton.className = "disponible";
         boton.onclick = () => {
-          window.location.href = `registro.html?boleto=${id}`;
+          window.location.href = `registro.html?boleto=${i}`;
         };
-
-        // Traer estado desde Firestore
-        const ref = doc(db, "boletos", id);
-        const snap = await getDoc(ref);
-        if (snap.exists()) {
-          const estado = snap.data().estado;
-          if (estado === "apartado") boton.className = "apartado";
-          else if (estado === "pagado") {
-            boton.className = "pagado";
-            boton.disabled = true;
-          }
-        }
 
         div.appendChild(nums);
         div.appendChild(boton);
-        contenedor.appendChild(div);
+        panel.appendChild(div);
       }
+
+      const querySnapshot = await getDocs(collection(db, "boletos"));
+      querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const id = parseInt(data.idboleto);
+        const estado = data.estado?.toLowerCase();
+
+        const boton = document.querySelector(`button[data-id='${id}']`);
+        if (boton) {
+          boton.className = estado;
+
+          if (estado === "pagado") {
+            boton.disabled = false;
+            boton.onclick = () => {
+              const nombre = data.nombre || "Participante";
+              const op = oportunidades(id).join(',');
+              const url = `boleto-participacion.html?nombre=${encodeURIComponent(nombre)}&folio=${id}&op=${op}`;
+              window.open(url, "_blank");
+            };
+          }
+        }
+      });
+    });
+  </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f9f9f9;
+      text-align: center;
     }
 
-    cargarBoletos();
-  </script>
+    h2 {
+      color: #1b5e20;
+      margin-bottom: 10px;
+    }
+
+    .leyenda {
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #333;
+    }
+
+    #panel {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 14px;
+      margin-bottom: 30px;
+    }
+
+    .boleto {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0px 3px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+
+    .boleto:hover {
+      transform: scale(1.05);
+    }
+
+    .numeros {
+      font-size: 12px;
+      margin-bottom: 6px;
+      color: #444;
+    }
+
+    button {
+      width: 100%;
+      padding: 8px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      animation: rebote 0.8s;
+    }
+
+    @keyframes rebote {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    .disponible { background-color: #2ecc71; }
+    .apartado   { background-color: #f1c40f; }
+    .pagado     { background-color: #e74c3c; }
+
+    .boton-inicio {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #1976d2;
+      color: white;
+      border-radius: 25px;
+      font-weight: bold;
+      text-decoration: none;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <a class="boton-inicio" href="index.html">⬅ Volver al Inicio</a>
+
+  <h2>RIFA – ELIGE TU BOLETO</h2>
+  <div class="leyenda">
+    Verde = Disponible · Amarillo = Apartado · Rojo = Pagado
+  </div>
+  <div id="panel"></div>
+
+  <a class="boton-inicio" href="index.html">⬅ Volver al Inicio</a>
 </body>
 </html>
