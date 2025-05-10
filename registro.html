@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Registro de Boleto</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       background-color: #f4fce3;
@@ -11,7 +11,6 @@
       text-align: center;
       padding: 30px;
     }
-
     .contenedor {
       background: white;
       max-width: 400px;
@@ -20,19 +19,16 @@
       border-radius: 12px;
       box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
-
     h2 {
       color: #205b18;
       margin-bottom: 20px;
     }
-
     label {
       display: block;
       text-align: left;
       font-weight: bold;
       margin-top: 15px;
     }
-
     input {
       width: 100%;
       padding: 10px;
@@ -40,7 +36,6 @@
       border: 1px solid #ccc;
       border-radius: 6px;
     }
-
     button {
       margin-top: 20px;
       background-color: #2d7928;
@@ -52,7 +47,6 @@
       cursor: pointer;
       width: 100%;
     }
-
     .volver {
       margin-top: 20px;
       display: inline-block;
@@ -63,11 +57,6 @@
       text-decoration: none;
       font-weight: bold;
       font-size: 15px;
-      box-shadow: 0px 3px 6px rgba(0,0,0,0.2);
-    }
-
-    .volver:hover {
-      background-color: #075607;
     }
   </style>
 </head>
@@ -77,85 +66,63 @@
     <form id="formulario-registro">
       <label>Nombre:</label>
       <input type="text" id="nombre" required>
-
       <label>Teléfono:</label>
       <input type="text" id="telefono" required>
-
       <label>Población:</label>
       <input type="text" id="poblacion" required>
-
-      <button type="submit" id="btnEnviar">🎟️ Apartar Boleto</button>
+      <button type="submit">🎟️ Apartar Boleto</button>
     </form>
-    <a class="volver" href="panel-boletos-1.html">⬅ Ir al Panel de Boletos 1</a>
+    <a class="volver" href="panel-boletos-1.html">⬅ Ir al Panel de Boletos</a>
   </div>
 
   <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  <script>
-    // Tu configuración personalizada de Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
       authDomain: "rifas-con-causa.firebaseapp.com",
       projectId: "rifas-con-causa",
-      storageBucket: "rifas-con-causa.firebasestorage.app",
+      storageBucket: "rifas-con-causa.appspot.com",
       messagingSenderId: "347417635634",
       appId: "1:347417635634:web:3ddab8921d26707910452b"
     };
 
-    // Inicializar Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-    // Obtener ID del boleto desde la URL
-    const params = new URLSearchParams(window.location.search);
-    const idboleto = params.get("id");
+    const formulario = document.getElementById("formulario-registro");
 
-    document.getElementById("formulario-registro").addEventListener("submit", async function(e) {
+    formulario.addEventListener("submit", async function(e) {
       e.preventDefault();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const idboleto = urlParams.get("id");
+
       const nombre = document.getElementById("nombre").value.trim();
       const telefono = document.getElementById("telefono").value.trim();
       const poblacion = document.getElementById("poblacion").value.trim();
-      const boton = document.getElementById("btnEnviar");
 
       if (!nombre || !telefono || !poblacion) {
         alert("Por favor completa todos los campos.");
         return;
       }
 
-      boton.disabled = true;
-      boton.textContent = "⏳ Enviando...";
-
       try {
-        // Verificar si ya existe el folio
-        const docRef = db.collection("RegistroBoletos").doc(idboleto);
-        const docSnap = await docRef.get();
-
-        if (docSnap.exists()) {
-          alert("⚠️ Este folio ya ha sido registrado.");
-          boton.disabled = false;
-          boton.textContent = "🎟️ Apartar Boleto";
-          return;
-        }
-
-        // Guardar en Firestore
-        await docRef.set({
-          idboleto: idboleto,
-          Nombre: nombre,
-          Telefono: telefono,
-          Poblacion: poblacion,
-          Estado: "apartado",
-          Fecha: new Date().toISOString()
+        await addDoc(collection(db, "RegistroBoletos"), {
+          idboleto,
+          nombre,
+          telefono,
+          poblacion,
+          estado: "apartado",
+          fecha: serverTimestamp()
         });
-
-        alert(`✅ ¡Tu boleto #${idboleto} ha sido apartado exitosamente!\nTienes dos horas para pagar. Si no se paga, vuelve a estar disponible.\n\nCuenta SPIN: 4217 4701 5601 6160\nCLABE: 7289 6900 0143 3179 21`);
-        boton.textContent = "✔️ Apartado";
+        alert(`✅ ¡Tu boleto #${idboleto} ha sido apartado exitosamente!`);
+        formulario.reset();
       } catch (error) {
         console.error("Error al registrar:", error);
         alert("Hubo un problema al registrar tu boleto. Intenta de nuevo.");
-        boton.disabled = false;
-        boton.textContent = "🎟️ Apartar Boleto";
       }
     });
   </script>
