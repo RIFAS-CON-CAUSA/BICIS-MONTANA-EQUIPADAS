@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Registro de Boleto</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       background-color: #f4fce3;
@@ -53,10 +53,6 @@
       width: 100%;
     }
 
-    button:disabled {
-      background-color: #999;
-    }
-
     .volver {
       margin-top: 20px;
       display: inline-block;
@@ -78,29 +74,46 @@
 <body>
   <div class="contenedor">
     <h2>Registro de Boleto</h2>
-    <form id="formulario-registro" onsubmit="enviarFormulario(event)">
+    <form id="formulario-registro">
       <label>Nombre:</label>
-      <input type="text" id="nombre" required />
+      <input type="text" id="nombre" required>
 
       <label>Teléfono:</label>
-      <input type="text" id="telefono" required />
+      <input type="text" id="telefono" required>
 
       <label>Población:</label>
-      <input type="text" id="poblacion" required />
+      <input type="text" id="poblacion" required>
 
       <button type="submit" id="btnEnviar">🎟️ Apartar Boleto</button>
     </form>
     <a class="volver" href="panel-boletos-1.html">⬅ Ir al Panel de Boletos 1</a>
   </div>
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
   <script>
-    const urlRegistro = "https://script.google.com/macros/s/AKfycbwCCNRE5wOiKFGGPJbsvg0JlhP4zCEpJ0lmGMBjQ7A1I8EPtqrQp1hktrejsNL8sLyw/exec";
+    // Tu configuración personalizada de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
+      authDomain: "rifas-con-causa.firebaseapp.com",
+      projectId: "rifas-con-causa",
+      storageBucket: "rifas-con-causa.firebasestorage.app",
+      messagingSenderId: "347417635634",
+      appId: "1:347417635634:web:3ddab8921d26707910452b"
+    };
+
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Obtener ID del boleto desde la URL
     const params = new URLSearchParams(window.location.search);
     const idboleto = params.get("id");
 
-    async function enviarFormulario(e) {
+    document.getElementById("formulario-registro").addEventListener("submit", async function(e) {
       e.preventDefault();
-
       const nombre = document.getElementById("nombre").value.trim();
       const telefono = document.getElementById("telefono").value.trim();
       const poblacion = document.getElementById("poblacion").value.trim();
@@ -115,37 +128,36 @@
       boton.textContent = "⏳ Enviando...";
 
       try {
-        const res = await fetch(urlRegistro, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            idboleto: idboleto,
-            Nombre: nombre,
-            Telefono: telefono,
-            Poblacion: poblacion,
-            Estado: "Apartado"
-          })
-        });
+        // Verificar si ya existe el folio
+        const docRef = db.collection("RegistroBoletos").doc(idboleto);
+        const docSnap = await docRef.get();
 
-        const data = await res.json();
-
-        if (data.status === "ok") {
-          alert(`✅ ¡Tu boleto #${idboleto} ha sido apartado exitosamente! Tienes dos horas para pagar. Si no se paga, se pasa a "disponible". Cuenta: SPIN OXXO 4217 4701 5601 6160 — CLABE: 7289 6900 0143 3179 21`);
-          boton.textContent = "✔️ Apartado";
-          boton.disabled = true;
-        } else {
-          throw new Error("Error en la respuesta del servidor");
+        if (docSnap.exists()) {
+          alert("⚠️ Este folio ya ha sido registrado.");
+          boton.disabled = false;
+          boton.textContent = "🎟️ Apartar Boleto";
+          return;
         }
 
+        // Guardar en Firestore
+        await docRef.set({
+          idboleto: idboleto,
+          Nombre: nombre,
+          Telefono: telefono,
+          Poblacion: poblacion,
+          Estado: "apartado",
+          Fecha: new Date().toISOString()
+        });
+
+        alert(`✅ ¡Tu boleto #${idboleto} ha sido apartado exitosamente!\nTienes dos horas para pagar. Si no se paga, vuelve a estar disponible.\n\nCuenta SPIN: 4217 4701 5601 6160\nCLABE: 7289 6900 0143 3179 21`);
+        boton.textContent = "✔️ Apartado";
       } catch (error) {
         console.error("Error al registrar:", error);
         alert("Hubo un problema al registrar tu boleto. Intenta de nuevo.");
         boton.disabled = false;
         boton.textContent = "🎟️ Apartar Boleto";
       }
-    }
+    });
   </script>
 </body>
 </html>
