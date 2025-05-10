@@ -2,134 +2,88 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Boleto Pagado de Participación</title>
-  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <title>Boleto de Participación</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Arial', sans-serif;
-      background: #f0f0f0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    .boleto {
-      width: 350px;
-      height: 630px;
-      padding: 0;
-      background: url('https://raw.githubusercontent.com/RIFAS-CON-CAUSA/BICIS-MONTANA-EQUIPADAS/main/las%202%20bicis.jpeg') no-repeat center top;
-      background-size: cover;
-      border: 6px solid #1976d2;
-      border-radius: 16px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      color: #000;
+      font-family: Arial, sans-serif;
+      background-color: #f0fff4;
+      padding: 20px;
       text-align: center;
-      position: relative;
-      overflow: hidden;
     }
-    .inner {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      right: 10px;
-      background: rgba(255, 255, 255, 0.9);
-      padding: 10px;
+
+    .boleto {
+      max-width: 400px;
+      margin: auto;
+      background: white;
+      border: 4px dashed #4caf50;
+      padding: 20px;
       border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    h2 {
-      margin: 0;
+
+    h1 {
+      color: #2e7d32;
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .dato {
+      font-size: 16px;
+      margin: 8px 0;
+      color: #333;
+    }
+
+    .numeros {
       font-size: 18px;
+      font-weight: bold;
       color: #d32f2f;
+      margin: 15px 0;
     }
-    .nombre {
-      font-weight: bold;
-      font-size: 16px;
-      margin: 8px 0 5px;
-    }
-    .folio {
-      font-size: 14px;
-      margin-bottom: 6px;
-    }
-    .oportunidades {
-      font-size: 14px;
-      margin: 6px 0;
-    }
-    .frase {
-      font-size: 13px;
-      margin-top: 8px;
-      font-weight: bold;
-    }
-    .fecha {
-      font-size: 12px;
-      margin-top: 6px;
-    }
-    .leyenda-sorteo {
-      font-size: 12px;
-      margin-top: 6px;
-      line-height: 1.3;
-    }
-    #descargar {
+
+    .gracias {
       margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
-      background: #388e3c;
+      font-size: 14px;
+      color: #444;
+      font-style: italic;
+    }
+
+    .volver {
+      margin-top: 20px;
+      display: inline-block;
+      background: #2e7d32;
       color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
+      padding: 10px 20px;
+      border-radius: 20px;
+      text-decoration: none;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
 
-  <div id="captura" class="boleto">
-    <div class="inner">
-      <h2>BOLETO PAGADO DE PARTICIPACIÓN</h2>
-      <div class="nombre" id="nombre">Nombre del Participante</div>
-      <div class="folio" id="folio">Boleto #00</div>
-      <div class="oportunidades" id="oportunidades">123 · 234 · 345 · 456 · 499<br>500 · 620 · 711 · 812 · 999</div>
-      <div class="frase" id="frase">Gracias por rodar con nosotros hacia la esperanza.</div>
-      <div class="fecha" id="fecha"></div>
-      <div class="leyenda-sorteo">Participas el día 30 de mayo de 2025<br>con los tres últimos dígitos<br>del Premio Mayor de Lotería Nacional.</div>
+  <div class="boleto">
+    <h1>🎟️ BOLETO DE PARTICIPACIÓN</h1>
+    <div class="dato" id="folio"></div>
+    <div class="dato" id="nombre"></div>
+    <div class="numeros" id="oportunidades"></div>
+    <div class="gracias">
+      Gracias por apoyar esta causa. ¡Mucho éxito!
     </div>
   </div>
 
-  <button id="descargar">Descargar como imagen</button>
+  <a class="volver" href="index.html">⬅ Volver al inicio</a>
 
   <script>
-    const frases = [
-      "Gracias por rodar con nosotros hacia la esperanza.",
-      "Tu participación impulsa una buena causa.",
-      "Con cada pedalada, estás más cerca de ayudar.",
-      "Una bicicleta, una esperanza, una causa. ¡Gracias!",
-      "Este boleto es un acto de generosidad."
-    ];
+    const url = new URLSearchParams(window.location.search);
+    const folio = url.get("folio") || "000";
+    const nombre = url.get("nombre") || "Nombre no registrado";
+    const oportunidades = url.get("op") || "";
 
-    // Simulación de datos recibidos (reemplazar con dinámicos)
-    const nombre = "Miriam Camacho";
-    const folio = 34;
-    const oportunidades = ["112", "130", "255", "320", "422", "603", "700", "812", "921", "988"];
-
-    document.getElementById('nombre').textContent = nombre;
-    document.getElementById('folio').textContent = `Boleto #${folio}`;
-    document.getElementById('oportunidades').innerHTML =
-      oportunidades.slice(0, 5).join(" · ") + "<br>" + oportunidades.slice(5).join(" · ");
-    document.getElementById('frase').textContent = frases[Math.floor(Math.random() * frases.length)];
-
-    const hoy = new Date();
-    document.getElementById('fecha').textContent = hoy.toLocaleDateString('es-MX', {
-      day: '2-digit', month: 'long', year: 'numeric'
-    });
-
-    document.getElementById('descargar').addEventListener('click', () => {
-      html2canvas(document.querySelector("#captura")).then(canvas => {
-        const link = document.createElement('a');
-        link.download = `boleto-${folio}.png`;
-        link.href = canvas.toDataURL();
-        link.click();
-      });
-    });
+    document.getElementById("folio").textContent = "Folio: " + folio;
+    document.getElementById("nombre").textContent = "Nombre: " + decodeURIComponent(nombre);
+    document.getElementById("oportunidades").textContent = "Oportunidades: " + oportunidades.split(",").join(" · ");
   </script>
+
 </body>
 </html>
