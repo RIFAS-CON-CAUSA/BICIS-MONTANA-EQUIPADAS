@@ -2,116 +2,96 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Panel Boletos - Bloque 1</title>
+  <title>Panel de Boletos Registrados</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial; text-align: center; padding: 20px; background-color: #f4fff0; }
-    h1 { color: #1b5e20; margin-bottom: 10px; }
-    h2 { color: #388e3c; margin-top: 5px; }
-    p { font-weight: bold; color: #444; margin-top: 10px; }
-    #panel { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 20px; }
-    .boleto {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      border: 2px solid #ccc;
-      padding: 10px;
-      border-radius: 10px;
-      background: #f9f9f9;
+    body {
+      background: #eefbe9;
+      font-family: Arial, sans-serif;
+      padding: 20px;
     }
-    .numeros {
-      font-size: 12px;
-      margin-bottom: 6px;
-      color: #34495e;
+
+    h2 {
+      text-align: center;
+      color: #1b5e20;
     }
-    button {
-      padding: 10px;
-      font-size: 16px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      color: white;
+
+    table {
       width: 100%;
+      border-collapse: collapse;
+      background: white;
+      margin-top: 20px;
     }
-    .disponible { background-color: #2ecc71; }
-    .apartado { background-color: #f1c40f; }
-    .pagado { background-color: #e74c3c; cursor: not-allowed; }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+
+    th {
+      background-color: #a5d6a7;
+    }
+
+    .btn-volver {
+      display: inline-block;
+      background: #388e3c;
+      color: white;
+      padding: 10px 20px;
+      margin: 20px auto;
+      text-align: center;
+      font-weight: bold;
+      text-decoration: none;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
   </style>
 </head>
 <body>
-  <h1>RIFA – ELIGE TU BOLETO</h1>
-  <h2>ES SEGURO QUE ALGUIEN QUE COMPRE UN BOLETO SE GANARÁ LAS TRES BICIS PERRONAS</h2>
-  <p>🟢 Verde: Disponible &nbsp;&nbsp;&nbsp; 🟡 Amarillo: Apartado &nbsp;&nbsp;&nbsp; 🔴 Rojo: Pagado</p>
-  <div id="panel"></div>
-  <p>¿Buscas del 51 al 100? 👉 <a href="panel-boletos-2.html">Ir al Bloque 2</a></p>
+  <h2>📋 Boletos Registrados</h2>
+  <div id="tabla-boletos"></div>
+  <a class="btn-volver" href="index.html">⬅ Volver al inicio</a>
 
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   <script>
-    const oportunidadesPorBoleto = [];
-    let usados = new Set();
+    // Tu configuración de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
+      authDomain: "rifas-con-causa.firebaseapp.com",
+      projectId: "rifas-con-causa",
+      storageBucket: "rifas-con-causa.firebasestorage.app",
+      messagingSenderId: "347417635634",
+      appId: "1:347417635634:web:3ddab8921d26707910452b"
+    };
 
-    // Generar 500 números únicos del 000 al 499
-    while (usados.size < 500) {
-      usados.add(String(Math.floor(Math.random() * 500)).padStart(3, '0'));
-    }
-    const todos = Array.from(usados);
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-    for (let i = 0; i < 50; i++) {
-      oportunidadesPorBoleto.push(todos.slice(i * 10, i * 10 + 10));
-    }
+    async function cargarBoletos() {
+      const tabla = document.getElementById("tabla-boletos");
+      const snapshot = await db.collection("RegistroBoletos").get();
 
-    const panel = document.getElementById("panel");
-    for (let i = 1; i <= 50; i++) {
-      const div = document.createElement("div");
-      div.className = "boleto";
+      let html = "<table><tr><th>Folio</th><th>Nombre</th><th>Teléfono</th><th>Población</th><th>Estado</th><th>Fecha</th></tr>";
 
-      const nums = document.createElement("div");
-      nums.className = "numeros";
-      nums.textContent = oportunidadesPorBoleto[i - 1].join(" · ");
-
-      const boton = document.createElement("button");
-      boton.textContent = `Boleto #${i}`;
-      boton.className = "disponible";
-      boton.setAttribute("data-id", i);
-      boton.onclick = () => {
-        window.location.href = `registro.html?id=${i}`;
-      };
-
-      div.appendChild(nums);
-      div.appendChild(boton);
-      panel.appendChild(div);
-    }
-
-    // Estado en tiempo real desde la hoja
-    fetch("https://script.google.com/macros/s/AKfycbz3izwDGnZJpKj2TUfIRPIcL29j1tlqduw6lpZW90UY5IQMUzi2ByNWAx5IX9igDi8D/exec")
-      .then(res => res.json())
-      .then(data => {
-        data.forEach(boleto => {
-          const btn = document.querySelector(`button[data-id='${boleto.id}']`);
-          if (btn) {
-            btn.className = boleto.estado;
-            if (boleto.estado === 'pagado') btn.disabled = true;
-            if (boleto.estado === 'apartado') btn.onclick = () => alert(`🚧 Boleto #${boleto.id} está apartado.`);
-          }
-        });
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        html += `<tr>
+          <td>${d.idboleto}</td>
+          <td>${d.Nombre}</td>
+          <td>${d.Telefono}</td>
+          <td>${d.Poblacion}</td>
+          <td>${d.Estado}</td>
+          <td>${d.Fecha ? d.Fecha.split("T")[0] : ''}</td>
+        </tr>`;
       });
+
+      html += "</table>";
+      tabla.innerHTML = html;
+    }
+
+    cargarBoletos();
   </script>
-<a href="index.html" style="
-  display: block;
-  margin: 30px auto 0;
-  background-color: #1b5e20;
-  color: white;
-  padding: 12px 30px;
-  border-radius: 30px;
-  font-weight: bold;
-  font-size: 16px;
-  text-decoration: none;
-  border: 2px solid #fdd835;
-  width: fit-content;
-">
-🏠 Volver al inicio
-</a>
 </body>
 </html>
-
-
-
