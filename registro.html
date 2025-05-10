@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -94,9 +94,9 @@
   </div>
 
   <script>
-    const urlRegistro = "https://script.google.com/macros/s/AKfycbz3izwDGnZJpKj2TUfIRPIcL29j1tlqduw6lpZW90UY5IQMUzi2ByNWAx5IX9igDi8D/exec"; 
+    const urlRegistro = "https://script.google.com/macros/s/AKfycby8ziGHJcOKAqusH263dxhStDqqCiP5dVulFrI2yVtfvbC8zExG-B110T9h3lKuMtFA/exec";
     const params = new URLSearchParams(window.location.search);
-    const idboleto = params.get("boleto");
+    const idboleto = params.get("id");
 
     async function enviarFormulario(e) {
       e.preventDefault();
@@ -129,19 +129,17 @@
           })
         });
 
-              const data = await res.json();
+        const data = await res.json();
 
-      if (data.status === "ok") {
-        alert(`✅ ¡Tu boleto #${idboleto} ha sido apartado exitosamente! Tienes dos horas para pagar. Si no se paga, el boleto volverá a estar disponible.\n\n💳 Cuenta SPIN OXXO: 4217 4701 5601 6160\n🔢 CLABE: 728969000143317921\n📍 Contáctanos para pago físico si lo prefieres.`);
-        boton.textContent = "✔️ Apartado";
-        boton.disabled = true;
-      } else if (data.status === "duplicado") {
-        alert(`⚠️ El boleto #${idboleto} ya ha sido registrado anteriormente.\nSi consideras que esto es un error, contáctanos para asistencia.`);
-        boton.disabled = false;
-        boton.textContent = "🎟️ Apartar Boleto";
-      } else {
-        throw new Error("Respuesta desconocida");
-      }
+        if (data.status === "ok") {
+          alert(`✅ ¡Tu boleto #${idboleto} ha sido apartado exitosamente! Tienes dos horas para pagar. Si no se paga, el boleto vuelve a estar disponible. 
+Cuenta SPIN OXXO: 4217 4701 5601 6160 
+CLABE: 7289 6900 0143 3179 21`);
+          boton.textContent = "✔️ Apartado";
+          boton.disabled = true;
+        } else {
+          throw new Error("Error en la respuesta");
+        }
 
       } catch (error) {
         console.error("Error al registrar:", error);
