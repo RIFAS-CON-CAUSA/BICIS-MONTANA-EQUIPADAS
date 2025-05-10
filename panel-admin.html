@@ -7,23 +7,51 @@
   <style>
     body { font-family: Arial, sans-serif; background: #f1f8e9; padding: 20px; }
     h1 { text-align: center; color: #1b5e20; }
-    .boleto { background: #fff; padding: 15px; margin-bottom: 12px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-    .boleto.pagado { border-left: 6px solid #c62828; }
-    button { margin-top: 8px; background: #2e7d32; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; }
-    #volver { display: block; margin: 20px auto; background: #0b640b; color: white; padding: 10px 20px; border-radius: 20px; text-decoration: none; text-align: center; width: fit-content; }
+    .boleto {
+      background: #fff;
+      padding: 15px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      border-left: 6px solid #fbc02d;
+    }
+    .pagado { border-left-color: #c62828; }
+    .apartado { border-left-color: #fbc02d; }
+    button {
+      margin-top: 8px;
+      background: #2e7d32;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .marcar {
+      background-color: #1976d2;
+      margin-left: 10px;
+    }
+    #volver {
+      display: block;
+      margin: 20px auto;
+      background: #0b640b;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 20px;
+      text-decoration: none;
+      text-align: center;
+      width: fit-content;
+    }
   </style>
 </head>
 <body>
 
 <a id="volver" href="index.html">⬅ Volver a inicio</a>
-<h1>Panel de Administración - Boletos Pagados</h1>
-
+<h1>Panel de Administración - Boletos</h1>
 <div id="contenedor-boletos"></div>
 
-<!-- Script -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import html2canvas from "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";
 
   const firebaseConfig = {
@@ -38,33 +66,46 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  async function mostrarBoletosPagados() {
+  async function mostrarBoletos() {
     const contenedor = document.getElementById("contenedor-boletos");
     const snapshot = await getDocs(collection(db, "boletos"));
 
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      if (data.estado === "pagado") {
-        const div = document.createElement("div");
-        div.className = "boleto pagado";
-        div.innerHTML = `
-          <p><strong>Boleto #${data.idboleto}</strong></p>
-          <p>Nombre: ${data.nombre}</p>
-          <p>Teléfono: ${data.telefono}</p>
-          <p>Población: ${data.poblacion}</p>
+    snapshot.forEach(docSnap => {
+      const data = docSnap.data();
+      const id = docSnap.id;
+      const claseEstado = data.estado === "pagado" ? "pagado" : "apartado";
+
+      const div = document.createElement("div");
+      div.className = `boleto ${claseEstado}`;
+      div.innerHTML = `
+        <p><strong>Boleto #${data.idboleto}</strong></p>
+        <p>Nombre: ${data.nombre}</p>
+        <p>Teléfono: ${data.telefono}</p>
+        <p>Población: ${data.poblacion}</p>
+        <p><em>Estado: ${data.estado.toUpperCase()}</em></p>
+        ${data.estado === "pagado" ? `
           <button onclick="generarRecibo('${data.idboleto}', '${data.nombre}', '${data.telefono}', '${data.poblacion}')">📄 Descargar recibo</button>
-          <div id="recibo-${data.idboleto}" style="display:none; padding:15px; background:#fff; color:#000; width:300px; border:2px solid #2e7d32;">
-            <h3 style="text-align:center;">RECIBO DE DONACIÓN</h3>
-            <p><strong>Folio:</strong> ${data.idboleto}</p>
-            <p><strong>Nombre:</strong> ${data.nombre}</p>
-            <p><strong>Teléfono:</strong> ${data.telefono}</p>
-            <p><strong>Población:</strong> ${data.poblacion}</p>
-            <p style="margin-top:20px; text-align:center;">Gracias por apoyar esta causa.</p>
-          </div>
-        `;
-        contenedor.appendChild(div);
-      }
+        ` : `
+          <button class="marcar" onclick="marcarPagado('${id}')">✅ Marcar como pagado</button>
+        `}
+        <div id="recibo-${data.idboleto}" style="display:none; padding:15px; background:#fff; color:#000; width:300px; border:2px solid #2e7d32;">
+          <h3 style="text-align:center;">RECIBO DE DONACIÓN</h3>
+          <p><strong>Folio:</strong> ${data.idboleto}</p>
+          <p><strong>Nombre:</strong> ${data.nombre}</p>
+          <p><strong>Teléfono:</strong> ${data.telefono}</p>
+          <p><strong>Población:</strong> ${data.poblacion}</p>
+          <p style="margin-top:20px; text-align:center;">Gracias por apoyar esta causa.</p>
+        </div>
+      `;
+      contenedor.appendChild(div);
     });
+  }
+
+  window.marcarPagado = async (idDoc) => {
+    const ref = doc(db, "boletos", idDoc);
+    await updateDoc(ref, { estado: "pagado" });
+    alert("✅ Boleto marcado como pagado.");
+    location.reload();
   }
 
   window.generarRecibo = async (id, nombre, telefono, poblacion) => {
@@ -78,7 +119,7 @@
     recibo.style.display = "none";
   };
 
-  mostrarBoletosPagados();
+  mostrarBoletos();
 </script>
 </body>
 </html>
