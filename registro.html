@@ -129,15 +129,19 @@
           })
         });
 
-        const data = await res.json();
+              const data = await res.json();
 
-        if (data.status === "ok") {
-          alert(`✅ ¡Tu boleto #${idboleto} ha sido apartado exitosamente! tienes dos horas para pagar y si no se paga se  pasa a "disponible" la cuenta es spin oxxo 4217 4701 5601 6160 --- Clabe 72 8969 0001 4331 7921 o contactanos para pago fisico `);
-          boton.textContent = "✔️ Apartado";
-          boton.disabled = true;
-        } else {
-          throw new Error("Error en la respuesta");
-        }
+      if (data.status === "ok") {
+        alert(`✅ ¡Tu boleto #${idboleto} ha sido apartado exitosamente! Tienes dos horas para pagar. Si no se paga, el boleto volverá a estar disponible.\n\n💳 Cuenta SPIN OXXO: 4217 4701 5601 6160\n🔢 CLABE: 728969000143317921\n📍 Contáctanos para pago físico si lo prefieres.`);
+        boton.textContent = "✔️ Apartado";
+        boton.disabled = true;
+      } else if (data.status === "duplicado") {
+        alert(`⚠️ El boleto #${idboleto} ya ha sido registrado anteriormente.\nSi consideras que esto es un error, contáctanos para asistencia.`);
+        boton.disabled = false;
+        boton.textContent = "🎟️ Apartar Boleto";
+      } else {
+        throw new Error("Respuesta desconocida");
+      }
 
       } catch (error) {
         console.error("Error al registrar:", error);
