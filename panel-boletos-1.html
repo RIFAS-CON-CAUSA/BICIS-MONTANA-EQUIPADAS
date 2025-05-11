@@ -1,31 +1,185 @@
-<body style="background-color:#f4fce3; font-family: Arial, sans-serif; padding:20px; text-align:center;">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel de Boletos - Rifa Bicis Montaña</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: #f4fce3;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #205b18;
+      margin-top: 10px;
+    }
+
+    .panel {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .boleto {
+      background-color: #ffffff;
+      border: 2px solid #cfd8dc;
+      border-radius: 12px;
+      padding: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+
+    .boleto:hover {
+      transform: scale(1.03);
+    }
+
+    .numeros {
+      font-size: 12px;
+      color: #37474f;
+      margin-bottom: 8px;
+    }
+
+    .btn {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+
+    .disponible {
+      background-color: #2e7d32;
+    }
+
+    .disponible:hover {
+      background-color: #1b5e20;
+    }
+
+    .apartado {
+      background-color: #fbc02d;
+      color: black;
+    }
+
+    .pagado {
+      background-color: #d32f2f;
+    }
+
+    .volver {
+      display: inline-block;
+      background: #1b5e20;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: bold;
+      margin: 10px auto;
+    }
+  </style>
+</head>
+<body>
 
   <!-- Botón superior -->
-  <a href="index.html" style="display:inline-block; background:#1b5e20; color:white; padding:10px 20px; border-radius:25px; text-decoration:none; font-weight:bold; margin-bottom:15px;">
-    ← Volver al Inicio
-  </a>
+  <a class="volver" href="index.html">← Volver al Inicio</a>
 
   <!-- Texto superior -->
   <p style="font-size:18px; font-weight:bold; color:#2e7d32;">Aquí tienes los 100 boletos</p>
 
-  <!-- Título principal -->
-  <h1 style="color:#205b18;">RIFA - ELIGE TU BOLETO</h1>
+  <!-- Título -->
+  <h1>RIFA - ELIGE TU BOLETO</h1>
 
-  <!-- Texto motivacional -->
+  <!-- Subtítulo -->
   <p style="font-size:16px; color:#444; max-width:500px; margin:auto 0 30px 0;">
     Gracias por tu apoyo al deporte y los jóvenes.<br>
     <strong>¡Mucha suerte! Con un boleto ya estás dentro de los probables ganadores y nuevo ciclista.</strong>
   </p>
 
-  <!-- AQUÍ VAN LOS BOLETOS (div id="panel") -->
+  <!-- Panel de boletos -->
+  <div id="panel" class="panel"></div>
 
   <!-- Botón inferior -->
-  <a href="index.html" style="display:inline-block; background:#1b5e20; color:white; padding:10px 20px; border-radius:25px; text-decoration:none; font-weight:bold; margin-top:30px;">
-    ← Volver al Inicio
-  </a>
+  <a class="volver" href="index.html">← Volver al Inicio</a>
 
-  <!-- Texto de agradecimiento -->
+  <!-- Texto de cierre -->
   <p style="margin-top:10px; font-size:14px; color:#333;">
     Gracias por ser parte de esta causa.
   </p>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
+      authDomain: "rifas-con-causa.firebaseapp.com",
+      projectId: "rifas-con-causa",
+      storageBucket: "rifas-con-causa.appspot.com",
+      messagingSenderId: "347417635634",
+      appId: "1:347417635634:web:3ddab8921d26707910452b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const oportunidades = Array.from({ length: 100 }, (_, i) => {
+      const base = i < 50 ? 0 : 500;
+      const grupo = [];
+      while (grupo.length < 10) {
+        const num = String(base + Math.floor(Math.random() * 500)).padStart(3, "0");
+        if (!grupo.includes(num)) grupo.push(num);
+      }
+      return grupo;
+    });
+
+    const panel = document.getElementById("panel");
+
+    async function cargarBoletos() {
+      for (let i = 1; i <= 100; i++) {
+        const id = i.toString().padStart(3, "0");
+        const grupo = oportunidades[i - 1];
+        const div = document.createElement("div");
+        div.className = "boleto";
+
+        const nums = document.createElement("div");
+        nums.className = "numeros";
+        nums.textContent = grupo.join(" · ");
+
+        const btn = document.createElement("button");
+        btn.className = "btn disponible";
+        btn.textContent = "Boleto #" + id;
+        btn.onclick = () => {
+          window.location.href = `registro.html?boleto=${id}`;
+        };
+
+        // consulta estado en Firestore
+        const docRef = doc(db, "boletos", id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const estado = docSnap.data().estado;
+          if (estado === "apartado") {
+            btn.className = "btn apartado";
+          } else if (estado === "pagado") {
+            btn.className = "btn pagado";
+            btn.disabled = true;
+          }
+        }
+
+        div.appendChild(nums);
+        div.appendChild(btn);
+        panel.appendChild(div);
+      }
+    }
+
+    cargarBoletos();
+  </script>
 </body>
+</html>
