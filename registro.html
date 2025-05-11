@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Registro de Boleto</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -30,12 +30,12 @@
       const idboleto = new URLSearchParams(window.location.search).get("boleto");
 
       if (!nombre || !telefono || !poblacion || !idboleto) {
-        alert("Por favor completa todos los campos y asegúrate de seleccionar un boleto.");
+        alert("Completa todos los campos y asegúrate de haber elegido un boleto.");
         return;
       }
 
-      if (!/^\d{10,}$/.test(telefono)) {
-        alert("El número de teléfono debe tener al menos 10 dígitos y solo números.");
+      if (!/^\d{10}$/.test(telefono)) {
+        alert("El teléfono debe contener exactamente 10 dígitos numéricos.");
         return;
       }
 
@@ -44,16 +44,23 @@
 
       try {
         await setDoc(doc(db, "boletos", idboleto), {
-          idboleto: idboleto,
-          nombre: nombre,
-          telefono: telefono,
-          poblacion: poblacion,
+          idboleto,
+          nombre,
+          telefono,
+          poblacion,
           estado: "apartado",
           fecha: new Date().toISOString()
         });
 
-        alert(`✅ ¡Boleto #${idboleto} registrado correctamente! Tienes 2 horas para pagar o el boleto se liberará. Cuenta Spin Oxxo: 4217 4701 5601 6160 | Clabe: 728969000143317921`);
+        alert(`✅ ¡Boleto #${idboleto} registrado correctamente! 
+Tienes 2 horas para pagar antes de que vuelva a estar disponible.
+Cuenta Spin OXXO: 4217 4701 5601 6160 
+CLABE: 7289 6900 0143 3179 21 
+O paga con tu promotor autorizado. 
+(Tómale captura de pantalla)`);
+
         boton.textContent = "✔️ Registrado";
+        boton.disabled = true;
       } catch (error) {
         console.error("Error al registrar:", error);
         alert("Error al guardar el boleto. Intenta nuevamente.");
@@ -69,7 +76,6 @@
       text-align: center;
       padding: 30px;
     }
-
     .contenedor {
       background: white;
       max-width: 400px;
@@ -78,19 +84,16 @@
       border-radius: 12px;
       box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
-
     h2 {
       color: #205b18;
       margin-bottom: 20px;
     }
-
     label {
       display: block;
       text-align: left;
       font-weight: bold;
       margin-top: 15px;
     }
-
     input {
       width: 100%;
       padding: 10px;
@@ -98,7 +101,6 @@
       border: 1px solid #ccc;
       border-radius: 6px;
     }
-
     button {
       margin-top: 20px;
       background-color: #2d7928;
@@ -110,14 +112,4 @@
       cursor: pointer;
       width: 100%;
     }
-
-    button:disabled {
-      background-color: #999;
-    }
-
-    .volver {
-      margin-top: 20px;
-      display: inline-block;
-      background: #0b640b;
-      padding: 10px 20px;
-      border-radius
+    button:
