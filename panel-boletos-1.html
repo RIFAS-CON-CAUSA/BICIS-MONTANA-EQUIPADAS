@@ -2,114 +2,126 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Panel de Boletos</title>
+  <title>RIFA – Elige tu boleto</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       font-family: Arial, sans-serif;
-      text-align: center;
-      background-color: #f3fbe6;
+      background: #f9fddf;
+      margin: 0;
       padding: 20px;
+      text-align: center;
     }
-
-    a.volver {
+    h1 {
+      color: #1b5e20;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    #volverInicio {
       display: inline-block;
       margin: 10px auto 20px;
-      padding: 10px 25px;
+      padding: 8px 20px;
       background-color: #1b5e20;
       color: white;
-      font-weight: bold;
-      border-radius: 25px;
+      border-radius: 20px;
       text-decoration: none;
+      font-weight: bold;
       font-size: 14px;
     }
-
-    h1, h2, h3 {
-      color: #205b18;
+    #busqueda {
+      margin-bottom: 10px;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      width: 250px;
+      font-size: 14px;
     }
-
-    .instrucciones {
-      margin: 10px 0;
-      color: #333;
-      font-size: 15px;
-    }
-
     #panel {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
       gap: 12px;
-      margin-top: 20px;
+      max-width: 1000px;
+      margin: auto;
     }
-
     .boleto {
-      border: 2px solid #ccc;
-      padding: 10px;
-      border-radius: 12px;
       background: #fff;
-      box-shadow: 0 0 6px rgba(0,0,0,0.1);
+      padding: 12px;
+      border-radius: 10px;
+      border: 2px solid #ccc;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease;
     }
-
-    .numeros {
-      font-size: 13px;
-      margin-bottom: 6px;
-      color: #555;
-    }
-
-    button {
-      width: 100%;
-      padding: 10px;
-      font-size: 15px;
-      font-weight: bold;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-
-    button:hover {
+    .boleto:hover {
       transform: scale(1.05);
     }
-
-    .disponible {
-      background-color: #2ecc71;
+    .numeros {
+      font-size: 13px;
+      color: #444;
+      margin-bottom: 8px;
     }
-
-    .apartado {
-      background-color: #f1c40f;
+    button {
+      padding: 10px;
+      border: none;
+      color: white;
+      font-weight: bold;
+      font-size: 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+      width: 100%;
     }
+    .disponible { background-color: #2ecc71; }
+    .apartado { background-color: #f1c40f; }
+    .pagado { background-color: #e74c3c; }
 
-    .pagado {
-      background-color: #e74c3c;
-    }
-
-    .agradecimiento {
+    #reporteRepetidos {
+      display: none;
       margin-top: 30px;
       font-size: 14px;
+      background: #fff3cd;
+      border: 1px solid #ffeeba;
+      padding: 15px;
+      border-radius: 10px;
+    }
+    #btnBNR {
+      font-size: 10px;
+      background-color: transparent;
+      border: none;
       color: #444;
+      text-decoration: underline;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+    .mensaje-final {
+      margin-top: 30px;
       font-weight: bold;
+      font-size: 15px;
+      color: #333;
     }
   </style>
 </head>
 <body>
-  <a class="volver" href="index.html">⬅ Volver al inicio</a>
 
-  <h1>RIFA – ELIGE TU BOLETO</h1>
-  <h3>Aquí tienes los 100 boletos</h3>
-  <p class="instrucciones">🟢 Disponible · 🟡 Apartado · 🔴 Pagado</p>
+  <a id="volverInicio" href="index.html">⬅ Volver al inicio</a>
+  <button id="btnBNR" onclick="pedirClaveBNR()">BNR</button>
+  <h1>Aquí tienes los 100 boletos</h1>
+  <p><strong>RIFA – Elige tu boleto</strong></p>
+  <p>Verde: Disponible · Amarillo: Apartado · Rojo: No disponible</p>
 
   <div id="panel"></div>
 
-  <a class="volver" href="index.html">⬅ Volver al inicio</a>
+  <a id="volverInicio" href="index.html">⬅ Volver al inicio</a>
 
-  <div class="agradecimiento">
-    Gracias por tu apoyo al deporte y los jóvenes. <br>
-    Mucha suerte, con un boleto ya estás dentro de los probables ganadores y nuevo ciclista.
+  <div class="mensaje-final">
+    Gracias por tu apoyo al deporte y los jóvenes.<br>
+    ¡MUCHA SUERTE! Con un boleto ya estás dentro de los probables ganadores y nuevo ciclista.
   </div>
+
+  <div id="reporteRepetidos"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
@@ -123,57 +135,74 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Generar números del 000 al 999 sin repetir
-    const todosLosNumeros = Array.from({ length: 1000 }, (_, i) => String(i).padStart(3, "0"));
-    for (let i = todosLosNumeros.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [todosLosNumeros[i], todosLosNumeros[j]] = [todosLosNumeros[j], todosLosNumeros[i]];
-    }
-
     const panel = document.getElementById("panel");
-    const boletos = [];
+    const oportunidadesGlobal = [];
 
-    for (let i = 0; i < 100; i++) {
-      const numeros = todosLosNumeros.slice(i * 10, i * 10 + 10);
-      const boleto = document.createElement("div");
-      boleto.className = "boleto";
-
-      const nums = document.createElement("div");
-      nums.className = "numeros";
-      nums.textContent = numeros.join(" · ");
-
-      const btn = document.createElement("button");
-      btn.textContent = `Boleto #${String(i + 1).padStart(3, "0")}`;
-      btn.className = "disponible";
-      btn.setAttribute("data-id", String(i + 1).padStart(3, "0"));
-      btn.onclick = () => {
-        window.location.href = `registro.html?boleto=${btn.getAttribute("data-id")}`;
-      };
-
-      boleto.appendChild(nums);
-      boleto.appendChild(btn);
-      panel.appendChild(boleto);
-      boletos.push({ id: btn.getAttribute("data-id"), boton: btn });
-    }
-
-    // Consultar Firestore y actualizar estatus
-    async function actualizarEstados() {
-      const snapshot = await getDocs(collection(db, "boletos"));
-      const registros = {};
-      snapshot.forEach(doc => {
-        registros[doc.id] = doc.data().estado;
-      });
-
-      boletos.forEach(b => {
-        const estado = registros[b.id];
-        if (estado === "apartado" || estado === "pagado") {
-          b.boton.className = estado;
-          if (estado === "pagado") b.boton.disabled = true;
+    function generarNumeros(boleto) {
+      const usados = new Set();
+      const base = boleto <= 50 ? 0 : 500;
+      const nums = [];
+      while (nums.length < 10) {
+        let num = String(Math.floor(Math.random() * 500) + base).padStart(3, '0');
+        if (!usados.has(num)) {
+          usados.add(num);
+          nums.push(num);
+          oportunidadesGlobal.push({ num, boleto });
         }
-      });
+      }
+      return nums;
     }
 
-    actualizarEstados();
+    async function construirBoletos() {
+      for (let i = 1; i <= 100; i++) {
+        const id = String(i).padStart(3, '0');
+        const ref = doc(db, "boletos", id);
+        const snap = await getDoc(ref);
+        const estado = snap.exists() ? snap.data().estado : "disponible";
+
+        const div = document.createElement("div");
+        div.className = "boleto";
+
+        const numeros = generarNumeros(i);
+        const numsDiv = document.createElement("div");
+        numsDiv.className = "numeros";
+        numsDiv.textContent = numeros.join(" · ");
+        div.appendChild(numsDiv);
+
+        const btn = document.createElement("button");
+        btn.textContent = `Boleto #${id}`;
+        btn.className = estado.toLowerCase();
+        btn.disabled = estado === "pagado";
+        btn.onclick = () => window.location.href = `registro.html?boleto=${id}`;
+
+        div.appendChild(btn);
+        panel.appendChild(div);
+      }
+    }
+
+    construirBoletos();
+
+    window.pedirClaveBNR = () => {
+      const clave = prompt("Introduce la clave:");
+      if (clave === "BNR") {
+        const contador = {};
+        for (let obj of oportunidadesGlobal) {
+          contador[obj.num] = (contador[obj.num] || []);
+          contador[obj.num].push(obj.boleto);
+        }
+
+        let repetidos = Object.entries(contador).filter(e => e[1].length > 1);
+        let salida = "<h3>Números repetidos:</h3><ul>";
+        for (let [numero, boletos] of repetidos) {
+          salida += `<li>${numero} → Boletos: ${boletos.map(b => "#" + String(b).padStart(3, '0')).join(", ")}</li>`;
+        }
+        salida += "</ul>";
+        document.getElementById("reporteRepetidos").innerHTML = salida;
+        document.getElementById("reporteRepetidos").style.display = "block";
+      } else {
+        alert("Clave incorrecta.");
+      }
+    }
   </script>
 </body>
 </html>
