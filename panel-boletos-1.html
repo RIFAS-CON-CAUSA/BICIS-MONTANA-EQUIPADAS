@@ -2,11 +2,95 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Panel Boletos</title>
+  <title>Panel de Boletos</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0fff4;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .volver {
+      display: inline-block;
+      margin: 10px auto 30px;
+      padding: 10px 20px;
+      background: #2e7d32;
+      color: white;
+      text-decoration: none;
+      border-radius: 20px;
+      font-weight: bold;
+    }
+
+    h1 {
+      color: #1b5e20;
+    }
+
+    .leyenda {
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    .panel {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 16px;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .boleto {
+      background: white;
+      border: 2px solid #ccc;
+      border-radius: 12px;
+      padding: 10px;
+      transition: transform 0.2s ease;
+    }
+
+    .boleto:hover {
+      transform: scale(1.05);
+    }
+
+    .numeros {
+      font-size: 12px;
+      margin-bottom: 6px;
+      color: #555;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 14px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+    }
+
+    .disponible {
+      background-color: #4caf50;
+    }
+
+    .apartado {
+      background-color: #fbc02d;
+    }
+
+    .pagado {
+      background-color: #e53935;
+    }
+  </style>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      doc,
+      getDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
@@ -20,150 +104,53 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const oportunidades = (base) => {
-      const lista = [];
-      const offset = base <= 50 ? 0 : 500;
-      for (let i = 0; i < 10; i++) {
-        lista.push(String(offset + (base * 10 + i) % 500).padStart(3, '0'));
-      }
-      return lista;
-    };
+    const oportunidades = [];
 
-    window.addEventListener("DOMContentLoaded", async () => {
+    // Genera oportunidades únicas para cada boleto
+    function generarNumeros(ini) {
+      const base = ini <= 50 ? 0 : 500;
+      const usados = new Set();
+      const nums = [];
+      while (nums.length < 10) {
+        const n = Math.floor(Math.random() * 500) + base;
+        if (!usados.has(n)) {
+          usados.add(n);
+          nums.push(String(n).padStart(3, "0"));
+        }
+      }
+      return nums;
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
       const panel = document.getElementById("panel");
 
       for (let i = 1; i <= 100; i++) {
+        const numero = String(i).padStart(3, "0");
         const div = document.createElement("div");
         div.className = "boleto";
 
-        const nums = document.createElement("div");
-        nums.className = "numeros";
-        nums.textContent = oportunidades(i).join(" · ");
+        const nums = generarNumeros(i);
+        oportunidades.push({ id: numero, nums });
+
+        const numDiv = document.createElement("div");
+        numDiv.className = "numeros";
+        numDiv.textContent = nums.join(" · ");
 
         const boton = document.createElement("button");
-        boton.textContent = `#${String(i).padStart(3, '0')}`;
-        boton.dataset.id = i;
+        boton.textContent = `Boleto #${numero}`;
         boton.className = "disponible";
         boton.onclick = () => {
-          window.location.href = `registro.html?boleto=${i}`;
+          window.location.href = `registro.html?boleto=${numero}`;
         };
 
-        div.appendChild(nums);
+        div.appendChild(numDiv);
         div.appendChild(boton);
         panel.appendChild(div);
       }
 
-      const querySnapshot = await getDocs(collection(db, "boletos"));
-      querySnapshot.forEach((docSnap) => {
+      const snapshot = await getDocs(collection(db, "boletos"));
+      snapshot.forEach(docSnap => {
         const data = docSnap.data();
-        const id = parseInt(data.idboleto);
-        const estado = data.estado?.toLowerCase();
-
-        const boton = document.querySelector(`button[data-id='${id}']`);
+        const boton = document.querySelector(`button:contains("${data.idboleto}")`);
         if (boton) {
-          boton.className = estado;
-
-          if (estado === "pagado") {
-            boton.disabled = false;
-            boton.onclick = () => {
-              const nombre = data.nombre || "Participante";
-              const op = oportunidades(id).join(',');
-              const url = `boleto-participacion.html?nombre=${encodeURIComponent(nombre)}&folio=${id}&op=${op}`;
-              window.open(url, "_blank");
-            };
-          }
-        }
-      });
-    });
-  </script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background-color: #f9f9f9;
-      text-align: center;
-    }
-
-    h2 {
-      color: #1b5e20;
-      margin-bottom: 10px;
-    }
-
-    .leyenda {
-      margin-bottom: 20px;
-      font-size: 14px;
-      color: #333;
-    }
-
-    #panel {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-      gap: 14px;
-      margin-bottom: 30px;
-    }
-
-    .boleto {
-      background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 10px;
-      box-shadow: 0px 3px 8px rgba(0,0,0,0.1);
-      transition: transform 0.2s;
-    }
-
-    .boleto:hover {
-      transform: scale(1.05);
-    }
-
-    .numeros {
-      font-size: 12px;
-      margin-bottom: 6px;
-      color: #444;
-    }
-
-    button {
-      width: 100%;
-      padding: 8px;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      font-weight: bold;
-      color: white;
-      cursor: pointer;
-      animation: rebote 0.8s;
-    }
-
-    @keyframes rebote {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
-
-    .disponible { background-color: #2ecc71; }
-    .apartado   { background-color: #f1c40f; }
-    .pagado     { background-color: #e74c3c; }
-
-    .boton-inicio {
-      display: inline-block;
-      padding: 10px 20px;
-      background: #1976d2;
-      color: white;
-      border-radius: 25px;
-      font-weight: bold;
-      text-decoration: none;
-      margin-bottom: 20px;
-    }
-  </style>
-</head>
-<body>
-  <a class="boton-inicio" href="index.html">⬅ Volver al Inicio</a>
-
-  <h2>RIFA – ELIGE TU BOLETO</h2>
-  <div class="leyenda">
-    Verde = Disponible · Amarillo = Apartado · Rojo = Pagado
-  </div>
-  <div id="panel"></div>
-
-  <a class="boton-inicio" href="index.html">⬅ Volver al Inicio</a>
-</body>
-</html>
+          boton.className
