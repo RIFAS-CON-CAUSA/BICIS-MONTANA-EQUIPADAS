@@ -176,6 +176,21 @@
       }, 2000);
     });
   </script>
+<button id="accesoPc" onclick="pedirAcceso()" style="display:none;position:fixed;bottom:20px;right:20px;padding:10px 15px;background:#1a237e;color:white;border:none;border-radius:8px;font-weight:bold;cursor:pointer;">Admin</button>
 
+<script>
+  if (window.innerWidth > 768) {
+    document.getElementById("accesoPc").style.display = "block";
+  }
+
+  function pedirAcceso() {
+    const pass = prompt("Ingresa contraseña de acceso:");
+    if (pass === "admin2025") {
+      window.location.href = "panel-admin.html";
+    } else {
+      alert("Contraseña incorrecta.");
+    }
+  }
+</script>
 </body>
 </html>
