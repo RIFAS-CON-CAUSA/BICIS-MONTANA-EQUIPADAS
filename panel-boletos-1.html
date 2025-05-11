@@ -8,37 +8,31 @@
     body {
       font-family: Arial, sans-serif;
       background: #f9fddf;
-      margin: 0;
       padding: 20px;
       text-align: center;
     }
-    h1 {
-      color: #1b5e20;
-      font-size: 24px;
-      margin-bottom: 10px;
-    }
     #volverInicio {
-      display: inline-block;
-      margin: 10px auto 20px;
-      padding: 8px 20px;
       background-color: #1b5e20;
       color: white;
       border-radius: 20px;
+      padding: 10px 20px;
       text-decoration: none;
+      display: inline-block;
+      margin-bottom: 15px;
       font-weight: bold;
-      font-size: 14px;
     }
-    #busqueda {
-      margin-bottom: 10px;
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 20px;
-      width: 250px;
+    h1 {
+      color: #1b5e20;
+      font-size: 22px;
+      margin-top: 10px;
+    }
+    .leyenda {
       font-size: 14px;
+      margin-bottom: 20px;
     }
     #panel {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
       gap: 12px;
       max-width: 1000px;
       margin: auto;
@@ -49,10 +43,6 @@
       border-radius: 10px;
       border: 2px solid #ccc;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      transition: transform 0.2s ease;
-    }
-    .boleto:hover {
-      transform: scale(1.05);
     }
     .numeros {
       font-size: 13px;
@@ -67,31 +57,11 @@
       font-size: 15px;
       border-radius: 8px;
       cursor: pointer;
-      transition: 0.2s;
       width: 100%;
     }
     .disponible { background-color: #2ecc71; }
     .apartado { background-color: #f1c40f; }
     .pagado { background-color: #e74c3c; }
-
-    #reporteRepetidos {
-      display: none;
-      margin-top: 30px;
-      font-size: 14px;
-      background: #fff3cd;
-      border: 1px solid #ffeeba;
-      padding: 15px;
-      border-radius: 10px;
-    }
-    #btnBNR {
-      font-size: 10px;
-      background-color: transparent;
-      border: none;
-      color: #444;
-      text-decoration: underline;
-      cursor: pointer;
-      margin-left: 10px;
-    }
     .mensaje-final {
       margin-top: 30px;
       font-weight: bold;
@@ -103,14 +73,10 @@
 <body>
 
   <a id="volverInicio" href="index.html">⬅ Volver al inicio</a>
-  <button id="btnBNR" onclick="pedirClaveBNR()">BNR</button>
 
   <h1>Aquí tienes los 100 boletos</h1>
   <p><strong>RIFA – Elige tu boleto</strong></p>
-  <p>Verde: Disponible · Amarillo: Apartado · Rojo: No disponible</p>
-
-  <input type="text" id="busqueda" placeholder="Encuentra tu número de la suerte 🔍" />
-  <button onclick="buscarNumero()">Buscar</button>
+  <p class="leyenda">Verde: Disponible · Amarillo: Apartado · Rojo: No disponible</p>
 
   <div id="panel"></div>
 
@@ -120,8 +86,6 @@
     Gracias por tu apoyo al deporte y los jóvenes.<br>
     ¡MUCHA SUERTE! Con un boleto ya estás dentro de los probables ganadores y nuevo ciclista.
   </div>
-
-  <div id="reporteRepetidos"></div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -140,7 +104,6 @@
     const db = getFirestore(app);
 
     const panel = document.getElementById("panel");
-    const oportunidadesGlobal = [];
 
     function generarNumeros(boleto) {
       const usados = new Set();
@@ -151,7 +114,6 @@
         if (!usados.has(num)) {
           usados.add(num);
           nums.push(num);
-          oportunidadesGlobal.push({ num, boleto });
         }
       }
       return nums;
@@ -178,51 +140,14 @@
         btn.className = estado.toLowerCase();
         btn.disabled = estado === "pagado";
         btn.onclick = () => window.location.href = `registro.html?boleto=${id}`;
-
         div.appendChild(btn);
+
         panel.appendChild(div);
       }
     }
 
     construirBoletos();
-
-    window.pedirClaveBNR = () => {
-      const clave = prompt("Introduce la clave:");
-      if (clave === "BNR") {
-        const contador = {};
-        for (let obj of oportunidadesGlobal) {
-          contador[obj.num] = (contador[obj.num] || []);
-          contador[obj.num].push(obj.boleto);
-        }
-
-        let repetidos = Object.entries(contador).filter(e => e[1].length > 1);
-        let salida = "<h3>Números repetidos:</h3><ul>";
-        for (let [numero, boletos] of repetidos) {
-          salida += `<li>${numero} → Boletos: ${boletos.map(b => "#" + String(b).padStart(3, '0')).join(", ")}</li>`;
-        }
-        salida += "</ul>";
-        if (repetidos.length === 0) salida = "<p>No hay números repetidos.</p>";
-        document.getElementById("reporteRepetidos").innerHTML = salida;
-        document.getElementById("reporteRepetidos").style.display = "block";
-      } else {
-        alert("Clave incorrecta.");
-      }
-    }
-
-    window.buscarNumero = () => {
-      const numero = document.getElementById("busqueda").value.trim();
-      if (!numero) return alert("Ingresa un número para buscar.");
-
-      const boletos = oportunidadesGlobal
-        .filter(obj => obj.num === numero)
-        .map(obj => `#${String(obj.boleto).padStart(3, '0')}`);
-
-      if (boletos.length > 0) {
-        alert(`¡Tu número ${numero} está en los siguientes boletos: ${boletos.join(", ")}`);
-      } else {
-        alert(`El número ${numero} no se encuentra en ningún boleto actual.`);
-      }
-    }
   </script>
+
 </body>
 </html>
