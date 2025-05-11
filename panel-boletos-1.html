@@ -15,31 +15,37 @@
     h1 {
       color: #1b5e20;
       font-size: 24px;
-      margin-bottom: 10px;
     }
     #volverInicio {
       display: inline-block;
-      margin: 10px auto 20px;
-      padding: 8px 20px;
+      margin: 10px auto;
+      padding: 10px 20px;
       background-color: #1b5e20;
       color: white;
       border-radius: 20px;
       text-decoration: none;
       font-weight: bold;
-      font-size: 14px;
     }
-    #busqueda {
-      margin-bottom: 10px;
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 20px;
-      width: 250px;
+    .instrucciones {
+      font-size: 15px;
+      margin: 15px 0;
+    }
+    #busqueda, #btnBuscar {
+      padding: 10px;
       font-size: 14px;
+      margin: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    #btnBuscar {
+      background-color: #1565c0;
+      color: white;
+      border: none;
     }
     #panel {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 15px;
       max-width: 1000px;
       margin: auto;
     }
@@ -49,10 +55,6 @@
       border-radius: 10px;
       border: 2px solid #ccc;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      transition: transform 0.2s ease;
-    }
-    .boleto:hover {
-      transform: scale(1.05);
     }
     .numeros {
       font-size: 13px;
@@ -66,22 +68,29 @@
       font-weight: bold;
       font-size: 15px;
       border-radius: 8px;
-      cursor: pointer;
-      transition: 0.2s;
       width: 100%;
+      cursor: pointer;
     }
     .disponible { background-color: #2ecc71; }
     .apartado { background-color: #f1c40f; }
     .pagado { background-color: #e74c3c; }
 
-    #reporteRepetidos {
-      display: none;
-      margin-top: 30px;
-      font-size: 14px;
+    #reporteRepetidos, #reporteBusqueda {
+      margin-top: 20px;
       background: #fff3cd;
       border: 1px solid #ffeeba;
       padding: 15px;
       border-radius: 10px;
+      font-size: 14px;
+      display: none;
+    }
+    #btnBNR {
+      font-size: 10px;
+      background-color: transparent;
+      border: none;
+      color: #444;
+      text-decoration: underline;
+      cursor: pointer;
     }
     .mensaje-final {
       margin-top: 30px;
@@ -93,25 +102,129 @@
 </head>
 <body>
 
-  <a id="volverInicio" href="index.html">⬅ Volver al inicio</a>
-  <button id="btnBNR" onclick="pedirClaveBNR()" style="font-size:10px; background-color:transparent; border:none; color:#444; text-decoration:underline; cursor:pointer;">BNR</button>
+<a id="volverInicio" href="index.html">⬅ Volver al inicio</a>
+<button id="btnBNR" onclick="pedirClaveBNR()">BNR</button>
 
-  <h1>Aquí tienes los 100 boletos</h1>
-  <p><strong>RIFA – Elige tu boleto</strong></p>
-  <p>
-    <span style="color:green;">🟢 Verde:</span> Disponible ·
-    <span style="color:orange;">🟡 Amarillo:</span> Apartado ·
-    <span style="color:red;">🔴 Rojo:</span> No disponible
-  </p>
+<h1>Aquí tienes los 100 boletos</h1>
+<p class="instrucciones">
+  <strong>RIFA – Elige tu boleto</strong><br>
+  <span style="color:#2ecc71;">🟩 Verde</span>: Disponible &nbsp; 
+  <span style="color:#f1c40f;">🟨 Amarillo</span>: Apartado &nbsp; 
+  <span style="color:#e74c3c;">🟥 Rojo</span>: No disponible
+</p>
 
-  <!-- Campo de búsqueda -->
-  <div style="position: relative; display: inline-block; margin: 15px auto;">
-    <input id="busqueda" placeholder="Encuentra tu número de la suerte 🔍"
-           style="padding:8px; border:1px solid #ccc; border-radius:20px; width:250px; font-size:14px;">
-    <button onclick="buscarNumero()" style="background:#2962ff; color:white; border:none; padding:8px 12px; border-radius:20px; font-weight:bold; margin-left:8px;">Buscar</button>
-    <div id="resultadoBusqueda" style="position:absolute; top:42px; left:0; width:100%; background:#fff; border:1px solid #ccc; border-radius:10px; padding:8px; display:none; z-index:999; font-size:14px;"></div>
-  </div>
+<input id="busqueda" placeholder="Encuentra tu número de la suerte 🔍">
+<button id="btnBuscar" onclick="buscarNumero()">Buscar</button>
 
-  <div id="panel"></div>
+<div id="panel"></div>
 
-  <a id="volverInicio" href="index.html">⬅ Volver al inicio</a>
+<a id="volverInicio" href="index.html">⬅ Volver al inicio</a>
+
+<div class="mensaje-final">
+  Gracias por tu apoyo al deporte y los jóvenes.<br>
+  ¡MUCHA SUERTE! Con un boleto ya estás dentro de los probables ganadores y nuevo ciclista.
+</div>
+
+<div id="reporteBusqueda"></div>
+<div id="reporteRepetidos"></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
+    authDomain: "rifas-con-causa.firebaseapp.com",
+    projectId: "rifas-con-causa",
+    storageBucket: "rifas-con-causa.appspot.com",
+    messagingSenderId: "347417635634",
+    appId: "1:347417635634:web:3ddab8921d26707910452b"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const panel = document.getElementById("panel");
+  const oportunidadesGlobal = [];
+
+  async function construirBoletos() {
+    for (let i = 1; i <= 100; i++) {
+      const id = String(i).padStart(3, '0');
+      const ref = doc(db, "boletos", id);
+      const snap = await getDoc(ref);
+      const data = snap.data();
+      const estado = data?.estado || "disponible";
+      const numeros = data?.numeros || [];
+
+      const div = document.createElement("div");
+      div.className = "boleto";
+
+      const numsDiv = document.createElement("div");
+      numsDiv.className = "numeros";
+      numsDiv.textContent = numeros.join(" · ");
+      div.appendChild(numsDiv);
+
+      for (let num of numeros) {
+        oportunidadesGlobal.push({ num, boleto: id });
+      }
+
+      const btn = document.createElement("button");
+      btn.textContent = `Boleto #${id}`;
+      btn.className = estado.toLowerCase();
+      btn.disabled = estado === "pagado";
+      btn.onclick = () => window.location.href = `registro.html?boleto=${id}`;
+
+      div.appendChild(btn);
+      panel.appendChild(div);
+    }
+  }
+
+  window.buscarNumero = () => {
+    const input = document.getElementById("busqueda").value.trim();
+    const reporte = document.getElementById("reporteBusqueda");
+    if (!/^\d{3}$/.test(input)) {
+      reporte.style.display = "block";
+      reporte.innerHTML = "⚠️ Ingresa un número de 3 dígitos exactos (ej: 170)";
+      return;
+    }
+    const resultado = oportunidadesGlobal.filter(o => o.num === input);
+    if (resultado.length === 0) {
+      reporte.style.display = "block";
+      reporte.innerHTML = `❌ El número <strong>${input}</strong> no aparece en ningún boleto.`;
+    } else {
+      const boletos = resultado.map(r => `#${r.boleto}`);
+      const texto = boletos.length === 1 
+        ? `✅ El número <strong>${input}</strong> aparece en el siguiente boleto:<br>${boletos[0]}`
+        : `✅ El número <strong>${input}</strong> aparece en los siguientes boletos:<br>${boletos.join(", ")}`;
+      reporte.style.display = "block";
+      reporte.innerHTML = texto;
+    }
+  };
+
+  window.pedirClaveBNR = () => {
+    const clave = prompt("Introduce la clave:");
+    if (clave === "BNR") {
+      const contador = {};
+      for (let obj of oportunidadesGlobal) {
+        contador[obj.num] = (contador[obj.num] || []);
+        contador[obj.num].push(obj.boleto);
+      }
+
+      let repetidos = Object.entries(contador).filter(e => e[1].length > 1);
+      let salida = "<h3>🔁 Números repetidos:</h3><ul>";
+      for (let [numero, boletos] of repetidos) {
+        salida += `<li>${numero} → Boletos: ${boletos.map(b => "#" + String(b).padStart(3, '0')).join(", ")}</li>`;
+      }
+      salida += "</ul>";
+      const cont = document.getElementById("reporteRepetidos");
+      cont.innerHTML = salida;
+      cont.style.display = "block";
+    } else {
+      alert("Clave incorrecta.");
+    }
+  };
+
+  construirBoletos();
+</script>
+</body>
+</html>
