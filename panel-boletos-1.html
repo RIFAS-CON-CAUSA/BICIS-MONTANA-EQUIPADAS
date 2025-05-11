@@ -115,11 +115,11 @@
 
     querySnapshot.forEach((docSnap) => {
       const data = docSnap.data();
-      data.docId = docSnap.id;
+      data.docId = docSnap.id;  // <-- Agregamos docId como respaldo
       datosBoletos.push(data);
     });
 
-    datosBoletos.sort((a, b) => parseInt(a.idboleto || 0) - parseInt(b.idboleto || 0));
+    datosBoletos.sort((a, b) => parseInt(a.idboleto || a.docId || 0) - parseInt(b.idboleto || b.docId || 0));
     pintarBoletos(datosBoletos);
   }
 
@@ -128,7 +128,7 @@
     container.innerHTML = "";
 
     lista.forEach(data => {
-      const idboleto = data.idboleto || 'Sin número';
+      const idboleto = data.idboleto || data.docId || 'Sin número';
       const numeros = Array.isArray(data.numeros) ? data.numeros.map(n => String(n)) : [];
       const numerosOrdenados = numeros.sort((a, b) => parseInt(a) - parseInt(b));
 
