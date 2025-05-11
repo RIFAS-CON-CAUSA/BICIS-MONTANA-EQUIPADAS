@@ -2,77 +2,200 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Panel Admin - Acceso</title>
+  <title>Panel Admin - Rifas con Causa</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f1f8e9;
-      text-align: center;
-      padding: 40px;
+    body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px; }
+    h1 { text-align: center; color: #1b5e20; }
+
+    .filtros, .acciones {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      gap: 10px;
     }
-    .login-box {
-      background: white;
-      padding: 30px;
-      max-width: 400px;
-      margin: auto;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-    input {
-      display: block;
-      margin: 12px auto;
-      padding: 10px;
-      width: 80%;
-      font-size: 16px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-    button {
-      padding: 10px 20px;
-      font-weight: bold;
-      font-size: 16px;
-      background: #388e3c;
-      color: white;
+
+    .filtros button, .acciones button {
+      padding: 8px 15px;
       border: none;
-      border-radius: 6px;
+      border-radius: 20px;
+      font-weight: bold;
       cursor: pointer;
     }
-    #error {
-      color: red;
-      margin-top: 10px;
+
+    .disponible { background: #2ecc71; color: white; }
+    .apartado { background: #f1c40f; color: black; }
+    .pagado { background: #e74c3c; color: white; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+
+    th {
+      background: #1976d2;
+      color: white;
+    }
+
+    .filtro-busqueda input {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      width: 250px;
     }
   </style>
 </head>
 <body>
-  <div class="login-box">
-    <h2>Acceso al Panel Administrativo</h2>
-    <input type="text" id="usuario" placeholder="Nombre de usuario">
-    <input type="password" id="clave" placeholder="Contraseña">
-    <button onclick="verificarAcceso()">Entrar</button>
-    <div id="error"></div>
+
+  <h1>Panel Administrativo - Rifas con Causa</h1>
+
+  <div class="filtros">
+    <button onclick="filtrar('todos')">Mostrar Todos</button>
+    <button class="disponible" onclick="filtrar('disponible')">Disponibles</button>
+    <button class="apartado" onclick="filtrar('apartado')">Apartados</button>
+    <button class="pagado" onclick="filtrar('pagado')">Pagados</button>
   </div>
 
-  <script>
-    const accesos = {
-      "manuel": "manuel",
-      "steven": "steven",
-      "patty": "patty",
-      "miriam": "miriam",
-      "dianne": "dianne"
+  <div class="acciones">
+    <div class="filtro-busqueda">
+      <input type="text" id="busqueda" placeholder="Buscar por nombre, población o número..." oninput="filtrarBusqueda()">
+    </div>
+    <button onclick="exportarExcel()">📤 Exportar a Excel</button>
+  </div>
+
+  <table id="tablaBoletos">
+    <thead>
+      <tr>
+        <th>Boleto</th>
+        <th>Nombre</th>
+        <th>Teléfono</th>
+        <th>Población</th>
+        <th>Estado</th>
+        <th>Fecha</th>
+        <th>Cambiar Estado</th>
+        <th>Rol que modificó</th>
+        <th>Forma de pago</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
+      authDomain: "rifas-con-causa.firebaseapp.com",
+      projectId: "rifas-con-causa",
+      storageBucket: "rifas-con-causa.appspot.com",
+      messagingSenderId: "347417635634",
+      appId: "1:347417635634:web:3ddab8921d26707910452b"
     };
 
-    function verificarAcceso() {
-      const usuario = document.getElementById("usuario").value.toLowerCase().trim();
-      const clave = document.getElementById("clave").value.trim();
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    let datosBoletos = [];
 
-      if (accesos[usuario] && accesos[usuario] === clave) {
-        localStorage.setItem("adminActual", usuario);
-        window.location.href = "panel-admin-real.html"; // Redirige al panel real
+    const tbody = document.querySelector("#tablaBoletos tbody");
+
+    async function cargarBoletos() {
+      const querySnapshot = await getDocs(collection(db, "boletos"));
+      datosBoletos = [];
+      tbody.innerHTML = "";
+      querySnapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        datosBoletos.push(data);
+      });
+      mostrarBoletos(datosBoletos);
+    }
+
+    function mostrarBoletos(lista) {
+      tbody.innerHTML = "";
+      lista.forEach(boleto => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>#${boleto.idboleto}</td>
+          <td>${boleto.nombre}</td>
+          <td>${boleto.telefono}</td>
+          <td>${boleto.poblacion}</td>
+          <td class="${boleto.estado}">${boleto.estado}</td>
+          <td>${new Date(boleto.fecha).toLocaleString()}</td>
+          <td>
+            <select onchange="cambiarEstado('${boleto.idboleto}', this.value)">
+              <option disabled selected>Editar</option>
+              <option value="disponible">Disponible</option>
+              <option value="apartado">Apartado</option>
+              <option value="pagado">Pagado</option>
+            </select>
+          </td>
+          <td>${boleto.modificadoPor || ""}</td>
+          <td>${boleto.formaPago || ""}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function cambiarEstado(id, nuevoEstado) {
+      const rol = prompt("¿Cuál es tu rol o nombre?");
+      const formaPago = nuevoEstado === "pagado" ? prompt("¿Forma de pago? (Efectivo, OXXO, etc.)") : "";
+
+      const ref = doc(db, "boletos", id);
+      await updateDoc(ref, {
+        estado: nuevoEstado,
+        modificadoPor: rol,
+        formaPago: formaPago
+      });
+      cargarBoletos();
+    }
+
+    function filtrar(estado) {
+      if (estado === "todos") {
+        mostrarBoletos(datosBoletos);
       } else {
-        document.getElementById("error").textContent = "Usuario o contraseña incorrectos.";
+        const filtrados = datosBoletos.filter(b => b.estado === estado);
+        mostrarBoletos(filtrados);
       }
     }
+
+    function filtrarBusqueda() {
+      const q = document.getElementById("busqueda").value.toLowerCase();
+      const filtrados = datosBoletos.filter(b =>
+        b.nombre.toLowerCase().includes(q) ||
+        b.poblacion.toLowerCase().includes(q) ||
+        b.idboleto.toString().includes(q)
+      );
+      mostrarBoletos(filtrados);
+    }
+
+    function exportarExcel() {
+      let csv = "Boleto,Nombre,Teléfono,Población,Estado,Fecha,Modificado por,Forma de pago\n";
+      datosBoletos.forEach(b => {
+        csv += `#${b.idboleto},"${b.nombre}","${b.telefono}","${b.poblacion}","${b.estado}","${new Date(b.fecha).toLocaleString()}","${b.modificadoPor || ""}","${b.formaPago || ""}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Boletos-Rifa-${new Date().toLocaleDateString()}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    cargarBoletos();
   </script>
+
 </body>
 </html>
