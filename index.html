@@ -1,169 +1,37 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Rifa Bicis Montaña Equipadas</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rifas con Causa</title>
   <style>
     body {
+      background-color: #f4fce3;
       font-family: Arial, sans-serif;
-      background-color: #f9fddf;
-      margin: 0;
-      padding: 0;
-    }
-
-    .contenedor {
-      max-width: 700px;
-      margin: auto;
+      text-align: center;
       padding: 20px;
-      border: 4px solid #ffeb3b;
-      background-color: #f4fff0;
-      border-radius: 10px;
-      box-sizing: border-box;
-      margin-bottom: 90px;
     }
 
-    h1, h2 {
-      text-align: center;
-      color: #1b5e20;
+    h1 {
+      color: #0b640b;
+      font-size: 2em;
     }
 
-    .texto-superior {
-      background-color: #1976d2;
-      color: white;
-      text-align: center;
-      padding: 15px 10px;
-      border-radius: 8px;
-      font-size: 15px;
-      margin-bottom: 20px;
-    }
-
-    .premio {
-      background-color: #e8f5e9;
-      padding: 15px;
-      margin-bottom: 20px;
-      border-left: 6px solid #66bb6a;
-      border-radius: 8px;
-    }
-
-    .btn-ver, .enlace-facebook, .btn-flotante {
-      display: block;
-      width: fit-content;
-      margin: 10px auto;
-      padding: 10px 25px;
-      border-radius: 30px;
-      text-align: center;
-      text-decoration: none;
-      font-weight: bold;
+    .botones {
+      margin-top: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
     }
 
     .btn-ver {
-      background-color: #2e7d32;
+      background-color: #1e7b1e;
       color: white;
-      border: 2px solid #fbc02d;
-      font-size: 16px;
-    }
-
-    .enlace-facebook {
-      background-color: #2962ff;
-      color: white;
-    }
-
-    .btn-flotante {
-      position: fixed;
-      bottom: 15px;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #2e7d32;
-      color: white;
-      border: 2px solid #fbc02d;
-      font-size: 14px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-      z-index: 999;
-    }
-
-    img {
-      max-width: 100%;
-      border-radius: 8px;
-      margin: 10px 0;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="contenedor">
-    <div class="texto-superior">
-      <p>🥳 <strong>Gran Rifa de Bicicletas de Montaña</strong> 🚴</p>
-      <p>🏁 <strong>MOTIVEMOS A LOS JÓVENES AL DEPORTE, PORQUE EL DEPORTE ES SALUD.</strong></p>
-      <p>🧡 Esta vez estamos apoyando a un joven de 14 años que está emprendiendo en este deporte del ciclismo.</p>
-      <p>🔍 <strong>Necesita una bicicleta más super para ir a la competencia estatal.</strong></p>
-    </div>
-
-    <h1>🎉 RIFA – BICIS MONTAÑA EQUIPADAS 🎉</h1>
-    <h2>3 premios + envío gratis a todo México</h2>
-    <h2>Se rifa en base a la Lotería Nacional el 30 de mayo de 2025</h2>
-
-    <img src="https://github.com/RIFAS-CON-CAUSA/BICIS-MONTANA-EQUIPADAS/blob/main/las%202%20bicis.jpeg?raw=true" alt="Bicicletas">
-    <img src="https://github.com/RIFAS-CON-CAUSA/BICIS-MONTANA-EQUIPADAS/blob/main/Rising.jpeg?raw=true" alt="Bicicleta Rising">
-
-    <div class="premio">
-      <strong>🏆 1.er Premio: Bicicleta Olympus (seminueva)</strong>
-      <ul>
-        <li>Cuadro de aluminio</li>
-        <li>Freno hidráulico trasero</li>
-        <li>Rines aerodinámicos R26</li>
-        <li>Suspensión de aire con bloqueo</li>
-        <li>Transmisión 7x2</li>
-        <li>Llantas seminuevas</li>
-      </ul>
-    </div>
-
-    <div class="premio">
-      <strong>🥈 2.º Premio: Bicicleta Rising (seminueva)</strong>
-      <ul>
-        <li>Suspensión delantera de aire con bloqueo manual</li>
-        <li>Transmisión 10x1</li>
-        <li>Frenos hidráulicos delanteros y traseros</li>
-        <li>Llantas seminuevas</li>
-        <li>Rines de aluminio R26</li>
-        <li>Maza tronadora</li>
-      </ul>
-    </div>
-
-    <div class="premio">
-      <strong>🎁 3.er Premio adicional: Bicicleta Mercurio 26 (básica, ganada recientemente en una competencia local)</strong>
-      <p>📢 Este premio es para quien compre más de 3 boletos y comparta en Facebook.</p>
-      <p>📦 Envío GRATIS a todo México.</p>
-      <p>📌 Recuerda poner tu número en la publicación.</p>
-    </div>
-
-    <a class="btn-ver" href="panel-boletos-1.html">🎫 Ver boletos disponibles</a>
-    <a class="enlace-facebook" href="https://www.facebook.com/profile.php?id=61576286602097" target="_blank">🔵 Más info en Facebook</a>
-  </div>
-
-  <a class="btn-flotante" href="https://wa.me/523311571619" target="_blank">📲 WhatsApp: Más info</a>
-
-<!-- Zona invisible para activación del botón admin -->
-<div id="zona-secreta" style="position:fixed; bottom:10px; right:10px; width:30px; height:30px; z-index:999;"></div>
-
-<!-- Botón que se mostrará tras triple toque -->
-<a id="btn-admin" href="admin.html" style="display:none; position:fixed; bottom:60px; right:10px; background-color:#1976d2; color:white; padding:10px 20px; border-radius:20px; text-decoration:none; font-weight:bold; z-index:1000; box-shadow:0 4px 6px rgba(0,0,0,0.3);">
-  🔐 Ingresar como administrador
-</a>
-
-<script>
-  let toques = 0;
-  const zona = document.getElementById("zona-secreta");
-  const boton = document.getElementById("btn-admin");
-
-  zona.addEventListener("touchstart", () => {
-    toques++;
-    if (toques === 3) {
-      boton.style.display = "block";
-      toques = 0;
-    }
-    setTimeout(() => toques = 0, 1000); // Reinicia si no se toca rápido
-  });
-</script>
-</body>
-</html>
+      padding: 14px 24px;
+      border: none;
+      border-radius: 30px;
+      font-size: 18px;
+      font-weight: bold;
+      text-decoration: none;
+      box-shadow: 0 5px 10px rgba(0,
