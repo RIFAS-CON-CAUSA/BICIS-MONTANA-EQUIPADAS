@@ -1,162 +1,31 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Panel de Boletos - Rifa Bicis</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background-color: #f0fff0;
-      text-align: center;
-    }
-    h1 {
-      color: #1b5e20;
-    }
-    .leyenda {
-      background: #e8f5e9;
-      padding: 10px;
-      margin-bottom: 20px;
-      border-radius: 8px;
-    }
-    .leyenda span {
-      margin: 0 8px;
-      padding: 4px 10px;
-      border-radius: 20px;
-      color: white;
-      font-weight: bold;
-    }
-    .verde { background: #2ecc71; }
-    .amarillo { background: #f1c40f; }
-    .rojo { background: #e74c3c; }
-    #panel {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 15px;
-      margin-top: 20px;
-    }
-    .boleto {
-      border-radius: 10px;
-      padding: 10px;
-      background: #fff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-      transition: transform 0.2s ease;
-    }
-    .boleto:hover {
-      transform: scale(1.05);
-    }
-    .numeros {
-      font-size: 12px;
-      margin-bottom: 8px;
-      color: #555;
-    }
-    button {
-      width: 100%;
-      padding: 10px;
-      font-size: 14px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      color: white;
-      font-weight: bold;
-      transition: transform 0.1s;
-    }
-    button:active {
-      transform: scale(0.95);
-    }
-    .disponible { background: #2ecc71; }
-    .apartado { background: #f1c40f; }
-    .pagado { background: #e74c3c; }
-    .enlace-inicio {
-      display: inline-block;
-      margin-top: 30px;
-      background: #1b5e20;
-      padding: 10px 20px;
-      color: white;
-      border-radius: 25px;
-      text-decoration: none;
-      font-weight: bold;
-    }
-  </style>
-</head>
-<body>
-  <h1>RIFA – ELIGE TU BOLETO</h1>
-  <div class="leyenda">
-    <span class="verde">Disponible</span>
-    <span class="amarillo">Apartado</span>
-    <span class="rojo">Pagado</span>
-  </div>
-  <div id="panel"></div>
-  <a class="enlace-inicio" href="index.html">⬅ Volver al inicio</a>
+<body style="background-color:#f4fce3; font-family: Arial, sans-serif; padding:20px; text-align:center;">
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  <!-- Botón superior -->
+  <a href="index.html" style="display:inline-block; background:#1b5e20; color:white; padding:10px 20px; border-radius:25px; text-decoration:none; font-weight:bold; margin-bottom:15px;">
+    ← Volver al Inicio
+  </a>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
-      authDomain: "rifas-con-causa.firebaseapp.com",
-      projectId: "rifas-con-causa",
-      storageBucket: "rifas-con-causa.appspot.com",
-      messagingSenderId: "347417635634",
-      appId: "1:347417635634:web:3ddab8921d26707910452b"
-    };
+  <!-- Texto superior -->
+  <p style="font-size:18px; font-weight:bold; color:#2e7d32;">Aquí tienes los 100 boletos</p>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+  <!-- Título principal -->
+  <h1 style="color:#205b18;">RIFA - ELIGE TU BOLETO</h1>
 
-    const oportunidadesGeneradas = new Set();
-    function generarOportunidades(idboleto) {
-      const base = idboleto <= 50 ? 0 : 500;
-      const oportunidades = [];
-      while (oportunidades.length < 10) {
-        const num = String(base + Math.floor(Math.random() * 500)).padStart(3, '0');
-        if (!oportunidades.includes(num)) {
-          oportunidades.push(num);
-        }
-      }
-      return oportunidades;
-    }
+  <!-- Texto motivacional -->
+  <p style="font-size:16px; color:#444; max-width:500px; margin:auto 0 30px 0;">
+    Gracias por tu apoyo al deporte y los jóvenes.<br>
+    <strong>¡Mucha suerte! Con un boleto ya estás dentro de los probables ganadores y nuevo ciclista.</strong>
+  </p>
 
-    async function cargarBoletos() {
-      const contenedor = document.getElementById("panel");
-      for (let i = 1; i <= 100; i++) {
-        const id = i.toString().padStart(3, '0');
-        const oportunidades = generarOportunidades(i);
-        const div = document.createElement("div");
-        div.className = "boleto";
+  <!-- AQUÍ VAN LOS BOLETOS (div id="panel") -->
 
-        const nums = document.createElement("div");
-        nums.className = "numeros";
-        nums.textContent = oportunidades.join(" · ");
+  <!-- Botón inferior -->
+  <a href="index.html" style="display:inline-block; background:#1b5e20; color:white; padding:10px 20px; border-radius:25px; text-decoration:none; font-weight:bold; margin-top:30px;">
+    ← Volver al Inicio
+  </a>
 
-        const boton = document.createElement("button");
-        boton.textContent = `Boleto #${id}`;
-        boton.className = "disponible";
-        boton.onclick = () => {
-          window.location.href = `registro.html?boleto=${id}`;
-        };
-
-        // Traer estado desde Firestore
-        const ref = doc(db, "boletos", id);
-        const snap = await getDoc(ref);
-        if (snap.exists()) {
-          const estado = snap.data().estado;
-          if (estado === "apartado") boton.className = "apartado";
-          else if (estado === "pagado") {
-            boton.className = "pagado";
-            boton.disabled = true;
-          }
-        }
-
-        div.appendChild(nums);
-        div.appendChild(boton);
-        contenedor.appendChild(div);
-      }
-    }
-
-    cargarBoletos();
-  </script>
+  <!-- Texto de agradecimiento -->
+  <p style="margin-top:10px; font-size:14px; color:#333;">
+    Gracias por ser parte de esta causa.
+  </p>
 </body>
-</html>
