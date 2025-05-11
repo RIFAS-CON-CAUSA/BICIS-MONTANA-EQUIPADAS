@@ -1,96 +1,98 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Panel de Boletos</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <title>Panel de Boletos - Rifa Bicis</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f0fff4;
       padding: 20px;
+      background-color: #f0fff0;
       text-align: center;
     }
-
-    .volver {
-      display: inline-block;
-      margin: 10px auto 30px;
-      padding: 10px 20px;
-      background: #2e7d32;
-      color: white;
-      text-decoration: none;
-      border-radius: 20px;
-      font-weight: bold;
-    }
-
     h1 {
       color: #1b5e20;
     }
-
     .leyenda {
-      margin-bottom: 10px;
+      background: #e8f5e9;
+      padding: 10px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+    }
+    .leyenda span {
+      margin: 0 8px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      color: white;
       font-weight: bold;
     }
-
-    .panel {
+    .verde { background: #2ecc71; }
+    .amarillo { background: #f1c40f; }
+    .rojo { background: #e74c3c; }
+    #panel {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 16px;
-      max-width: 1000px;
-      margin: auto;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
     }
-
     .boleto {
-      background: white;
-      border: 2px solid #ccc;
-      border-radius: 12px;
+      border-radius: 10px;
       padding: 10px;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
       transition: transform 0.2s ease;
     }
-
     .boleto:hover {
       transform: scale(1.05);
     }
-
     .numeros {
       font-size: 12px;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       color: #555;
     }
-
     button {
       width: 100%;
-      padding: 12px;
+      padding: 10px;
       font-size: 14px;
       border: none;
       border-radius: 8px;
-      font-weight: bold;
-      color: white;
       cursor: pointer;
+      color: white;
+      font-weight: bold;
+      transition: transform 0.1s;
     }
-
-    .disponible {
-      background-color: #4caf50;
+    button:active {
+      transform: scale(0.95);
     }
-
-    .apartado {
-      background-color: #fbc02d;
-    }
-
-    .pagado {
-      background-color: #e53935;
+    .disponible { background: #2ecc71; }
+    .apartado { background: #f1c40f; }
+    .pagado { background: #e74c3c; }
+    .enlace-inicio {
+      display: inline-block;
+      margin-top: 30px;
+      background: #1b5e20;
+      padding: 10px 20px;
+      color: white;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: bold;
     }
   </style>
+</head>
+<body>
+  <h1>RIFA – ELIGE TU BOLETO</h1>
+  <div class="leyenda">
+    <span class="verde">Disponible</span>
+    <span class="amarillo">Apartado</span>
+    <span class="rojo">Pagado</span>
+  </div>
+  <div id="panel"></div>
+  <a class="enlace-inicio" href="index.html">⬅ Volver al inicio</a>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import {
-      getFirestore,
-      collection,
-      getDocs,
-      doc,
-      getDoc
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
@@ -104,53 +106,57 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const oportunidades = [];
-
-    // Genera oportunidades únicas para cada boleto
-    function generarNumeros(ini) {
-      const base = ini <= 50 ? 0 : 500;
-      const usados = new Set();
-      const nums = [];
-      while (nums.length < 10) {
-        const n = Math.floor(Math.random() * 500) + base;
-        if (!usados.has(n)) {
-          usados.add(n);
-          nums.push(String(n).padStart(3, "0"));
+    const oportunidadesGeneradas = new Set();
+    function generarOportunidades(idboleto) {
+      const base = idboleto <= 50 ? 0 : 500;
+      const oportunidades = [];
+      while (oportunidades.length < 10) {
+        const num = String(base + Math.floor(Math.random() * 500)).padStart(3, '0');
+        if (!oportunidades.includes(num)) {
+          oportunidades.push(num);
         }
       }
-      return nums;
+      return oportunidades;
     }
 
-    document.addEventListener("DOMContentLoaded", async () => {
-      const panel = document.getElementById("panel");
-
+    async function cargarBoletos() {
+      const contenedor = document.getElementById("panel");
       for (let i = 1; i <= 100; i++) {
-        const numero = String(i).padStart(3, "0");
+        const id = i.toString().padStart(3, '0');
+        const oportunidades = generarOportunidades(i);
         const div = document.createElement("div");
         div.className = "boleto";
 
-        const nums = generarNumeros(i);
-        oportunidades.push({ id: numero, nums });
-
-        const numDiv = document.createElement("div");
-        numDiv.className = "numeros";
-        numDiv.textContent = nums.join(" · ");
+        const nums = document.createElement("div");
+        nums.className = "numeros";
+        nums.textContent = oportunidades.join(" · ");
 
         const boton = document.createElement("button");
-        boton.textContent = `Boleto #${numero}`;
+        boton.textContent = `Boleto #${id}`;
         boton.className = "disponible";
         boton.onclick = () => {
-          window.location.href = `registro.html?boleto=${numero}`;
+          window.location.href = `registro.html?boleto=${id}`;
         };
 
-        div.appendChild(numDiv);
-        div.appendChild(boton);
-        panel.appendChild(div);
-      }
+        // Traer estado desde Firestore
+        const ref = doc(db, "boletos", id);
+        const snap = await getDoc(ref);
+        if (snap.exists()) {
+          const estado = snap.data().estado;
+          if (estado === "apartado") boton.className = "apartado";
+          else if (estado === "pagado") {
+            boton.className = "pagado";
+            boton.disabled = true;
+          }
+        }
 
-      const snapshot = await getDocs(collection(db, "boletos"));
-      snapshot.forEach(docSnap => {
-        const data = docSnap.data();
-        const boton = document.querySelector(`button:contains("${data.idboleto}")`);
-        if (boton) {
-          boton.className
+        div.appendChild(nums);
+        div.appendChild(boton);
+        contenedor.appendChild(div);
+      }
+    }
+
+    cargarBoletos();
+  </script>
+</body>
+</html>
