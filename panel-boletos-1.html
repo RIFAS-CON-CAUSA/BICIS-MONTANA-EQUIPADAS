@@ -4,13 +4,26 @@
   <meta charset="UTF-8">
   <title>Panel Boletos - Rifa Bicis</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f5f5dc; padding: 20px; text-align: center; }
+    body { font-family: Arial, sans-serif; background: #f5f5dc; padding: 20px; }
 
-    .header { margin-bottom: 20px; }
+    .header { margin-bottom: 20px; text-align: center; }
     .boton { padding: 10px 15px; background: #4CAF50; color: white; text-decoration: none; border-radius: 5px; margin: 5px; display: inline-block; }
 
-    .filtro { margin: 10px 0; }
-    .buscador input { padding: 5px; width: 200px; }
+    .filtro { margin: 10px 0; text-align: center; }
+    .agradecimiento { margin-top: 20px; font-weight: bold; font-size: 14px; text-align: center; }
+
+    .buscador-flotante {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
+      background: white;
+      padding: 5px;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+    }
+
+    .buscador-flotante input { padding: 5px; width: 150px; }
 
     .boleto {
       border: 1px solid #ccc;
@@ -24,15 +37,15 @@
       background: #e0ffe0;
     }
 
-    .apartado { background: #fff176 !important; }  /* Amarillo */
-    .pagado { background: #81c784 !important; }    /* Verde */
+    .apartado { background: #fff176 !important; }
+    .pagado { background: #f44336 !important; } /* Rojo pagado */
 
-    .agradecimiento { margin-top: 20px; font-weight: bold; font-size: 14px; }
+    .bnr-container { margin-top: 30px; display: none; text-align: center; }
+    .bnr-container.visible { display: block; }
 
-    /* Responsive: 3 boletos por línea en móviles */
     @media (max-width: 600px) {
       .boleto { width: calc(33.33% - 20px); box-sizing: border-box; }
-      .buscador input { width: 100%; }
+      .buscador-flotante input { width: 100px; }
     }
   </style>
 </head>
@@ -47,10 +60,11 @@
   <button class="boton" onclick="filtrar('todos')">Todos</button>
   <button class="boton" onclick="filtrar('disponible')">🟩 Disponible</button>
   <button class="boton" onclick="filtrar('apartado')">🟨 Apartado</button>
-  <button class="boton" onclick="filtrar('pagado')">🟩 Pagado</button>
+  <button class="boton" onclick="filtrar('pagado')">🟥 Pagado</button>
+  <button class="boton" onclick="mostrarBNR()">🔒 Ver BNR</button>
 </div>
 
-<div class="buscador">
+<div class="buscador-flotante">
   <input type="number" id="busquedaNumero" placeholder="Buscar número..." oninput="buscarNumero()">
 </div>
 
@@ -58,6 +72,11 @@
 
 <div class="agradecimiento">
   Gracias por tu apoyo al deporte y los jóvenes. ¡MUCHA SUERTE!
+</div>
+
+<div id="bnr-container" class="bnr-container">
+  <h3>🔎 Números Repetidos</h3>
+  <div id="bnr-result">Cargando...</div>
 </div>
 
 <script type="module">
@@ -137,6 +156,31 @@
     });
 
     pintarBoletos(filtrados);
+  }
+
+  function mostrarBNR() {
+    const clave = prompt("Introduce la clave para ver el BNR:");
+    if (clave === "admin2024") {
+      const bnrContainer = document.getElementById('bnr-container');
+      bnrContainer.classList.add('visible');
+      calcularBNR();
+    } else {
+      alert("Clave incorrecta.");
+    }
+  }
+
+  function calcularBNR() {
+    const contador = {};
+    datosBoletos.forEach(b => {
+      (b.numeros || []).forEach(num => {
+        contador[num] = (contador[num] || 0) + 1;
+      });
+    });
+
+    const repetidos = Object.entries(contador).filter(([num, count]) => count > 1).map(([num]) => num);
+
+    const resultado = repetidos.length > 0 ? repetidos.join(', ') : "No hay números repetidos.";
+    document.getElementById('bnr-result').textContent = resultado;
   }
 
   cargarBoletos();
