@@ -2,67 +2,12 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Panel de Boletos Registrados</title>
+  <title>Panel Administrativo - Rifas con Causa</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f8e2;
-      padding: 20px;
-    }
-    h2 {
-      text-align: center;
-      color: #2e7d32;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      font-size: 14px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: center;
-    }
-    th {
-      background: #a5d6a7;
-    }
-    #busqueda {
-      margin: 10px auto;
-      display: block;
-      padding: 10px;
-      width: 90%;
-      max-width: 400px;
-      border-radius: 20px;
-      border: 1px solid #ccc;
-      font-size: 14px;
-    }
-  </style>
-</head>
-<body>
-
-  <h2>Panel de Boletos Registrados</h2>
-  <input type="text" id="busqueda" placeholder="Buscar por nombre o número de boleto...">
-
-  <table id="tablaBoletos">
-    <thead>
-      <tr>
-        <th>Boleto</th>
-        <th>Nombre</th>
-        <th>Teléfono</th>
-        <th>Población</th>
-        <th>Estado</th>
-        <th>Fecha</th>
-        <th>Números</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
@@ -75,66 +20,157 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const auth = getAuth();
 
-    async function pedirClave() {
-      const clave = prompt("Introduce la clave:");
-      if (clave !== "pelona10") {
-        alert("Clave incorrecta.");
-        window.location.href = "index.html";
-      } else {
-        cargarBoletos();
+    const usuariosPermitidos = {
+      "manuel@gmail.com": "admin",
+      "steven@gmail.com": "verificador",
+      "patty@gmail.com": "verificador",
+      "miriam@gmail.com": "verificador",
+      "dianne@gmail.com": "verificador"
+    };
+
+    const tabla = document.getElementById("tablaDatos");
+    const loginForm = document.getElementById("loginForm");
+    const panel = document.getElementById("panel");
+    const userDisplay = document.getElementById("usuario");
+    const logoutBtn = document.getElementById("logout");
+
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("correo").value;
+      const pass = document.getElementById("clave").value;
+
+      try {
+        const cred = await signInWithEmailAndPassword(auth, email, pass);
+        const rol = usuariosPermitidos[email];
+        if (!rol) throw new Error("No tienes permisos asignados.");
+
+        loginForm.style.display = "none";
+        panel.style.display = "block";
+        userDisplay.textContent = `${email} (${rol})`;
+        cargarDatos(email, rol);
+      } catch (err) {
+        alert("Error: " + err.message);
       }
+    });
+
+    logoutBtn.onclick = () => {
+      signOut(auth).then(() => {
+        panel.style.display = "none";
+        loginForm.style.display = "block";
+      });
+    };
+
+    document.getElementById("recuperar").onclick = () => {
+      const correo = prompt("Escribe tu correo para recuperar tu contraseña:");
+      if (correo) {
+        sendPasswordResetEmail(auth, correo)
+          .then(() => alert("Revisa tu correo."))
+          .catch(err => alert("Error: " + err.message));
+      }
+    };
+
+    document.getElementById("cambiarClave").onclick = () => {
+      const nueva = prompt("Escribe tu nueva contraseña:");
+      if (nueva.length < 6) return alert("Mínimo 6 caracteres.");
+      updatePassword(auth.currentUser, nueva)
+        .then(() => alert("Contraseña actualizada"))
+        .catch(err => alert("Error: " + err.message));
+    };
+
+    async function cargarDatos(emailUsuario, rol) {
+      tabla.innerHTML = "";
+      const q = await getDocs(collection(db, "boletos"));
+
+      q.forEach((docSnap) => {
+        const data = docSnap.data();
+        const fila = document.createElement("tr");
+
+        const f1 = `<td>${data.idboleto}</td>`;
+        const f2 = `<td>${data.nombre}</td>`;
+        const f3 = `<td>${data.telefono}</td>`;
+        const f4 = `<td>${data.poblacion}</td>`;
+        const f5 = `<td>${data.estado}</td>`;
+        const f6 = `<td>${data.fecha ? data.fecha.slice(0,10) : ""}</td>`;
+        let f7 = "";
+
+        if (data.estado !== "pagado") {
+          f7 = `<td><button onclick="marcarPagado('${docSnap.id}', '${emailUsuario}')">Marcar pagado</button></td>`;
+        } else {
+          f7 = `<td><span style="color:red;">✔️ Pagado</span><br><small>${data.registradoPor || "?"}</small></td>`;
+        }
+
+        fila.innerHTML = f1 + f2 + f3 + f4 + f5 + f6 + f7;
+        tabla.appendChild(fila);
+      });
     }
 
-    async function cargarBoletos() {
-      const tbody = document.querySelector("tbody");
-      const consulta = await getDocs(collection(db, "boletos"));
-      const datos = [];
+    window.marcarPagado = async (id, correo) => {
+      if (!confirm("¿Confirmas marcar como pagado?")) return;
+      const ref = doc(db, "boletos", id);
+      await updateDoc(ref, { estado: "pagado", registradoPor: correo });
+      location.reload();
+    };
 
-      consulta.forEach(doc => {
-        const d = doc.data();
-        datos.push({
-          boleto: doc.id,
-          nombre: d.nombre,
-          telefono: d.telefono,
-          poblacion: d.poblacion,
-          estado: d.estado,
-          fecha: d.fecha ? new Date(d.fecha).toLocaleString() : "",
-          numeros: d.numeros ? d.numeros.join(" · ") : "—"
-        });
+    document.getElementById("exportar").onclick = () => {
+      let csv = "idboleto,nombre,telefono,poblacion,estado,fecha\n";
+      const filas = tabla.querySelectorAll("tr");
+      filas.forEach(f => {
+        const celdas = f.querySelectorAll("td");
+        const linea = Array.from(celdas).slice(0, 6).map(c => c.textContent.trim()).join(",");
+        csv += linea + "\n";
       });
-
-      mostrarFilas(datos);
-
-      document.getElementById("busqueda").addEventListener("input", e => {
-        const texto = e.target.value.toLowerCase();
-        const filtrados = datos.filter(d =>
-          d.nombre.toLowerCase().includes(texto) ||
-          d.boleto.includes(texto)
-        );
-        mostrarFilas(filtrados);
-      });
-    }
-
-    function mostrarFilas(boletos) {
-      const tbody = document.querySelector("tbody");
-      tbody.innerHTML = "";
-      boletos.forEach(b => {
-        tbody.innerHTML += `
-          <tr>
-            <td>#${b.boleto}</td>
-            <td>${b.nombre}</td>
-            <td>${b.telefono}</td>
-            <td>${b.poblacion}</td>
-            <td>${b.estado}</td>
-            <td>${b.fecha}</td>
-            <td>${b.numeros}</td>
-          </tr>`;
-      });
-    }
-
-    pedirClave();
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "registro_rifa.csv";
+      a.click();
+    };
   </script>
 
+  <style>
+    body { font-family: Arial; background: #f8f8f8; padding: 20px; }
+    h2 { text-align: center; }
+    #panel { display: none; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; font-size: 13px; }
+    th { background: #e3f2fd; }
+    button { padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; background: #2e7d32; color: white; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; }
+    .topbar button { background: #d32f2f; }
+  </style>
+</head>
+<body>
+  <div id="loginForm">
+    <h2>Acceso al panel</h2>
+    <form>
+      <input id="correo" type="email" placeholder="Correo" required><br><br>
+      <input id="clave" type="password" placeholder="Contraseña" required><br><br>
+      <button type="submit">Ingresar</button><br><br>
+    </form>
+    <button id="recuperar">¿Olvidaste la contraseña?</button>
+  </div>
+
+  <div id="panel">
+    <div class="topbar">
+      <div><strong>Bienvenido:</strong> <span id="usuario"></span></div>
+      <div>
+        <button id="exportar">Exportar a Excel</button>
+        <button id="cambiarClave">Cambiar contraseña</button>
+        <button id="logout">Cerrar sesión</button>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Folio</th><th>Nombre</th><th>Teléfono</th><th>Población</th><th>Estado</th><th>Fecha</th><th>Acción</th>
+        </tr>
+      </thead>
+      <tbody id="tablaDatos"></tbody>
+    </table>
+  </div>
 </body>
 </html>
