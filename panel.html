@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel de Boletos Registrados</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f8e2;
+      padding: 20px;
+    }
+    h2 {
+      text-align: center;
+      color: #2e7d32;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background: #a5d6a7;
+    }
+    #busqueda {
+      margin: 10px auto;
+      display: block;
+      padding: 10px;
+      width: 90%;
+      max-width: 400px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Panel de Boletos Registrados</h2>
+  <input type="text" id="busqueda" placeholder="Buscar por nombre o número de boleto...">
+
+  <table id="tablaBoletos">
+    <thead>
+      <tr>
+        <th>Boleto</th>
+        <th>Nombre</th>
+        <th>Teléfono</th>
+        <th>Población</th>
+        <th>Estado</th>
+        <th>Fecha</th>
+        <th>Números</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
+      authDomain: "rifas-con-causa.firebaseapp.com",
+      projectId: "rifas-con-causa",
+      storageBucket: "rifas-con-causa.appspot.com",
+      messagingSenderId: "347417635634",
+      appId: "1:347417635634:web:3ddab8921d26707910452b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function pedirClave() {
+      const clave = prompt("Introduce la clave:");
+      if (clave !== "pelona10") {
+        alert("Clave incorrecta.");
+        window.location.href = "index.html";
+      } else {
+        cargarBoletos();
+      }
+    }
+
+    async function cargarBoletos() {
+      const tbody = document.querySelector("tbody");
+      const consulta = await getDocs(collection(db, "boletos"));
+      const datos = [];
+
+      consulta.forEach(doc => {
+        const d = doc.data();
+        datos.push({
+          boleto: doc.id,
+          nombre: d.nombre,
+          telefono: d.telefono,
+          poblacion: d.poblacion,
+          estado: d.estado,
+          fecha: d.fecha ? new Date(d.fecha).toLocaleString() : "",
+          numeros: d.numeros ? d.numeros.join(" · ") : "—"
+        });
+      });
+
+      mostrarFilas(datos);
+
+      document.getElementById("busqueda").addEventListener("input", e => {
+        const texto = e.target.value.toLowerCase();
+        const filtrados = datos.filter(d =>
+          d.nombre.toLowerCase().includes(texto) ||
+          d.boleto.includes(texto)
+        );
+        mostrarFilas(filtrados);
+      });
+    }
+
+    function mostrarFilas(boletos) {
+      const tbody = document.querySelector("tbody");
+      tbody.innerHTML = "";
+      boletos.forEach(b => {
+        tbody.innerHTML += `
+          <tr>
+            <td>#${b.boleto}</td>
+            <td>${b.nombre}</td>
+            <td>${b.telefono}</td>
+            <td>${b.poblacion}</td>
+            <td>${b.estado}</td>
+            <td>${b.fecha}</td>
+            <td>${b.numeros}</td>
+          </tr>`;
+      });
+    }
+
+    pedirClave();
+  </script>
+
+</body>
+</html>
