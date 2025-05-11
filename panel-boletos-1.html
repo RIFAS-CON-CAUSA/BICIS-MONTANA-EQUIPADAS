@@ -53,6 +53,8 @@
     .bnr-container { margin-top: 30px; display: none; text-align: center; }
     .bnr-container.visible { display: block; }
 
+    .footer { margin-top: 30px; text-align: center; }
+
     @media (max-width: 600px) {
       .boleto { width: calc(33.33% - 20px); box-sizing: border-box; }
       .buscador-bnr input { width: 100px; }
@@ -62,11 +64,9 @@
 <body>
 
 <div class="header">
-  <a href="index.html" class="boton">⬅ Volver al inicio</a>
   <h2>📋 Aquí tienes los 100 boletos</h2>
-
   <div class="buscador-bnr">
-    <input type="number" id="busquedaNumero" placeholder="Buscar número..." oninput="buscarNumero()">
+    <input type="number" id="busquedaNumero" placeholder="Buscar tu número..." oninput="buscarNumero()">
     <span class="bnr-link" onclick="mostrarBNR()">🔒 Ver BNR</span>
   </div>
 </div>
@@ -88,6 +88,10 @@
   <div id="bnr-result">Cargando...</div>
 </div>
 
+<div class="footer">
+  <a href="index.html" class="boton">⬅ Volver al inicio</a>
+</div>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
   import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
@@ -105,8 +109,7 @@
   const db = getFirestore(app);
 
   let datosBoletos = [];
-
-  async function cargarBoletos() {
+async function cargarBoletos() {
     const container = document.getElementById('boletos-container');
     container.innerHTML = "Cargando...";
 
@@ -115,7 +118,7 @@
 
     querySnapshot.forEach((docSnap) => {
       const data = docSnap.data();
-      data.docId = docSnap.id;  // <-- Agregamos docId como respaldo
+      data.docId = docSnap.id;
       datosBoletos.push(data);
     });
 
@@ -194,6 +197,5 @@
 
   cargarBoletos();
 </script>
-
 </body>
 </html>
