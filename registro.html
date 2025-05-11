@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Registro de Boleto</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -23,14 +23,14 @@
     window.enviarFormulario = async function(e) {
       e.preventDefault();
 
+      const idboleto = new URLSearchParams(window.location.search).get("boleto");
       const nombre = document.getElementById("nombre").value.trim();
       const telefono = document.getElementById("telefono").value.trim();
       const poblacion = document.getElementById("poblacion").value.trim();
       const boton = document.getElementById("btnEnviar");
-      const idboleto = new URLSearchParams(window.location.search).get("boleto");
 
-      if (!nombre || !telefono || !poblacion || !idboleto) {
-        alert("Completa todos los campos y asegúrate de haber elegido un boleto.");
+      if (!idboleto || !nombre || !telefono || !poblacion) {
+        alert("Completa todos los campos y asegúrate de ingresar desde un botón de boleto.");
         return;
       }
 
@@ -52,22 +52,15 @@
           fecha: new Date().toISOString()
         });
 
-        alert(`✅ ¡Boleto #${idboleto} registrado correctamente! 
-Tienes 2 horas para pagar antes de que vuelva a estar disponible.
-Cuenta Spin OXXO: 4217 4701 5601 6160 
-CLABE: 7289 6900 0143 3179 21 
-O paga con tu promotor autorizado. 
-(Tómale captura de pantalla)`);
-
+        alert(`✅ ¡Boleto #${idboleto} registrado correctamente! Tienes 2 horas para pagar antes de que vuelva a estar disponible.\n\nCuenta Spin OXXO: 4217 4701 5601 6160\nCLABE: 7289 6900 0143 3179 21\n\nO paga con tu promotor autorizado.\n(Tómale captura de pantalla).`);
         boton.textContent = "✔️ Registrado";
-        boton.disabled = true;
       } catch (error) {
         console.error("Error al registrar:", error);
         alert("Error al guardar el boleto. Intenta nuevamente.");
         boton.disabled = false;
         boton.textContent = "🎟️ Apartar Boleto";
       }
-    };
+    }
   </script>
   <style>
     body {
@@ -76,6 +69,7 @@ O paga con tu promotor autorizado.
       text-align: center;
       padding: 30px;
     }
+
     .contenedor {
       background: white;
       max-width: 400px;
@@ -84,16 +78,19 @@ O paga con tu promotor autorizado.
       border-radius: 12px;
       box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
+
     h2 {
       color: #205b18;
       margin-bottom: 20px;
     }
+
     label {
       display: block;
       text-align: left;
       font-weight: bold;
       margin-top: 15px;
     }
+
     input {
       width: 100%;
       padding: 10px;
@@ -101,6 +98,7 @@ O paga con tu promotor autorizado.
       border: 1px solid #ccc;
       border-radius: 6px;
     }
+
     button {
       margin-top: 20px;
       background-color: #2d7928;
@@ -112,4 +110,52 @@ O paga con tu promotor autorizado.
       cursor: pointer;
       width: 100%;
     }
-    button:
+
+    button:disabled {
+      background-color: #999;
+    }
+
+    .volver {
+      margin-top: 20px;
+      display: inline-block;
+      background: #0b640b;
+      padding: 10px 20px;
+      border-radius: 20px;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 15px;
+      box-shadow: 0px 3px 6px rgba(0,0,0,0.2);
+    }
+
+    .mensaje-final {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 14px;
+      color: #444;
+    }
+  </style>
+</head>
+<body>
+  <div class="contenedor">
+    <h2>Registro de Boleto</h2>
+    <form id="formulario-registro" onsubmit="enviarFormulario(event)">
+      <label>Nombre:</label>
+      <input type="text" id="nombre" required>
+
+      <label>Teléfono:</label>
+      <input type="tel" id="telefono" required>
+
+      <label>Población:</label>
+      <input type="text" id="poblacion" required>
+
+      <button type="submit" id="btnEnviar">🎟️ Apartar Boleto</button>
+    </form>
+    <a class="volver" href="panel-boletos-1.html">⬅ Volver al Panel</a>
+    <div class="mensaje-final">
+      Gracias por apoyar esta causa.<br>
+      "Por una juventud más inducida al deporte... porque el deporte es salud".
+    </div>
+  </div>
+</body>
+</html>
