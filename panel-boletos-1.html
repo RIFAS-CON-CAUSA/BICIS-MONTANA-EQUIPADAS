@@ -1,357 +1,161 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Panel de Boletos</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>Panel Boletos Rifa - Bicis</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f9fddf;
-      margin: 0;
-      padding: 20px;
-      text-align: center;
-    }
-
-    h1 {
-      color: #1b5e20;
-    }
-
-    .btn {
-      padding: 10px 20px;
-      border-radius: 20px;
-      text-decoration: none;
-      font-weight: bold;
-      margin: 10px;
-      display: inline-block;
-    }
-
-    .btn-inicio {
-      background-color: #1b5e20;
-      color: white;
-    }
-
-    .btn-bnr {
-      font-size: 12px;
-      background: transparent;
-      border: none;
-      color: #444;
-      text-decoration: underline;
-      cursor: pointer;
-    }
-
-    #busquedaNum {
-      margin-top: 10px;
-      padding: 8px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      width: 180px;
-    }
-
-    #resultadoBusqueda {
-      display: none;
-      background: #e0f7fa;
-      border: 1px solid #00acc1;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 8px;
-      font-size: 14px;
-      color: #004d40;
-    }
-
-    #resultadoBusqueda button {
-      margin-top: 8px;
-      background: #00796b;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 20px;
-      cursor: pointer;
-    }
-
-    .leyenda {
-      margin: 10px 0;
-      font-size: 15px;
-    }
-
-    .leyenda span {
-      display: inline-block;
-      margin: 0 10px;
-    }
-
-    .verde { color: green; }
-    .amarillo { color: #f1c40f; }
-    .rojo { color: red; }
-
-    #panel {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 12px;
-      margin-top: 20px;
-    }
+    body { font-family: Arial, sans-serif; background: #f5f5dc; padding: 20px; }
 
     .boleto {
-      border-radius: 10px;
-      border: 2px solid #ccc;
+      border: 1px solid #ccc;
+      border-radius: 5px;
       padding: 10px;
-      background: white;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin: 5px;
+      width: 160px;
+      display: inline-block;
+      vertical-align: top;
+      text-align: center;
+      background: #e0ffe0;
     }
 
-    .numeros {
-      font-size: 12px;
-      color: #555;
-      margin-bottom: 8px;
-    }
+    .apartado { background: #fff176; }  /* Amarillo */
+    .pagado { background: #81c784; }    /* Verde */
 
-    button.boton-boleto {
-      width: 100%;
-      padding: 10px;
-      border: none;
-      font-weight: bold;
-      border-radius: 8px;
-      color: white;
-      font-size: 15px;
-      cursor: pointer;
-    }
+    button { margin-top: 5px; }
 
-    .disponible { background-color: #2ecc71; }
-    .apartado { background-color: #f1c40f; }
-    .pagado { background-color: #e74c3c; }
+    #filtro { margin-bottom: 20px; }
 
-    #reporteRepetidos {
-      display: none;
-      margin-top: 20px;
-      background: #fff3cd;
-      border: 1px solid #ffeeba;
-      padding: 15px;
-      border-radius: 10px;
-    }
-
-    .mensaje-final {
-      margin-top: 30px;
-      font-weight: bold;
-      font-size: 15px;
-      color: #333;
+    /* Responsive: 3 boletos por línea en móviles */
+    @media (max-width: 600px) {
+      .boleto {
+        width: calc(33.33% - 20px);
+        box-sizing: border-box;
+      }
     }
   </style>
 </head>
 <body>
 
-  <a href="index.html" class="btn btn-inicio">⬅ Volver al inicio</a>
-  <button class="btn-bnr" onclick="pedirClaveBNR()">BNR</button>
+<h2>Panel de Boletos - Rifa Bicis</h2>
 
-  <h1>🎫 Aquí tienes los 100 boletos</h1>
-  <p class="leyenda">
-    <span class="verde">🟢 Disponible</span>
-    <span class="amarillo">🟡 Apartado</span>
-    <span class="rojo">🔴 Pagado</span>
-  </p>
-
-  <input id="busquedaNum" type="text" placeholder="🔍 Encuentra tu número de la suerte" onkeydown="if(event.key==='Enter')buscarNumero()" />
-  <div id="resultadoBusqueda"></div>
-
-  <div id="panel"></div>
-
-  <a href="index.html" class="btn btn-inicio">⬅ Volver al inicio</a>
-
-  <div class="mensaje-final">
-    Gracias por tu apoyo al deporte y los jóvenes.<br>¡MUCHA SUERTE!
-  </div>
-
-  <div id="reporteRepetidos"></div>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
-      authDomain: "rifas-con-causa.firebaseapp.com",
-      projectId: "rifas-con-causa",
-      storageBucket: "rifas-con-causa.appspot.com",
-      messagingSenderId: "347417635634",
-      appId: "1:347417635634:web:3ddab8921d26707910452b"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    const panel = document.getElementById("panel");
-    const oportunidadesGlobal = [];
-
-    function generarNumerosFijos(boleto) {
-      const base = boleto <= 50 ? 0 : 500;
-      const inicio = (boleto - 1) * 10;
-      const nums = [];
-      for (let i = 0; i < 10; i++) {
-        let num = String(base + (inicio + i) % 500).padStart(3, '0');
-        nums.push(num);
-        oportunidadesGlobal.push({ num, boleto });
-      }
-      return nums;
-    }
-
-    async function construirBoletos() {
-      for (let i = 1; i <= 100; i++) {
-        const id = String(i).padStart(3, '0');
-        const ref = doc(db, "boletos", id);
-        const snap = await getDoc(ref);
-        const estado = snap.exists() ? snap.data().estado : "disponible";
-
-        const div = document.createElement("div");
-        div.className = "boleto";
-
-        const numeros = generarNumerosFijos(i);
-        const numsDiv = document.createElement("div");
-        numsDiv.className = "numeros";
-        numsDiv.textContent = numeros.join(" · ");
-        div.appendChild(numsDiv);
-
-        const btn = document.createElement("button");
-        btn.textContent = `Boleto #${id}`;
-        btn.className = `boton-boleto ${estado}`;
-        btn.disabled = estado === "pagado";
-        btn.onclick = () => window.location.href = `registro.html?boleto=${id}`;
-
-        div.appendChild(btn);
-        panel.appendChild(div);
-      }
-    }
-
-    construirBoletos();
-
-    window.pedirClaveBNR = () => {
-      const clave = prompt("Introduce la clave:");
-      if (clave === "BNR") {
-        const contador = {};
-        for (let obj of oportunidadesGlobal) {
-          contador[obj.num] = (contador[obj.num] || []);
-          contador[obj.num].push(obj.boleto);
-        }
-
-        let repetidos = Object.entries(contador).filter(e => e[1].length > 1);
-        let salida = "<h3>Números repetidos:</h3><ul>";
-        for (let [numero, boletos] of repetidos) {
-          salida += `<li>${numero} → Boletos: ${boletos.map(b => "#" + String(b).padStart(3, '0')).join(", ")}</li>`;
-        }
-        salida += "</ul>";
-        document.getElementById("reporteRepetidos").innerHTML = salida;
-        document.getElementById("reporteRepetidos").style.display = "block";
-      } else {
-        alert("Clave incorrecta.");
-      }
-    };
-
-    window.buscarNumero = () => {
-      const valor = document.getElementById("busquedaNum").value.trim();
-      const salida = document.getElementById("resultadoBusqueda");
-      if (!valor) return;
-
-      const encontrados = oportunidadesGlobal.filter(obj => obj.num === valor);
-      if (encontrados.length > 0) {
-        const boletos = encontrados.map(e => `#${String(e.boleto).padStart(3, '0')}`).join(", ");
-        salida.innerHTML = `El número ${valor} aparece en el siguiente boleto: <br><strong>${boletos}</strong><br><button onclick="document.getElementById('resultadoBusqueda').style.display='none'">Aceptar</button>`;
-      } else {
-        salida.innerHTML = `El número ${valor} no aparece en ningún boleto.<br><button onclick="document.getElementById('resultadoBusqueda').style.display='none'">Aceptar</button>`;
-      }
-      salida.style.display = "block";
-    };
-  </script>
-<!-- Incluye este bloque completo en tu archivo panel-boletos-1.html justo antes del </body> -->
-<style>
-  #resultadoBusqueda {
-    position: fixed;
-    bottom: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #fff3cd;
-    border: 1px solid #ffeeba;
-    padding: 12px 20px;
-    border-radius: 10px;
-    font-size: 14px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    display: none;
-    z-index: 9999;
-  }
-  #resultadoBusqueda button {
-    margin-top: 8px;
-    background: #dc3545;
-    border: none;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-</style>
-
-<!-- Resultado flotante -->
-<div id="resultadoBusqueda">
-  <div id="contenidoResultado"></div>
-  <button onclick="document.getElementById('resultadoBusqueda').style.display='none'">Cerrar</button>
+<div>
+  <label for="filtro">Filtrar por estado: </label>
+  <select id="filtro" onchange="filtrarBoletos()">
+    <option value="todos">Todos</option>
+    <option value="disponible">Disponible</option>
+    <option value="apartado">Apartado</option>
+    <option value="pagado">Pagado</option>
+  </select>
 </div>
 
-<!-- Script de funciones -->
-<script>
-  const oportunidadesGlobal = [];
+<div id="boletos-container"></div>
 
-  function mostrarResultado(numero, boletos) {
-    const contenedor = document.getElementById("resultadoBusqueda");
-    const contenido = document.getElementById("contenidoResultado");
+<button onclick="descargarReporte()">Descargar Reporte Excel</button>
 
-    if (boletos.length === 1) {
-      contenido.innerHTML = `✅ El número <strong style="color:orange;">${numero}</strong> aparece en el siguiente boleto: <strong>#${String(boletos[0]).padStart(3,'0')}</strong>`;
-    } else if (boletos.length > 1) {
-      contenido.innerHTML = `✅ El número <strong style="color:orange;">${numero}</strong> aparece en los siguientes boletos: <strong>${boletos.map(b => "#" + String(b).padStart(3,'0')).join(", ")}</strong>`;
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+  import { getFirestore, doc, getDocs, updateDoc, collection } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "tu-api-key",
+    authDomain: "tu-proyecto.firebaseapp.com",
+    projectId: "tu-proyecto",
+    storageBucket: "tu-proyecto.appspot.com",
+    messagingSenderId: "tu-sender-id",
+    appId: "tu-app-id"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  let datosBoletos = [];
+
+  async function cargarBoletos() {
+    const container = document.getElementById('boletos-container');
+    container.innerHTML = "";
+
+    const querySnapshot = await getDocs(collection(db, "boletos"));
+    datosBoletos = [];
+
+    querySnapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      data.docId = docSnap.id;
+      datosBoletos.push(data);
+    });
+
+    pintarBoletos(datosBoletos);
+  }
+
+  function pintarBoletos(lista) {
+    const container = document.getElementById('boletos-container');
+    container.innerHTML = "";
+
+    lista.forEach(data => {
+      let numerosOrdenados = (data.numeros || []).sort((a, b) => parseInt(a) - parseInt(b));
+
+      const div = document.createElement('div');
+      div.className = 'boleto';
+      div.id = `boleto-${data.idboleto}`;
+
+      if (data.estado === "apartado") div.classList.add('apartado');
+      if (data.estado === "pagado") div.classList.add('pagado');
+
+      div.innerHTML = `
+        <strong>Boleto #${data.idboleto}</strong><br>
+        <small>${numerosOrdenados.join(' - ')}</small><br>
+        <small>${data.nombre || 'Disponible'}</small><br>
+        <small>Pago: ${data.pago || '-'}</small><br>
+        <small>Modificado por: ${data.modificadoPor || '-'}</small><br>
+        ${data.estado === "pagado" ? '<button disabled>Pagado</button>' : `
+        <button onclick="cambiarEstado('${data.docId}', 'apartado')">Apartar</button>
+        <button onclick="cambiarEstado('${data.docId}', 'pagado')">Pagar</button>`}
+      `;
+
+      container.appendChild(div);
+    });
+  }
+
+  async function cambiarEstado(docId, nuevoEstado) {
+    const nombreUsuario = prompt("¿Quién realiza este cambio? (Ej: Miriam, Patty)");
+    const metodoPago = nuevoEstado === "pagado" ? prompt("Forma de pago: Efectivo o Transferencia") : "";
+
+    await updateDoc(doc(db, "boletos", docId), {
+      estado: nuevoEstado,
+      modificadoPor: nombreUsuario,
+      pago: metodoPago
+    });
+
+    alert(`Boleto actualizado a ${nuevoEstado}`);
+    cargarBoletos();
+  }
+
+  function filtrarBoletos() {
+    const valor = document.getElementById('filtro').value;
+    if (valor === "todos") {
+      pintarBoletos(datosBoletos);
     } else {
-      contenido.innerHTML = `❌ El número <strong>${numero}</strong> no se encuentra en ningún boleto.`;
-    }
-
-    contenedor.style.display = "block";
-  }
-
-  function buscarNumeroSuerte() {
-    const valor = prompt("Ingresa tu número de la suerte (000 a 999):");
-    const numero = valor?.trim().padStart(3, '0');
-
-    if (!/^\d{3}$/.test(numero)) {
-      alert("Ingresa un número válido de 3 dígitos.");
-      return;
-    }
-
-    const boletos = oportunidadesGlobal.filter(obj => obj.num === numero).map(obj => obj.boleto);
-    mostrarResultado(numero, boletos);
-  }
-
-  function pedirClaveBNR() {
-    const clave = prompt("Introduce la clave:");
-    if (clave === "BNR") {
-      const contador = {};
-      for (let obj of oportunidadesGlobal) {
-        contador[obj.num] = (contador[obj.num] || []);
-        contador[obj.num].push(obj.boleto);
-      }
-
-      let repetidos = Object.entries(contador).filter(e => e[1].length > 1);
-      let salida = "<h3>Números repetidos:</h3><ul>";
-      for (let [numero, boletos] of repetidos) {
-        salida += `<li>${numero} → Boletos: ${boletos.map(b => "#" + String(b).padStart(3, '0')).join(", ")}</li>`;
-      }
-      salida += "</ul>";
-
-      const div = document.createElement("div");
-      div.innerHTML = salida;
-      div.style.background = "#fff";
-      div.style.border = "1px solid #ccc";
-      div.style.padding = "20px";
-      div.style.margin = "20px auto";
-      div.style.maxWidth = "600px";
-      div.style.borderRadius = "10px";
-      document.body.appendChild(div);
-    } else {
-      alert("Clave incorrecta.");
+      const filtrados = datosBoletos.filter(b => (b.estado || "disponible") === valor);
+      pintarBoletos(filtrados);
     }
   }
+
+  function descargarReporte() {
+    let csvContent = "data:text/csv;charset=utf-8,Boleto,Estado,Nombre,ModificadoPor,FormaPago\n";
+
+    datosBoletos.forEach(b => {
+      csvContent += `${b.idboleto},${b.estado || 'disponible'},${b.nombre || ''},${b.modificadoPor || ''},${b.pago || ''}\n`;
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "reporte_rifa_bicis.csv");
+    document.body.appendChild(link);
+    link.click();
+  }
+
+  cargarBoletos();
 </script>
+
 </body>
 </html>
