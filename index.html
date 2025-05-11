@@ -1,78 +1,103 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>RIFA – BICIS MONTAÑA EQUIPADAS</title>
   <style>
     body {
-      background-color: #fffde6;
+      background-color: #f4fce3;
       font-family: Arial, sans-serif;
       text-align: center;
       margin: 0;
+      padding: 0;
     }
-    .banner {
-      background-color: #0053a4;
-      color: white;
-      padding: 15px;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-    .contenido {
+    .contenedor {
+      max-width: 600px;
+      margin: auto;
       padding: 20px;
     }
     h1 {
+      font-size: 22px;
       color: #205b18;
     }
-    .card {
-      background: #f4fce3;
-      border-radius: 10px;
-      padding: 10px;
-      margin: 12px auto;
-      max-width: 360px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.2);
-    }
-    .card img {
+    img {
       width: 100%;
+      max-width: 500px;
+      margin: 15px auto;
       border-radius: 8px;
     }
-    .boton-verde {
-      display: block;
-      background-color: #207a15;
+    .premio {
+      background: white;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .boton {
+      display: inline-block;
+      background: #205b18;
       color: white;
-      padding: 12px 20px;
-      margin: 10px auto;
-      width: 240px;
-      font-size: 15px;
-      border: none;
+      font-weight: bold;
       border-radius: 25px;
+      padding: 12px 30px;
+      margin: 10px;
       text-decoration: none;
-      box-shadow: 0px 4px 6px rgba(0,0,0,0.2);
+      font-size: 16px;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.15);
       transition: transform 0.2s;
     }
-    .boton-verde:hover {
-      transform: scale(1.04);
+    .boton:hover {
+      transform: scale(1.05);
     }
-    .facebook {
-      display: inline-block;
-      background: #1877f2;
-      color: white;
-      padding: 8px 16px;
-      border-radius: 20px;
-      margin: 12px auto;
+    .bases {
+      background: #e2f3ff;
+      color: #003366;
+      padding: 12px;
+      margin-top: 15px;
+      border-radius: 10px;
       font-size: 14px;
-      text-decoration: none;
+      display: none;
     }
-    .whatsapp {
-      display: inline-block;
-      background: #25d366;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 25px;
-      font-weight: bold;
-      text-decoration: none;
-      margin-top: 10px;
+    .btn-azul {
+      background: #007BFF;
+    }
+    #boton-admin {
+      position: fixed;
+      bottom: 8px;
+      right: 12px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: transparent;
+      border: none;
     }
   </style>
 </head>
-<body onclick="cont
+<body>
+
+  <div class="contenedor">
+    <h1>🎉 RIFA – BICIS MONTAÑA EQUIPADAS 🎉</h1>
+    <p><strong>3 premios + envío gratis a todo México</strong></p>
+    <p>La rifa se hará en la última semana de junio 2025. El número del primer sorteo del día será el ganador.</p>
+
+    <div class="premio">
+      <img src="las%202%20bicis.jpeg" alt="Imagen premios" />
+    </div>
+
+    <div class="premio">
+      <img src="Rising.jpeg" alt="Premio 1" />
+      <p><strong>1er Premio: Bicicleta RISING</strong><br>10v velocidades, frenos hidráulicos, suspensión de aire, rines R26.</p>
+    </div>
+
+    <div class="premio">
+      <img src="Rising.jpeg" alt="Premio 2" />
+      <p><strong>2do Premio: Bicicleta OLYMPUS</strong><br>7v velocidades, frenos hidráulicos traseros, suspensión con bloqueo.</p>
+    </div>
+
+    <div class="premio">
+      <img src="Rising.jpeg" alt="Premio 3" />
+      <p><strong>3er Premio: Kit Accesorios</strong><br>Lámpara, guantes, luz LED, bocina musical, candado y bomba de aire.</p>
+    </div>
+
+    <a href="registro.html" class="boton">🎟️ Ir al Registro</a>
