@@ -36,19 +36,20 @@
 
 <h2>Panel de Boletos - Rifa Bicis</h2>
 
-<div id="boletos-container"></div>
+<div id="boletos-container">Cargando boletos...</div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-  import { getFirestore, doc, getDocs, updateDoc, collection } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+  import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
+  // ✅ Tu firebaseConfig real
   const firebaseConfig = {
-    apiKey: "tu-api-key",
-    authDomain: "tu-proyecto.firebaseapp.com",
-    projectId: "tu-proyecto",
-    storageBucket: "tu-proyecto.appspot.com",
-    messagingSenderId: "tu-sender-id",
-    appId: "tu-app-id"
+    apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
+    authDomain: "rifas-con-causa.firebaseapp.com",
+    projectId: "rifas-con-causa",
+    storageBucket: "rifas-con-causa.firebasestorage.app",
+    messagingSenderId: "347417635634",
+    appId: "1:347417635634:web:3ddab8921d26707910452b"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -56,7 +57,7 @@
 
   async function cargarBoletos() {
     const container = document.getElementById('boletos-container');
-    container.innerHTML = "";
+    container.innerHTML = "Cargando...";
 
     const querySnapshot = await getDocs(collection(db, "boletos"));
     let datosBoletos = [];
@@ -67,8 +68,15 @@
       datosBoletos.push(data);
     });
 
-    // Ordenar por idboleto numérico
+    // Ordenar por idboleto numérico ascendente
     datosBoletos.sort((a, b) => parseInt(a.idboleto) - parseInt(b.idboleto));
+
+    if (datosBoletos.length === 0) {
+      container.innerHTML = "<p>No hay boletos registrados.</p>";
+      return;
+    }
+
+    container.innerHTML = "";
 
     datosBoletos.forEach(data => {
       let numerosOrdenados = (data.numeros || []).sort((a, b) => parseInt(a) - parseInt(b));
@@ -109,8 +117,10 @@
     cargarBoletos();
   }
 
+  // ✅ Cargar boletos al iniciar
   cargarBoletos();
 </script>
 
 </body>
 </html>
+
