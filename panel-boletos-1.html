@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Panel Boletos Rifa - Bicis</title>
+  <title>Panel Boletos - Rifa Bicis</title>
   <style>
     body { font-family: Arial, sans-serif; background: #f5f5dc; padding: 20px; }
 
@@ -23,8 +23,6 @@
 
     button { margin-top: 5px; }
 
-    #filtro { margin-bottom: 20px; }
-
     /* Responsive: 3 boletos por línea en móviles */
     @media (max-width: 600px) {
       .boleto {
@@ -38,19 +36,7 @@
 
 <h2>Panel de Boletos - Rifa Bicis</h2>
 
-<div>
-  <label for="filtro">Filtrar por estado: </label>
-  <select id="filtro" onchange="filtrarBoletos()">
-    <option value="todos">Todos</option>
-    <option value="disponible">Disponible</option>
-    <option value="apartado">Apartado</option>
-    <option value="pagado">Pagado</option>
-  </select>
-</div>
-
 <div id="boletos-container"></div>
-
-<button onclick="descargarReporte()">Descargar Reporte Excel</button>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
@@ -68,14 +54,12 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  let datosBoletos = [];
-
   async function cargarBoletos() {
     const container = document.getElementById('boletos-container');
     container.innerHTML = "";
 
     const querySnapshot = await getDocs(collection(db, "boletos"));
-    datosBoletos = [];
+    let datosBoletos = [];
 
     querySnapshot.forEach((docSnap) => {
       const data = docSnap.data();
@@ -83,14 +67,10 @@
       datosBoletos.push(data);
     });
 
-    pintarBoletos(datosBoletos);
-  }
+    // Ordenar por idboleto numérico
+    datosBoletos.sort((a, b) => parseInt(a.idboleto) - parseInt(b.idboleto));
 
-  function pintarBoletos(lista) {
-    const container = document.getElementById('boletos-container');
-    container.innerHTML = "";
-
-    lista.forEach(data => {
+    datosBoletos.forEach(data => {
       let numerosOrdenados = (data.numeros || []).sort((a, b) => parseInt(a) - parseInt(b));
 
       const div = document.createElement('div');
@@ -116,7 +96,7 @@
   }
 
   async function cambiarEstado(docId, nuevoEstado) {
-    const nombreUsuario = prompt("¿Quién realiza este cambio? (Ej: Miriam, Patty)");
+    const nombreUsuario = prompt("¿Quién realiza este cambio?");
     const metodoPago = nuevoEstado === "pagado" ? prompt("Forma de pago: Efectivo o Transferencia") : "";
 
     await updateDoc(doc(db, "boletos", docId), {
@@ -127,31 +107,6 @@
 
     alert(`Boleto actualizado a ${nuevoEstado}`);
     cargarBoletos();
-  }
-
-  function filtrarBoletos() {
-    const valor = document.getElementById('filtro').value;
-    if (valor === "todos") {
-      pintarBoletos(datosBoletos);
-    } else {
-      const filtrados = datosBoletos.filter(b => (b.estado || "disponible") === valor);
-      pintarBoletos(filtrados);
-    }
-  }
-
-  function descargarReporte() {
-    let csvContent = "data:text/csv;charset=utf-8,Boleto,Estado,Nombre,ModificadoPor,FormaPago\n";
-
-    datosBoletos.forEach(b => {
-      csvContent += `${b.idboleto},${b.estado || 'disponible'},${b.nombre || ''},${b.modificadoPor || ''},${b.pago || ''}\n`;
-    });
-
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "reporte_rifa_bicis.csv");
-    document.body.appendChild(link);
-    link.click();
   }
 
   cargarBoletos();
