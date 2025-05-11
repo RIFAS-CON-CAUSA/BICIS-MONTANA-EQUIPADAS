@@ -11,7 +11,6 @@
       margin: 0;
       padding: 0;
     }
-
     .contenedor {
       max-width: 700px;
       margin: auto;
@@ -22,12 +21,10 @@
       box-sizing: border-box;
       margin-bottom: 90px;
     }
-
     h1, h2 {
       text-align: center;
       color: #1b5e20;
     }
-
     .texto-superior {
       background-color: #1976d2;
       color: white;
@@ -37,7 +34,6 @@
       font-size: 15px;
       margin-bottom: 20px;
     }
-
     .premio {
       background-color: #e8f5e9;
       padding: 15px;
@@ -45,7 +41,6 @@
       border-left: 6px solid #66bb6a;
       border-radius: 8px;
     }
-
     .btn-ver, .enlace-facebook, .btn-flotante {
       display: block;
       width: fit-content;
@@ -56,19 +51,17 @@
       text-decoration: none;
       font-weight: bold;
     }
-
     .btn-ver {
       background-color: #2e7d32;
       color: white;
       border: 2px solid #fbc02d;
       font-size: 16px;
+      cursor: pointer;
     }
-
     .enlace-facebook {
       background-color: #2962ff;
       color: white;
     }
-
     .btn-flotante {
       position: fixed;
       bottom: 15px;
@@ -81,7 +74,6 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.3);
       z-index: 999;
     }
-
     img {
       max-width: 100%;
       border-radius: 8px;
@@ -137,11 +129,30 @@
       <p>📌 Recuerda poner tu número en la publicación.</p>
     </div>
 
-    <a class="btn-ver" href="panel-boletos-1.html">🎫 Ver boletos disponibles</a>
+    <a id="btn-ver" class="btn-ver" href="panel-boletos-1.html">🎫 Ver boletos disponibles</a>
     <a class="enlace-facebook" href="https://www.facebook.com/profile.php?id=61576286602097" target="_blank">🔵 Más info en Facebook</a>
   </div>
 
   <a class="btn-flotante" href="https://wa.me/523311571619" target="_blank">📲 WhatsApp: Más info</a>
+
+  <script>
+    const botonVer = document.getElementById("btn-ver");
+    let tocado = 0;
+
+    botonVer.addEventListener("click", function(e) {
+      tocado++;
+      if (tocado >= 2) {
+        const pass = prompt("🔒 Ingresa la contraseña de administración:");
+        if (pass === "admin2025") {
+          window.location.href = "panel-admin.html";
+        } else {
+          alert("❌ Contraseña incorrecta.");
+        }
+        tocado = 0;
+        e.preventDefault();
+      }
+    });
+  </script>
 
 </body>
 </html>
