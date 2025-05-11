@@ -148,6 +148,32 @@
 
     construirBoletos();
   </script>
+<script>
+  function buscarNumero() {
+    const buscado = document.getElementById("busqueda").value.trim().padStart(3, '0');
+    if (!/^\d{3}$/.test(buscado)) {
+      alert("Introduce un número válido de 3 cifras.");
+      return;
+    }
 
+    const panel = document.getElementById("panel");
+    const boletos = panel.querySelectorAll(".boleto");
+    let encontrados = [];
+
+    boletos.forEach(boleto => {
+      const numeros = boleto.querySelector(".numeros").textContent;
+      if (numeros.includes(buscado)) {
+        const numBoleto = boleto.querySelector("button").textContent;
+        encontrados.push(numBoleto);
+      }
+    });
+
+    if (encontrados.length > 0) {
+      alert(`✅ El número ${buscado} aparece en los siguientes boletos: ${encontrados.join(", ")}`);
+    } else {
+      alert(`❌ El número ${buscado} no está presente en ningún boleto.`);
+    }
+  }
+</script>
 </body>
 </html>
