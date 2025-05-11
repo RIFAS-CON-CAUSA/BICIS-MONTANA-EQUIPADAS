@@ -4,7 +4,13 @@
   <meta charset="UTF-8">
   <title>Panel Boletos - Rifa Bicis</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f5f5dc; padding: 20px; }
+    body { font-family: Arial, sans-serif; background: #f5f5dc; padding: 20px; text-align: center; }
+
+    .header { margin-bottom: 20px; }
+    .boton { padding: 10px 15px; background: #4CAF50; color: white; text-decoration: none; border-radius: 5px; margin: 5px; display: inline-block; }
+
+    .filtro { margin: 10px 0; }
+    .buscador input { padding: 5px; width: 200px; }
 
     .boleto {
       border: 1px solid #ccc;
@@ -18,31 +24,46 @@
       background: #e0ffe0;
     }
 
-    .apartado { background: #fff176; }  /* Amarillo */
-    .pagado { background: #81c784; }    /* Verde */
+    .apartado { background: #fff176 !important; }  /* Amarillo */
+    .pagado { background: #81c784 !important; }    /* Verde */
 
-    button { margin-top: 5px; }
+    .agradecimiento { margin-top: 20px; font-weight: bold; font-size: 14px; }
 
     /* Responsive: 3 boletos por línea en móviles */
     @media (max-width: 600px) {
-      .boleto {
-        width: calc(33.33% - 20px);
-        box-sizing: border-box;
-      }
+      .boleto { width: calc(33.33% - 20px); box-sizing: border-box; }
+      .buscador input { width: 100%; }
     }
   </style>
 </head>
 <body>
 
-<h2>Panel de Boletos - Rifa Bicis</h2>
+<div class="header">
+  <a href="index.html" class="boton">⬅ Volver al inicio</a>
+  <h2>📋 Aquí tienes los 100 boletos</h2>
+</div>
+
+<div class="filtro">
+  <button class="boton" onclick="filtrar('todos')">Todos</button>
+  <button class="boton" onclick="filtrar('disponible')">🟩 Disponible</button>
+  <button class="boton" onclick="filtrar('apartado')">🟨 Apartado</button>
+  <button class="boton" onclick="filtrar('pagado')">🟩 Pagado</button>
+</div>
+
+<div class="buscador">
+  <input type="number" id="busquedaNumero" placeholder="Buscar número..." oninput="buscarNumero()">
+</div>
 
 <div id="boletos-container">Cargando boletos...</div>
 
+<div class="agradecimiento">
+  Gracias por tu apoyo al deporte y los jóvenes. ¡MUCHA SUERTE!
+</div>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-  import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-  // ✅ Tu firebaseConfig real
   const firebaseConfig = {
     apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
     authDomain: "rifas-con-causa.firebaseapp.com",
@@ -55,12 +76,14 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
+  let datosBoletos = [];
+
   async function cargarBoletos() {
     const container = document.getElementById('boletos-container');
     container.innerHTML = "Cargando...";
 
     const querySnapshot = await getDocs(collection(db, "boletos"));
-    let datosBoletos = [];
+    datosBoletos = [];
 
     querySnapshot.forEach((docSnap) => {
       const data = docSnap.data();
@@ -68,59 +91,56 @@
       datosBoletos.push(data);
     });
 
-    // Ordenar por idboleto numérico ascendente
     datosBoletos.sort((a, b) => parseInt(a.idboleto) - parseInt(b.idboleto));
+    pintarBoletos(datosBoletos);
+  }
 
-    if (datosBoletos.length === 0) {
-      container.innerHTML = "<p>No hay boletos registrados.</p>";
-      return;
-    }
-
+  function pintarBoletos(lista) {
+    const container = document.getElementById('boletos-container');
     container.innerHTML = "";
 
-    datosBoletos.forEach(data => {
+    lista.forEach(data => {
       let numerosOrdenados = (data.numeros || []).sort((a, b) => parseInt(a) - parseInt(b));
 
       const div = document.createElement('div');
       div.className = 'boleto';
-      div.id = `boleto-${data.idboleto}`;
-
       if (data.estado === "apartado") div.classList.add('apartado');
       if (data.estado === "pagado") div.classList.add('pagado');
 
       div.innerHTML = `
         <strong>Boleto #${data.idboleto}</strong><br>
-        <small>${numerosOrdenados.join(' - ')}</small><br>
-        <small>${data.nombre || 'Disponible'}</small><br>
-        <small>Pago: ${data.pago || '-'}</small><br>
-        <small>Modificado por: ${data.modificadoPor || '-'}</small><br>
-        ${data.estado === "pagado" ? '<button disabled>Pagado</button>' : `
-        <button onclick="cambiarEstado('${data.docId}', 'apartado')">Apartar</button>
-        <button onclick="cambiarEstado('${data.docId}', 'pagado')">Pagar</button>`}
+        <small>${numerosOrdenados.join(' - ')}</small>
       `;
 
       container.appendChild(div);
     });
   }
 
-  async function cambiarEstado(docId, nuevoEstado) {
-    const nombreUsuario = prompt("¿Quién realiza este cambio?");
-    const metodoPago = nuevoEstado === "pagado" ? prompt("Forma de pago: Efectivo o Transferencia") : "";
-
-    await updateDoc(doc(db, "boletos", docId), {
-      estado: nuevoEstado,
-      modificadoPor: nombreUsuario,
-      pago: metodoPago
-    });
-
-    alert(`Boleto actualizado a ${nuevoEstado}`);
-    cargarBoletos();
+  function filtrar(estado) {
+    if (estado === "todos") {
+      pintarBoletos(datosBoletos);
+    } else {
+      const filtrados = datosBoletos.filter(b => (b.estado || "disponible") === estado);
+      pintarBoletos(filtrados);
+    }
   }
 
-  // ✅ Cargar boletos al iniciar
+  function buscarNumero() {
+    const valor = document.getElementById('busquedaNumero').value;
+    if (!valor) {
+      pintarBoletos(datosBoletos);
+      return;
+    }
+
+    const filtrados = datosBoletos.filter(b => {
+      return (b.numeros || []).some(num => num.includes(valor));
+    });
+
+    pintarBoletos(filtrados);
+  }
+
   cargarBoletos();
 </script>
 
 </body>
 </html>
-
