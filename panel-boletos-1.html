@@ -8,23 +8,56 @@
     body {
       font-family: Arial, sans-serif;
       background: #f9fddf;
+      margin: 0;
       padding: 20px;
       text-align: center;
     }
     h1 {
       color: #1b5e20;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    #volverInicio {
+      display: inline-block;
+      margin: 10px auto 20px;
+      padding: 8px 20px;
+      background-color: #1b5e20;
+      color: white;
+      border-radius: 20px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 14px;
+    }
+    #busqueda {
+      margin-bottom: 10px;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 20px;
+      width: 250px;
+      font-size: 14px;
+    }
+    #panel {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+      max-width: 1000px;
+      margin: auto;
     }
     .boleto {
       background: #fff;
-      padding: 10px;
+      padding: 12px;
       border-radius: 10px;
       border: 2px solid #ccc;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease;
+    }
+    .boleto:hover {
+      transform: scale(1.05);
     }
     .numeros {
       font-size: 13px;
       color: #444;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
     button {
       padding: 10px;
@@ -34,46 +67,21 @@
       font-size: 15px;
       border-radius: 8px;
       cursor: pointer;
+      transition: 0.2s;
       width: 100%;
     }
     .disponible { background-color: #2ecc71; }
     .apartado { background-color: #f1c40f; }
     .pagado { background-color: #e74c3c; }
-    #panel {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 12px;
-      max-width: 1000px;
-      margin: auto;
-    }
-    #reporteRepetidos, #reporteBusqueda {
+
+    #reporteRepetidos {
       display: none;
-      margin-top: 20px;
+      margin-top: 30px;
       font-size: 14px;
       background: #fff3cd;
       border: 1px solid #ffeeba;
       padding: 15px;
       border-radius: 10px;
-    }
-    #btnBNR {
-      font-size: 10px;
-      background-color: transparent;
-      border: none;
-      color: #444;
-      text-decoration: underline;
-      cursor: pointer;
-      margin-left: 10px;
-    }
-    #volverInicio {
-      display: inline-block;
-      margin: 10px;
-      padding: 8px 20px;
-      background-color: #1b5e20;
-      color: white;
-      border-radius: 20px;
-      text-decoration: none;
-      font-weight: bold;
-      font-size: 14px;
     }
     .mensaje-final {
       margin-top: 30px;
@@ -81,148 +89,29 @@
       font-size: 15px;
       color: #333;
     }
-    #busqueda {
-      margin-top: 15px;
-    }
-    input[type="text"] {
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 20px;
-      width: 220px;
-    }
-    #buscarBtn {
-      background: #1565c0;
-      color: white;
-      padding: 8px 15px;
-      border: none;
-      border-radius: 20px;
-      font-weight: bold;
-      margin-left: 10px;
-      cursor: pointer;
-    }
   </style>
 </head>
 <body>
+
   <a id="volverInicio" href="index.html">⬅ Volver al inicio</a>
-  <button id="btnBNR" onclick="pedirClaveBNR()">BNR</button>
+  <button id="btnBNR" onclick="pedirClaveBNR()" style="font-size:10px; background-color:transparent; border:none; color:#444; text-decoration:underline; cursor:pointer;">BNR</button>
 
   <h1>Aquí tienes los 100 boletos</h1>
-  <h2>RIFA – Elige tu boleto</h2>
-  <p><span style="color:#2ecc71;">Verde</span>: Disponible · <span style="color:#f1c40f;">Amarillo</span>: Apartado · <span style="color:#e74c3c;">Rojo</span>: No disponible</p>
+  <p><strong>RIFA – Elige tu boleto</strong></p>
+  <p>
+    <span style="color:green;">🟢 Verde:</span> Disponible ·
+    <span style="color:orange;">🟡 Amarillo:</span> Apartado ·
+    <span style="color:red;">🔴 Rojo:</span> No disponible
+  </p>
 
-  <div id="busqueda">
-    <input type="text" id="numeroBuscar" placeholder="Encuentra tu número de la suerte 🔍">
-    <button id="buscarBtn" onclick="buscarNumero()">Buscar</button>
+  <!-- Campo de búsqueda -->
+  <div style="position: relative; display: inline-block; margin: 15px auto;">
+    <input id="busqueda" placeholder="Encuentra tu número de la suerte 🔍"
+           style="padding:8px; border:1px solid #ccc; border-radius:20px; width:250px; font-size:14px;">
+    <button onclick="buscarNumero()" style="background:#2962ff; color:white; border:none; padding:8px 12px; border-radius:20px; font-weight:bold; margin-left:8px;">Buscar</button>
+    <div id="resultadoBusqueda" style="position:absolute; top:42px; left:0; width:100%; background:#fff; border:1px solid #ccc; border-radius:10px; padding:8px; display:none; z-index:999; font-size:14px;"></div>
   </div>
 
   <div id="panel"></div>
 
   <a id="volverInicio" href="index.html">⬅ Volver al inicio</a>
-
-  <div class="mensaje-final">
-    Gracias por tu apoyo al deporte y los jóvenes.<br>
-    ¡MUCHA SUERTE! Con un boleto ya estás dentro de los probables ganadores y nuevo ciclista.
-  </div>
-
-  <div id="reporteBusqueda"></div>
-  <div id="reporteRepetidos"></div>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
-      authDomain: "rifas-con-causa.firebaseapp.com",
-      projectId: "rifas-con-causa",
-      storageBucket: "rifas-con-causa.appspot.com",
-      messagingSenderId: "347417635634",
-      appId: "1:347417635634:web:3ddab8921d26707910452b"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    const panel = document.getElementById("panel");
-    const oportunidadesGlobal = [];
-
-    async function construirBoletos() {
-      for (let i = 1; i <= 100; i++) {
-        const id = String(i).padStart(3, '0');
-        const ref = doc(db, "boletos", id);
-        const snap = await getDoc(ref);
-        if (!snap.exists()) continue;
-
-        const data = snap.data();
-        const numeros = data.numeros || [];
-        const estado = data.estado || "disponible";
-
-        numeros.forEach(num => {
-          oportunidadesGlobal.push({ num, boleto: id, estado });
-        });
-
-        const div = document.createElement("div");
-        div.className = "boleto";
-
-        const numsDiv = document.createElement("div");
-        numsDiv.className = "numeros";
-        numsDiv.textContent = numeros.join(" · ");
-        div.appendChild(numsDiv);
-
-        const btn = document.createElement("button");
-        btn.textContent = `Boleto #${id}`;
-        btn.className = estado.toLowerCase();
-        btn.disabled = estado === "pagado";
-        btn.onclick = () => window.location.href = `registro.html?boleto=${id}`;
-        div.appendChild(btn);
-
-        panel.appendChild(div);
-      }
-    }
-
-    window.pedirClaveBNR = () => {
-      const clave = prompt("Introduce la clave:");
-      if (clave === "BNR") {
-        const contador = {};
-        for (let obj of oportunidadesGlobal) {
-          contador[obj.num] = (contador[obj.num] || []);
-          contador[obj.num].push(obj.boleto);
-        }
-
-        const repetidos = Object.entries(contador).filter(([_, arr]) => arr.length > 1);
-        let salida = "<h3>Números repetidos:</h3><ul>";
-        for (let [numero, boletos] of repetidos) {
-          salida += `<li>${numero} → Boletos: ${boletos.map(b => "#" + b).join(", ")}</li>`;
-        }
-        salida += "</ul>";
-        document.getElementById("reporteRepetidos").innerHTML = salida;
-        document.getElementById("reporteRepetidos").style.display = "block";
-      } else {
-        alert("Clave incorrecta.");
-      }
-    };
-
-    window.buscarNumero = () => {
-      const buscado = document.getElementById("numeroBuscar").value.trim();
-      if (!/^\d{3}$/.test(buscado)) {
-        alert("Ingresa un número de 3 cifras (ej. 035)");
-        return;
-      }
-
-      const hallados = oportunidadesGlobal.filter(obj => obj.num === buscado);
-      const div = document.getElementById("reporteBusqueda");
-
-      if (hallados.length === 0) {
-        div.innerHTML = `❌ El número ${buscado} no aparece en ningún boleto.`;
-      } else {
-        const enBoletos = hallados.map(h => `#${h.boleto}`).join(", ");
-        div.innerHTML = `✅ El número <span style="color:orange;font-weight:bold;">${buscado}</span> aparece en los siguientes boletos: <br><strong>${enBoletos}</strong>`;
-      }
-
-      div.style.display = "block";
-    };
-
-    construirBoletos();
-  </script>
-</body>
-</html>
