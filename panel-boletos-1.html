@@ -2,121 +2,11 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Panel de Boletos - Rifa Bicis Montaña</title>
+  <title>Panel de Boletos</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      background-color: #f4fce3;
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      text-align: center;
-    }
-
-    h1 {
-      color: #205b18;
-      margin-top: 10px;
-    }
-
-    .panel {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 12px;
-      margin-top: 20px;
-      max-width: 900px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .boleto {
-      background-color: #ffffff;
-      border: 2px solid #cfd8dc;
-      border-radius: 12px;
-      padding: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      transition: transform 0.2s;
-    }
-
-    .boleto:hover {
-      transform: scale(1.03);
-    }
-
-    .numeros {
-      font-size: 12px;
-      color: #37474f;
-      margin-bottom: 8px;
-    }
-
-    .btn {
-      padding: 8px 12px;
-      border: none;
-      border-radius: 6px;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background 0.3s;
-    }
-
-    .disponible {
-      background-color: #2e7d32;
-    }
-
-    .disponible:hover {
-      background-color: #1b5e20;
-    }
-
-    .apartado {
-      background-color: #fbc02d;
-      color: black;
-    }
-
-    .pagado {
-      background-color: #d32f2f;
-    }
-
-    .volver {
-      display: inline-block;
-      background: #1b5e20;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 25px;
-      text-decoration: none;
-      font-weight: bold;
-      margin: 10px auto;
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Botón superior -->
-  <a class="volver" href="index.html">← Volver al Inicio</a>
-
-  <!-- Texto superior -->
-  <p style="font-size:18px; font-weight:bold; color:#2e7d32;">Aquí tienes los 100 boletos</p>
-
-  <!-- Título -->
-  <h1>RIFA - ELIGE TU BOLETO</h1>
-
-  <!-- Subtítulo -->
-  <p style="font-size:16px; color:#444; max-width:500px; margin:auto 0 30px 0;">
-    Gracias por tu apoyo al deporte y los jóvenes.<br>
-    <strong>¡Mucha suerte! Con un boleto ya estás dentro de los probables ganadores y nuevo ciclista.</strong>
-  </p>
-
-  <!-- Panel de boletos -->
-  <div id="panel" class="panel"></div>
-
-  <!-- Botón inferior -->
-  <a class="volver" href="index.html">← Volver al Inicio</a>
-
-  <!-- Texto de cierre -->
-  <p style="margin-top:10px; font-size:14px; color:#333;">
-    Gracias por ser parte de esta causa.
-  </p>
-
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
@@ -130,56 +20,139 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const oportunidades = Array.from({ length: 100 }, (_, i) => {
+    const oportunidadesPorBoleto = Array.from({ length: 100 }, (_, i) => {
       const base = i < 50 ? 0 : 500;
-      const grupo = [];
-      while (grupo.length < 10) {
-        const num = String(base + Math.floor(Math.random() * 500)).padStart(3, "0");
-        if (!grupo.includes(num)) grupo.push(num);
-      }
-      return grupo;
+      const offset = (i % 50) * 10;
+      return Array.from({ length: 10 }, (_, j) =>
+        String(base + ((offset + j) % 500)).padStart(3, '0')
+      );
     });
 
-    const panel = document.getElementById("panel");
+    document.addEventListener("DOMContentLoaded", async () => {
+      const panel = document.getElementById("panel");
 
-    async function cargarBoletos() {
       for (let i = 1; i <= 100; i++) {
-        const id = i.toString().padStart(3, "0");
-        const grupo = oportunidades[i - 1];
         const div = document.createElement("div");
         div.className = "boleto";
 
         const nums = document.createElement("div");
         nums.className = "numeros";
-        nums.textContent = grupo.join(" · ");
+        nums.textContent = oportunidadesPorBoleto[i - 1].join(" · ");
 
-        const btn = document.createElement("button");
-        btn.className = "btn disponible";
-        btn.textContent = "Boleto #" + id;
-        btn.onclick = () => {
-          window.location.href = `registro.html?boleto=${id}`;
-        };
+        const boton = document.createElement("button");
+        boton.textContent = `Boleto #${String(i).padStart(3, '0')}`;
+        boton.className = "disponible";
+        boton.setAttribute("data-id", String(i).padStart(3, '0'));
 
-        // consulta estado en Firestore
-        const docRef = doc(db, "boletos", id);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const estado = docSnap.data().estado;
-          if (estado === "apartado") {
-            btn.className = "btn apartado";
-          } else if (estado === "pagado") {
-            btn.className = "btn pagado";
-            btn.disabled = true;
-          }
-        }
+        boton.addEventListener("click", () => {
+          window.location.href = `registro.html?boleto=${String(i).padStart(3, '0')}`;
+        });
 
         div.appendChild(nums);
-        div.appendChild(btn);
+        div.appendChild(boton);
         panel.appendChild(div);
       }
-    }
 
-    cargarBoletos();
+      const querySnapshot = await getDocs(collection(db, "boletos"));
+      querySnapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        const id = data.idboleto;
+        const estado = (data.estado || "").toLowerCase();
+        const boton = document.querySelector(`button[data-id="${id}"]`);
+        if (boton) {
+          if (estado === "apartado") boton.className = "apartado";
+          if (estado === "pagado") {
+            boton.className = "pagado";
+            boton.disabled = true;
+          }
+        }
+      });
+    });
   </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fefefc;
+      padding: 20px;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #1b5e20;
+    }
+    .boleto {
+      background-color: #fff;
+      border: 2px solid #ccc;
+      padding: 10px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+    .boleto:hover {
+      transform: scale(1.05);
+    }
+    .numeros {
+      font-size: 12px;
+      margin-bottom: 6px;
+      color: #555;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      color: white;
+    }
+    .disponible {
+      background-color: #2ecc71;
+    }
+    .apartado {
+      background-color: #f1c40f;
+    }
+    .pagado {
+      background-color: #e74c3c;
+    }
+    #panel {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 12px;
+      max-width: 900px;
+      margin: 20px auto;
+    }
+    .volver {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .volver a {
+      font-weight: bold;
+      color: #1b5e20;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="volver">
+    <a href="index.html">⬅ Volver a inicio</a>
+  </div>
+
+  <h1>RIFA – ELIGE TU BOLETO</h1>
+  <h2>Aquí tienes los 100 boletos</h2>
+  <p style="text-align:center;">Verde = Disponible • Amarillo = Apartado • Rojo = Pagado</p>
+
+  <div id="panel"></div>
+
+  <p style="text-align:center; margin-top: 30px;">
+    Gracias por tu apoyo al deporte y los jóvenes.<br>
+    Mucha suerte, con un boleto ya estás dentro de los probables ganadores y nuevo ciclista.
+  </p>
+
+  <div class="volver">
+    <a href="index.html">⬅ Volver a inicio</a>
+  </div>
+
 </body>
 </html>
