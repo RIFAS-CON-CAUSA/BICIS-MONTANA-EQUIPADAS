@@ -6,24 +6,34 @@
   <style>
     body { font-family: Arial, sans-serif; background: #f5f5dc; padding: 20px; }
 
-    .header { margin-bottom: 20px; text-align: center; }
+    .header { margin-bottom: 20px; text-align: center; position: relative; }
     .boton { padding: 10px 15px; background: #4CAF50; color: white; text-decoration: none; border-radius: 5px; margin: 5px; display: inline-block; }
 
     .filtro { margin: 10px 0; text-align: center; }
     .agradecimiento { margin-top: 20px; font-weight: bold; font-size: 14px; text-align: center; }
 
-    .buscador-flotante {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      z-index: 1000;
-      background: white;
-      padding: 5px;
-      border-radius: 5px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+    .buscador-bnr {
+      position: absolute;
+      top: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    .buscador-flotante input { padding: 5px; width: 150px; }
+    .buscador-bnr input {
+      padding: 5px;
+      width: 150px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .bnr-link {
+      cursor: pointer;
+      color: #4CAF50;
+      font-weight: bold;
+      text-decoration: underline;
+    }
 
     .boleto {
       border: 1px solid #ccc;
@@ -38,14 +48,14 @@
     }
 
     .apartado { background: #fff176 !important; }
-    .pagado { background: #f44336 !important; } /* Rojo pagado */
+    .pagado { background: #f44336 !important; }
 
     .bnr-container { margin-top: 30px; display: none; text-align: center; }
     .bnr-container.visible { display: block; }
 
     @media (max-width: 600px) {
       .boleto { width: calc(33.33% - 20px); box-sizing: border-box; }
-      .buscador-flotante input { width: 100px; }
+      .buscador-bnr input { width: 100px; }
     }
   </style>
 </head>
@@ -54,18 +64,17 @@
 <div class="header">
   <a href="index.html" class="boton">⬅ Volver al inicio</a>
   <h2>📋 Aquí tienes los 100 boletos</h2>
+
+  <div class="buscador-bnr">
+    <input type="number" id="busquedaNumero" placeholder="Buscar número..." oninput="buscarNumero()">
+    <span class="bnr-link" onclick="mostrarBNR()">🔒 Ver BNR</span>
+  </div>
 </div>
 
 <div class="filtro">
-  <button class="boton" onclick="filtrar('todos')">Todos</button>
   <button class="boton" onclick="filtrar('disponible')">🟩 Disponible</button>
   <button class="boton" onclick="filtrar('apartado')">🟨 Apartado</button>
   <button class="boton" onclick="filtrar('pagado')">🟥 Pagado</button>
-  <button class="boton" onclick="mostrarBNR()">🔒 Ver BNR</button>
-</div>
-
-<div class="buscador-flotante">
-  <input type="number" id="busquedaNumero" placeholder="Buscar número..." oninput="buscarNumero()">
 </div>
 
 <div id="boletos-container">Cargando boletos...</div>
@@ -136,12 +145,8 @@
   }
 
   function filtrar(estado) {
-    if (estado === "todos") {
-      pintarBoletos(datosBoletos);
-    } else {
-      const filtrados = datosBoletos.filter(b => (b.estado || "disponible") === estado);
-      pintarBoletos(filtrados);
-    }
+    const filtrados = datosBoletos.filter(b => (b.estado || "disponible") === estado);
+    pintarBoletos(filtrados);
   }
 
   function buscarNumero() {
@@ -151,9 +156,9 @@
       return;
     }
 
-    const filtrados = datosBoletos.filter(b => {
-      return (b.numeros || []).some(num => num.includes(valor));
-    });
+    const filtrados = datosBoletos.filter(b =>
+      (b.numeros || []).some(num => num.includes(valor))
+    );
 
     pintarBoletos(filtrados);
   }
