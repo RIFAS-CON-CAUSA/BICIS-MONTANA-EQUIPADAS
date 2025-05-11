@@ -6,21 +6,20 @@
   <style>
     body { font-family: Arial, sans-serif; background: #f5f5dc; padding: 20px; margin: 0; }
 
-    .header { margin-bottom: 10px; text-align: center; }
+    .header { position: relative; text-align: center; margin-bottom: 10px; }
     .boton { padding: 10px 15px; background: #4CAF50; color: white; text-decoration: none; border-radius: 5px; margin: 5px; display: inline-block; }
 
-    .buscador-barra {
-      position: sticky;
+    .buscador-flotante {
+      position: absolute;
       top: 0;
-      background: #f5f5dc;
-      padding: 10px;
-      text-align: right;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      z-index: 999;
+      right: 0;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
 
-    .buscador-barra input { padding: 5px; width: 180px; border-radius: 5px; border: 1px solid #ccc; }
-    .buscador-barra button { padding: 6px 10px; margin-left: 5px; }
+    .buscador-flotante input { padding: 5px; width: 140px; border-radius: 5px; border: 1px solid #ccc; }
+    .buscador-flotante button { padding: 6px 10px; }
 
     .boleto {
       border: 1px solid #ccc;
@@ -41,6 +40,7 @@
 
     @media (max-width: 600px) {
       .boleto { width: calc(33.33% - 20px); }
+      .buscador-flotante input { width: 100px; }
     }
   </style>
 </head>
@@ -48,13 +48,11 @@
 
 <div class="header">
   <h2>📋 Panel de Boletos - Rifa</h2>
-</div>
-
-<div class="buscador-barra">
-  <input type="text" id="busquedaNumero" placeholder="Buscar tu número...">
-  <button onclick="buscarNumero()">Buscar</button>
-  <button onclick="mostrarBNR()">🔒 BNR</button>
-  <a href="registro.html" class="boton">+ Registrar Boleto</a>
+  <div class="buscador-flotante">
+    <input type="text" id="busquedaNumero" placeholder="Buscar número...">
+    <button onclick="buscarNumero()">Buscar</button>
+    <button onclick="mostrarBNR()">BNR</button>
+  </div>
 </div>
 
 <div id="boletos-container">Cargando boletos...</div>
@@ -85,7 +83,8 @@
   const db = getFirestore(app);
 
   let datosBoletos = [];
-async function cargarBoletos() {
+
+  async function cargarBoletos() {
     const container = document.getElementById('boletos-container');
     container.innerHTML = "Cargando...";
 
@@ -141,7 +140,7 @@ async function cargarBoletos() {
   }
 
   function mostrarBNR() {
-    const clave = prompt("Introduce la clave para ver el BNR:");
+    const clave = prompt("Introduce la clave BNR:");
     if (clave !== "admin2024") {
       alert("Clave incorrecta.");
       return;
@@ -166,5 +165,6 @@ async function cargarBoletos() {
 
   cargarBoletos();
 </script>
+
 </body>
 </html>
