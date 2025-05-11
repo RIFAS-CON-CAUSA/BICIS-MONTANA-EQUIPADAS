@@ -2,38 +2,25 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Panel Boletos - Rifa Bicis</title>
+  <title>Panel Boletos - Rifa</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f5f5dc; padding: 20px; }
+    body { font-family: Arial, sans-serif; background: #f5f5dc; padding: 20px; margin: 0; }
 
-    .header { margin-bottom: 20px; text-align: center; position: relative; }
+    .header { margin-bottom: 10px; text-align: center; }
     .boton { padding: 10px 15px; background: #4CAF50; color: white; text-decoration: none; border-radius: 5px; margin: 5px; display: inline-block; }
 
-    .filtro { margin: 10px 0; text-align: center; }
-    .agradecimiento { margin-top: 20px; font-weight: bold; font-size: 14px; text-align: center; }
-
-    .buscador-bnr {
-      position: absolute;
+    .buscador-barra {
+      position: sticky;
       top: 0;
-      right: 0;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      background: #f5f5dc;
+      padding: 10px;
+      text-align: right;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 999;
     }
 
-    .buscador-bnr input {
-      padding: 5px;
-      width: 150px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-
-    .bnr-link {
-      cursor: pointer;
-      color: #4CAF50;
-      font-weight: bold;
-      text-decoration: underline;
-    }
+    .buscador-barra input { padding: 5px; width: 180px; border-radius: 5px; border: 1px solid #ccc; }
+    .buscador-barra button { padding: 6px 10px; margin-left: 5px; }
 
     .boleto {
       border: 1px solid #ccc;
@@ -42,50 +29,39 @@
       margin: 5px;
       width: 160px;
       display: inline-block;
-      vertical-align: top;
       text-align: center;
       background: #e0ffe0;
     }
 
     .apartado { background: #fff176 !important; }
-    .pagado { background: #f44336 !important; }
+    .pagado { background: #f44336 !important; color: white; }
 
-    .bnr-container { margin-top: 30px; display: none; text-align: center; }
-    .bnr-container.visible { display: block; }
-
+    .bnr { margin-top: 20px; text-align: center; }
     .footer { margin-top: 30px; text-align: center; }
 
     @media (max-width: 600px) {
-      .boleto { width: calc(33.33% - 20px); box-sizing: border-box; }
-      .buscador-bnr input { width: 100px; }
+      .boleto { width: calc(33.33% - 20px); }
     }
   </style>
 </head>
 <body>
 
 <div class="header">
-  <h2>📋 Aquí tienes los 100 boletos</h2>
-  <div class="buscador-bnr">
-    <input type="number" id="busquedaNumero" placeholder="Buscar tu número..." oninput="buscarNumero()">
-    <span class="bnr-link" onclick="mostrarBNR()">🔒 Ver BNR</span>
-  </div>
+  <h2>📋 Panel de Boletos - Rifa</h2>
 </div>
 
-<div class="filtro">
-  <button class="boton" onclick="filtrar('disponible')">🟩 Disponible</button>
-  <button class="boton" onclick="filtrar('apartado')">🟨 Apartado</button>
-  <button class="boton" onclick="filtrar('pagado')">🟥 Pagado</button>
+<div class="buscador-barra">
+  <input type="text" id="busquedaNumero" placeholder="Buscar tu número...">
+  <button onclick="buscarNumero()">Buscar</button>
+  <button onclick="mostrarBNR()">🔒 BNR</button>
+  <a href="registro.html" class="boton">+ Registrar Boleto</a>
 </div>
 
 <div id="boletos-container">Cargando boletos...</div>
 
-<div class="agradecimiento">
-  Gracias por tu apoyo al deporte y los jóvenes. ¡MUCHA SUERTE!
-</div>
-
-<div id="bnr-container" class="bnr-container">
-  <h3>🔎 Números Repetidos</h3>
-  <div id="bnr-result">Cargando...</div>
+<div class="bnr" id="bnr-container" style="display:none;">
+  <h3>Números Repetidos</h3>
+  <div id="bnr-result">---</div>
 </div>
 
 <div class="footer">
@@ -149,11 +125,6 @@ async function cargarBoletos() {
     });
   }
 
-  function filtrar(estado) {
-    const filtrados = datosBoletos.filter(b => (b.estado || "disponible") === estado);
-    pintarBoletos(filtrados);
-  }
-
   function buscarNumero() {
     const valor = document.getElementById('busquedaNumero').value.trim();
     if (!valor) {
@@ -171,16 +142,11 @@ async function cargarBoletos() {
 
   function mostrarBNR() {
     const clave = prompt("Introduce la clave para ver el BNR:");
-    if (clave === "admin2024") {
-      const bnrContainer = document.getElementById('bnr-container');
-      bnrContainer.classList.add('visible');
-      calcularBNR();
-    } else {
+    if (clave !== "admin2024") {
       alert("Clave incorrecta.");
+      return;
     }
-  }
 
-  function calcularBNR() {
     const contador = {};
     datosBoletos.forEach(b => {
       (b.numeros || []).forEach(num => {
@@ -189,10 +155,13 @@ async function cargarBoletos() {
       });
     });
 
-    const repetidos = Object.entries(contador).filter(([num, count]) => count > 1).map(([num]) => num);
+    const repetidos = Object.entries(contador)
+      .filter(([num, count]) => count > 1)
+      .map(([num]) => num);
 
     const resultado = repetidos.length > 0 ? repetidos.join(', ') : "No hay números repetidos.";
     document.getElementById('bnr-result').textContent = resultado;
+    document.getElementById('bnr-container').style.display = 'block';
   }
 
   cargarBoletos();
