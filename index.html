@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rifas con Causa</title>
+  <title>Bienvenido a Rifas con Causa</title>
   <style>
     body {
       background-color: #f4fce3;
@@ -13,25 +13,151 @@
     }
 
     h1 {
-      color: #0b640b;
-      font-size: 2em;
+      color: #14532d;
+      font-size: 28px;
     }
 
-    .botones {
-      margin-top: 30px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .btn-ver {
-      background-color: #1e7b1e;
-      color: white;
-      padding: 14px 24px;
-      border: none;
-      border-radius: 30px;
+    .boton {
+      display: block;
+      margin: 20px auto;
+      padding: 14px 20px;
+      width: 80%;
+      max-width: 300px;
       font-size: 18px;
-      font-weight: bold;
+      color: white;
+      background-color: #166534;
+      border: none;
+      border-radius: 40px;
       text-decoration: none;
-      box-shadow: 0 5px 10px rgba(0,
+      font-weight: bold;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s;
+    }
+
+    .boton:hover {
+      transform: scale(1.05);
+    }
+
+    .boton span {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 5px;
+    }
+
+    .premios {
+      margin-top: 40px;
+    }
+
+    .premio {
+      margin: 15px auto;
+      max-width: 300px;
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .premio img {
+      width: 100%;
+      border-radius: 8px;
+    }
+
+    .premio h3 {
+      margin: 10px 0 5px;
+      color: #205b18;
+    }
+
+    .bases-btn {
+      font-size: 14px;
+      margin-top: 25px;
+      display: inline-block;
+      background: none;
+      border: none;
+      color: #256d1b;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    #modalBases {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      justify-content: center;
+      align-items: center;
+    }
+
+    #modalBases .contenido {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      text-align: left;
+    }
+
+    #modalBases .contenido h2 {
+      color: #205b18;
+    }
+
+    #modalBases .cerrar {
+      float: right;
+      cursor: pointer;
+      font-weight: bold;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎉 Bienvenido a Rifas con Causa 🎉</h1>
+
+  <a class="boton" href="registro.html"><span>📝</span>Ir al Registro</a>
+  <a class="boton" href="panel-boletos-1.html"><span>🎟️</span>Ver Panel de Boletos</a>
+  <a class="boton" href="panel-admin.html"><span>🔐</span>Administración</a>
+
+  <button class="bases-btn" onclick="document.getElementById('modalBases').style.display='flex'">Ver bases del sorteo</button>
+
+  <div class="premios">
+    <div class="premio">
+      <img src="https://raw.githubusercontent.com/RIFAS-CON-CAUSA/BICIS-MONTANA-EQUIPADAS/main/Rising.jpeg" alt="Bicicleta 1" />
+      <h3>1er Premio: Bicicleta RISING</h3>
+      <p>10x1 velocidades, frenos hidráulicos, suspensión de aire, rines R26.</p>
+    </div>
+    <div class="premio">
+      <img src="https://raw.githubusercontent.com/RIFAS-CON-CAUSA/BICIS-MONTANA-EQUIPADAS/main/las%202%20bicis.jpeg" alt="Bicicleta 2" />
+      <h3>2do Premio: Bicicleta OLYMPUS</h3>
+      <p>7x2 velocidades, freno hidráulico trasero, suspensión con bloqueo.</p>
+    </div>
+    <div class="premio">
+      <img src="https://raw.githubusercontent.com/RIFAS-CON-CAUSA/BICIS-MONTANA-EQUIPADAS/main/Rising.jpeg" alt="Accesorios" />
+      <h3>3er Premio: Kit Accesorios</h3>
+      <p>Incluye casco, luz LED, bomba manual, candado y botella térmica.</p>
+    </div>
+  </div>
+
+  <div id="modalBases">
+    <div class="contenido">
+      <span class="cerrar" onclick="document.getElementById('modalBases').style.display='none'">X</span>
+      <h2>Bases del Sorteo</h2>
+      <p>
+        Cada boleto tiene 10 oportunidades. Solo se considera válido si se paga antes de 2 horas desde su registro.
+        En caso de no pagarse, se liberará automáticamente.
+        El sorteo se realizará el 30 de mayo y se notificará a los ganadores por WhatsApp.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // cerrar modal si se toca fuera
+    window.onclick = function(event) {
+      const modal = document.getElementById('modalBases');
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+  </script>
+
+</body>
+</html>
