@@ -1,188 +1,107 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<title>Panel de Boletos</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-body {
-font-family: Arial, sans-serif;
-background: #f9fddf;
-margin: 0;
-padding: 20px;
-text-align: center;
-}
-h1 {
-color: #1b5e20;
-}
-.btn {
-padding: 10px 20px;
-border-radius: 20px;
-text-decoration: none;
-font-weight: bold;
-margin: 10px;
-display: inline-block;
-}
-.btn-inicio {
-background-color: #1b5e20;
-color: white;
-}
-.btn-bnr {
-font-size: 12px;
-background: transparent;
-border: none;
-color: #444;
-text-decoration: underline;
-cursor: pointer;
-}
-#busquedaNum {
-margin-top: 10px;
-padding: 8px;
-border-radius: 8px;
-border: 1px solid #ccc;
-width: 180px;
-}
-#resultadoBusqueda {
-display: none;
-background: #e0f7fa;
-border: 1px solid #00acc1;
-padding: 10px;
-margin-top: 10px;
-border-radius: 8px;
-font-size: 14px;
-color: #004d40;
-}
-#resultadoBusqueda button {
-margin-top: 8px;
-background: #00796b;
-color: white;
-border: none;
-padding: 6px 12px;
-border-radius: 20px;
-cursor: pointer;
-}
-.leyenda {
-margin: 10px 0;
-font-size: 15px;
-}
-window.pedirClaveBNR = () => {
-const clave = prompt("Introduce la clave:");
-if (clave === "BNR") {
-const contador = {};
-for (let obj of oportunidadesGlobal) {
-contador[obj.num] = (contador[obj.num] || []);
-contador[obj.num].push(obj.boleto);
-}
-let repetidos = Object.entries(contador).filter(e => e[1].length > 1);
-let salida = "<h3>Números repetidos:</h3><ul>";
-for (let [numero, boletos] of repetidos) {
-salida += `<li>${numero} → Boletos: ${boletos.map(b => "#" + String(b).padStart(3, '0')).join(", ")}</li>`;
-}
-salida += "</ul>";
-document.getElementById("reporteRepetidos").innerHTML = salida;
-document.getElementById("reporteRepetidos").style.display = "block";
-} else {
-alert("Clave incorrecta.");
-}
-};
-window.buscarNumero = () => {
-const valor = document.getElementById("busquedaNum").value.trim();
-const salida = document.getElementById("resultadoBusqueda");
-if (!valor) return;
-const encontrados = oportunidadesGlobal.filter(obj => obj.num === valor);
-if (encontrados.length > 0) {
-const boletos = encontrados.map(e => `#${String(e.boleto).padStart(3, '0')}`).join(", ");
-salida.innerHTML = `El número ${valor} aparece en el siguiente boleto: <br><strong>${boletos}</strong><br><button onclick="document.getElementById('resultadoBusqueda').style.display='none'">Aceptar</button>`;
-} else {
-salida.innerHTML = `El número ${valor} no aparece en ningún boleto.<br><button onclick="document.getElementById('resultadoBusqueda').style.display='none'">Aceptar</button>`;
-}
-salida.style.display = "block";
-};
+  <meta charset="UTF-8">
+  <title>Panel de Boletos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9fddf;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 { color: #1b5e20; }
+
+    .boleto {
+      display: inline-block;
+      width: 150px;
+      padding: 10px;
+      margin: 5px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      background: #e0ffe0;
+    }
+    .apartado { background: #fff176 !important; color: black !important; }
+    .pagado { background: #f44336 !important; color: white !important; }
+    .boleto small { color: inherit !important; }
+
+    .leyenda { margin: 10px 0; font-size: 15px; }
+
+    .btn { padding: 10px 20px; border-radius: 20px; text-decoration: none; font-weight: bold; margin: 10px; display: inline-block; }
+    .btn-inicio { background-color: #1b5e20; color: white; }
+  </style>
+</head>
+<body>
+
+<h1>📋 Aquí tienes los 100 boletos</h1>
+
+<a href="index.html" class="btn btn-inicio">⬅ Volver al inicio</a>
+
+<!-- Contenedor para los boletos -->
+<div id="panelBoletos">Cargando boletos...</div>
+
+<!-- Script de Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
+    authDomain: "rifas-con-causa.firebaseapp.com",
+    projectId: "rifas-con-causa",
+    storageBucket: "rifas-con-causa.firebasestorage.app",
+    messagingSenderId: "347417635634",
+    appId: "1:347417635634:web:3ddab8921d26707910452b"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const contenedor = document.getElementById('panelBoletos');
+
+  async function cargarBoletos() {
+    contenedor.innerHTML = "Cargando boletos...";
+    const querySnapshot = await getDocs(collection(db, "boletos"));
+
+    let oportunidadesGlobal = [];
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      oportunidadesGlobal.push({
+        boleto: data.idboleto || doc.id,
+        estado: data.estado || "disponible",
+        numeros: data.numeros || []
+      });
+    });
+
+    // Mezclar aleatoriamente
+    oportunidadesGlobal.sort(() => Math.random() - 0.5);
+
+    pintarBoletos(oportunidadesGlobal);
+  }
+
+  function pintarBoletos(lista) {
+    contenedor.innerHTML = ""; // Limpiar
+    lista.forEach(obj => {
+      const div = document.createElement('div');
+      div.classList.add('boleto');
+      if (obj.estado === 'apartado') div.classList.add('apartado');
+      if (obj.estado === 'pagado') div.classList.add('pagado');
+
+      const numerosTexto = obj.numeros.length > 0 ? obj.numeros.join(' - ') : 'Sin números';
+
+      div.innerHTML = `
+        <strong>Boleto #${String(obj.boleto).padStart(3,'0')}</strong><br>
+        <small>${numerosTexto}</small>
+      `;
+      contenedor.appendChild(div);
+    });
+  }
+
+  cargarBoletos();
 </script>
-<!-- Incluye este bloque completo en tu archivo panel-boletos-1.html justo antes del </body> -->
-<style>
-#resultadoBusqueda {
-position: fixed;
-bottom: 80px;
-left: 50%;
-transform: translateX(-50%);
-background: #fff3cd;
-border: 1px solid #ffeeba;
-padding: 12px 20px;
-border-radius: 10px;
-font-size: 14px;
-box-shadow: 0 0 10px rgba(0,0,0,0.2);
-display: none;
-z-index: 9999;
-}
-#resultadoBusqueda button {
-margin-top: 8px;
-background: #dc3545;
-border: none;
-color: white;
-padding: 5px 10px;
-border-radius: 6px;
-cursor: pointer;
-}
-</style>
-<!-- Resultado flotante -->
-<div id="resultadoBusqueda">
-<div id="contenidoResultado"></div>
-<button onclick="document.getElementById('resultadoBusqueda').style.display='none'">Cerrar</button>
-</div>
-<!-- Script de funciones -->
-<script>
-const oportunidadesGlobal = [];
-function mostrarResultado(numero, boletos) {
-const contenedor = document.getElementById("resultadoBusqueda");
-const contenido = document.getElementById("contenidoResultado");
-if (boletos.length === 1) {
-contenido.innerHTML = `✅ El número <strong style="color:orange;">${numero}</strong> aparece en el siguiente boleto: <strong>#${String(boletos[0]).padStart(3,'0')}</strong>`;
-} else if (boletos.length > 1) {
-contenido.innerHTML = `✅ El número <strong style="color:orange;">${numero}</strong> aparece en los siguientes boletos: <strong>${boletos.map(b => "#" + String(b).padStart(3,'0')).join(", ")}</strong>`;
-} else {
-contenido.innerHTML = `❌ El número <strong>${numero}</strong> no se encuentra en ningún boleto.`;
-}
-contenedor.style.display = "block";
-}
-function buscarNumeroSuerte() {
-const valor = prompt("Ingresa tu número de la suerte (000 a 999):");
-const numero = valor?.trim().padStart(3, '0');
-if (!/^\d{3}$/.test(numero)) {
-alert("Ingresa un número válido de 3 dígitos.");
-return;
-}
-const boletos = oportunidadesGlobal.filter(obj => obj.num === numero).map(obj => obj.boleto);
-mostrarResultado(numero, boletos);
-}
-function pedirClaveBNR() {
-const clave = prompt("Introduce la clave:");
-if (clave === "BNR") {
-const contador = {};
-for (let obj of oportunidadesGlobal) {
-contador[obj.num] = (contador[obj.num] || []);
-contador[obj.num].push(obj.boleto);
-}
-let repetidos = Object.entries(contador).filter(e => e[1].length > 1);
-let salida = "<h3>Números repetidos:</h3><ul>";
-for (let [numero, boletos] of repetidos) {
-salida += `<li>${numero} → Boletos: ${boletos.map(b => "#" + String(b).padStart(3, '0')).join(", ")}</li>`;
-}
-salida += "</ul>";
-const div = document.createElement("div");
-div.innerHTML = salida;
-div.style.background = "#fff";
-div.style.border = "1px solid #ccc";
-div.style.padding = "20px";
-div.style.margin = "20px auto";
-div.style.maxWidth = "600px";
-div.style.borderRadius = "10px";
-document.body.appendChild(div);
-} else {
-alert("Clave incorrecta.");
-}
-}
-</script>
+
 </body>
 </html>
-
