@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Boletos Rifa</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
+      authDomain: "rifas-con-causa.firebaseapp.com",
+      projectId: "rifas-con-causa",
+      storageBucket: "rifas-con-causa.appspot.com",
+      messagingSenderId: "347417635634",
+      appId: "1:347417635634:web:3ddab8921d26707910452b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function cargarBoletos() {
+      const querySnapshot = await getDocs(collection(db, "BoletosRifa"));
+      const tbody = document.getElementById("tablaBoletos");
+      tbody.innerHTML = "";
+
+      const boletos = [];
+      querySnapshot.forEach((doc) => {
+        boletos.push(doc.data());
+      });
+
+      boletos.sort((a, b) => parseInt(a.boleto) - parseInt(b.boleto));
+
+      boletos.forEach((boleto) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${boleto.boleto}</td>
+          <td>${boleto.series.join(", ")}</td>
+          <td>${boleto.estado}</td>
+          <td><button data-id="${boleto.boleto}" data-estado="${boleto.estado}" ${boleto.estado === 'pagado' ? 'disabled' : ''}>Cambiar Estado</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.querySelectorAll("button[data-id]").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+          const id = e.target.dataset.id;
+          const estadoActual = e.target.dataset.estado;
+
+          let nuevoEstado = "apartado";
+          if (estadoActual === "libre") nuevoEstado = "apartado";
+          else if (estadoActual === "apartado") nuevoEstado = "pagado";
+
+          await updateDoc(doc(db, "BoletosRifa", id), {
+            estado: nuevoEstado,
+            modificadoPor: "admin",  // Aquí se puede integrar el login real de roles
+            timestamp: new Date().toISOString()
+          });
+
+          alert(`Boleto ${id} actualizado a ${nuevoEstado}`);
+          cargarBoletos();
+        });
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", cargarBoletos);
+  </script>
+  <style>
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background-color: #004aad; color: white; }
+    tr:nth-child(even) { background-color: #f2f2f2; }
+    button:disabled { background-color: #ccc; color: #666; }
+  </style>
+</head>
+<body>
+  <h1>Panel Boletos Rifa</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Boleto</th>
+        <th>Series</th>
+        <th>Estado</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody id="tablaBoletos"></tbody>
+  </table>
+</body>
+</html>
