@@ -1,3 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Panel de Boletos</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body { font-family: Arial, sans-serif; background: #f9fddf; margin: 0; padding: 20px; text-align: center; }
+h1 { color: #1b5e20; }
+.btn { padding: 10px 20px; border-radius: 20px; text-decoration: none; font-weight: bold; margin: 10px; display: inline-block; }
+.btn-inicio { background-color: #1b5e20; color: white; }
+.boleto { display: inline-block; width: 150px; padding: 10px; margin: 5px; border: 1px solid #ccc; border-radius: 10px; background: #e0ffe0; }
+.apartado { background: #fff176 !important; color: black !important; }
+.pagado { background: #f44336 !important; color: white !important; }
+.boleto small { color: inherit !important; }
+#panelBoletos { margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<h1>📋 Aquí tienes los 100 boletos</h1>
+<a href="index.html" class="btn btn-inicio">⬅ Volver al inicio</a>
+
+<div id="panelBoletos">Cargando boletos...</div>
+
+<!-- Firebase Connection & Surtido -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
   import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
@@ -14,7 +40,6 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  // Referencia global para tu script original
   window.oportunidadesGlobal = [];
 
   async function cargarBoletos() {
@@ -32,15 +57,42 @@
       }
     });
 
-    // ✅ Surtido aleatorio respetando tu flujo
+    // Mezclar aleatoriamente
     oportunidadesGlobal.sort(() => Math.random() - 0.5);
 
-    // ✅ Aquí seguiría tu lógica normal de pintado o interacción
-    // (No tocamos tu estructura)
+    pintarBoletos();
+  }
 
-    // ✅ Solo para visualizar en consola que cargaron
-    console.log("Boletos cargados:", oportunidadesGlobal);
+  function pintarBoletos() {
+    const contenedor = document.getElementById('panelBoletos');
+    contenedor.innerHTML = "";
+
+    const boletosAgrupados = {};
+
+    oportunidadesGlobal.forEach(obj => {
+      if (!boletosAgrupados[obj.boleto]) {
+        boletosAgrupados[obj.boleto] = { estado: obj.estado, numeros: [] };
+      }
+      boletosAgrupados[obj.boleto].numeros.push(obj.num);
+    });
+
+    Object.entries(boletosAgrupados).forEach(([idBoleto, data]) => {
+      const div = document.createElement('div');
+      div.classList.add('boleto');
+      if (data.estado === 'apartado') div.classList.add('apartado');
+      if (data.estado === 'pagado') div.classList.add('pagado');
+
+      div.innerHTML = `
+        <strong>Boleto #${String(idBoleto).padStart(3,'0')}</strong><br>
+        <small>${data.numeros.join(' - ')}</small>
+      `;
+
+      contenedor.appendChild(div);
+    });
   }
 
   cargarBoletos();
 </script>
+
+</body>
+</html>
