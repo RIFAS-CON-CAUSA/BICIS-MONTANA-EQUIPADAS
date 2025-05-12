@@ -9,21 +9,64 @@ body { font-family: Arial, sans-serif; background: #f9fddf; margin: 0; padding: 
 h1 { color: #1b5e20; }
 .btn { padding: 10px 20px; border-radius: 20px; text-decoration: none; font-weight: bold; margin: 10px; display: inline-block; }
 .btn-inicio { background-color: #1b5e20; color: white; }
-.boleto { display: inline-block; width: 150px; padding: 10px; margin: 5px; border: 1px solid #ccc; border-radius: 10px; background: #e0ffe0; }
+.btn-bnr { font-size: 12px; background: transparent; border: none; color: #444; text-decoration: underline; cursor: pointer; }
+#busquedaNum { margin-top: 10px; padding: 8px; border-radius: 8px; border: 1px solid #ccc; width: 180px; }
+#resultadoBusqueda {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff3cd;
+  border: 1px solid #ffeeba;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  display: none;
+  z-index: 9999;
+}
+#resultadoBusqueda button {
+  margin-top: 8px;
+  background: #dc3545;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.boleto {
+  display: inline-block;
+  width: 150px;
+  padding: 10px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background: #e0ffe0;
+}
 .apartado { background: #fff176 !important; color: black !important; }
 .pagado { background: #f44336 !important; color: white !important; }
 .boleto small { color: inherit !important; }
-#panelBoletos { margin-top: 20px; }
 </style>
 </head>
 <body>
 
-<h1>📋 Aquí tienes los 100 boletos</h1>
-<a href="index.html" class="btn btn-inicio">⬅ Volver al inicio</a>
+<h1>📋 Panel de Boletos</h1>
+<p class="leyenda">🔎 Busca tu número o revisa los boletos en tiempo real.</p>
+
+<input type="text" id="busquedaNum" placeholder="Buscar tu número...">
+<button onclick="buscarNumeroSuerte()">Buscar</button>
+<button class="btn-bnr" onclick="pedirClaveBNR()">Ver BNR</button>
 
 <div id="panelBoletos">Cargando boletos...</div>
 
-<!-- Firebase Connection & Surtido -->
+<div id="resultadoBusqueda">
+  <div id="contenidoResultado"></div>
+  <button onclick="document.getElementById('resultadoBusqueda').style.display='none'">Cerrar</button>
+</div>
+
+<a href="index.html" class="btn btn-inicio">⬅ Volver al inicio</a>
+
+<!-- ✅ Firebase conexión e integración sin tocar lo demás -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
   import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
@@ -92,6 +135,57 @@ h1 { color: #1b5e20; }
   }
 
   cargarBoletos();
+</script>
+
+<!-- ✅ Tus funciones originales intactas -->
+<script>
+function mostrarResultado(numero, boletos) {
+  const contenedor = document.getElementById("resultadoBusqueda");
+  const contenido = document.getElementById("contenidoResultado");
+  if (boletos.length === 1) {
+    contenido.innerHTML = `✅ El número <strong style="color:orange;">${numero}</strong> aparece en el siguiente boleto: <strong>#${String(boletos[0]).padStart(3,'0')}</strong>`;
+  } else if (boletos.length > 1) {
+    contenido.innerHTML = `✅ El número <strong style="color:orange;">${numero}</strong> aparece en los siguientes boletos: <strong>${boletos.map(b => "#" + String(b).padStart(3,'0')).join(", ")}</strong>`;
+  } else {
+    contenido.innerHTML = `❌ El número <strong>${numero}</strong> no se encuentra en ningún boleto.`;
+  }
+  contenedor.style.display = "block";
+}
+
+function buscarNumeroSuerte() {
+  const valor = document.getElementById("busquedaNum").value.trim();
+  if (!valor) return;
+  const boletos = oportunidadesGlobal.filter(obj => obj.num === valor).map(obj => obj.boleto);
+  mostrarResultado(valor, boletos);
+}
+
+function pedirClaveBNR() {
+  const clave = prompt("Introduce la clave:");
+  if (clave === "BNR") {
+    const contador = {};
+    for (let obj of oportunidadesGlobal) {
+      contador[obj.num] = (contador[obj.num] || []);
+      contador[obj.num].push(obj.boleto);
+    }
+    let repetidos = Object.entries(contador).filter(e => e[1].length > 1);
+    let salida = "<h3>Números repetidos:</h3><ul>";
+    for (let [numero, boletos] of repetidos) {
+      salida += `<li>${numero} → Boletos: ${boletos.map(b => "#" + String(b).padStart(3, '0')).join(", ")}</li>`;
+    }
+    salida += "</ul>";
+    const div = document.createElement("div");
+    div.innerHTML = salida;
+    div.style.background = "#fff";
+    div.style.border = "1px solid #ccc";
+    div.style.padding = "20px";
+    div.style.margin = "20px auto";
+    div.style.maxWidth = "600px";
+    div.style.borderRadius = "10px";
+    document.body.appendChild(div);
+  } else {
+    alert("Clave incorrecta.");
+  }
+}
 </script>
 
 </body>
