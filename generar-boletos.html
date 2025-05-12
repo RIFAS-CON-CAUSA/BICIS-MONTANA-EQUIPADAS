@@ -2,10 +2,10 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Generar Boletos en Firebase</title>
+  <title>Generador BoletosRifa</title>
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getFirestore, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
@@ -19,36 +19,41 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    function generarNumerosAleatorios() {
-      const numeros = new Set();
-      while (numeros.size < 10) {
-        const num = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
-        numeros.add(num);
-      }
-      return Array.from(numeros);
-    }
-
     async function generarBoletos() {
-      const total = 100;
-      for (let i = 1; i <= total; i++) {
-        const id = String(i).padStart(3, '0');
-        const datos = {
-          idboleto: id,
-          numeros: generarNumerosAleatorios(),
-          estado: "disponible"
-        };
+      // Crear array 000-999
+      const numeros = Array.from({length: 1000}, (_, i) => i.toString().padStart(3, '0'));
 
-        await setDoc(doc(db, "boletos", id), datos, { merge: true });
+      // Mezclar aleatoriamente
+      numeros.sort(() => Math.random() - 0.5);
+
+      // Repartir en 100 boletos (10 series cada uno)
+      for (let i = 0; i < 100; i++) {
+        const series = numeros.slice(i * 10, (i + 1) * 10);
+        const boletoId = `boleto-${i+1}`;
+
+        await setDoc(doc(db, "BoletosRifa", boletoId), {
+          idboleto: i + 1,
+          nombre: "",
+          telefono: "",
+          poblacion: "",
+          estatus: "disponible",
+          series: series,
+          formaPago: "",
+          modificadoPor: "",
+          timestamp: new Date()
+        });
+
+        console.log(`✅ Creado ${boletoId} con series: ${series.join(", ")}`);
       }
 
-      alert("✅ 100 boletos generados y guardados exitosamente.");
-      document.getElementById("mensaje").textContent = "Boletos generados correctamente.";
+      alert("✅ Boletos creados correctamente en Firestore.");
     }
 
-    generarBoletos();
+    window.addEventListener('DOMContentLoaded', generarBoletos);
   </script>
 </head>
 <body>
-  <h3 id="mensaje">Generando boletos en Firebase...</h3>
+  <h2>Generando boletos en Firestore...</h2>
+  <p>Este proceso se ejecutará automáticamente.</p>
 </body>
 </html>
