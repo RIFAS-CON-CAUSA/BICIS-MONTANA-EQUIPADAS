@@ -159,40 +159,18 @@
     mostrarBoletos(filtrados);
   }
 
-  
-// --- FUNCION EXPORTAR EXCEL ---
-function exportarExcel() {
-  if (usuarioRol !== "Administrador") {
-    alert("Solo el Administrador puede exportar reportes.");
-    return;
-  }
-
-  let csv = "Boleto,Nombre,Teléfono,Población,Estado,Fecha,Modificado por,Forma de pago\n";
-
-  datosBoletos.forEach(b => {
-    csv += `#${b.boleto},"${b.nombre || ""}","${b.telefono || ""}","${b.poblacion || ""}","${b.estado}","${b.fecha ? new Date(b.fecha).toLocaleString() : ""}","${b.modificadoPor || ""}","${b.formaPago || ""}"\n`;
-  });
-
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `Boletos-Rifa-${new Date().toLocaleDateString()}.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-// --- FIN EXPORTAR EXCEL ---
-
+  function exportarExcel() {
     if (usuarioRol !== "Administrador") {
       alert("Solo el Administrador puede exportar reportes.");
       return;
     }
-    let csv = "Boleto,Nombre,Teléfono,Población,Estado,Fecha,Modificado por,Forma de pago
-";
+
+    let csv = "Boleto,Nombre,Teléfono,Población,Estado,Fecha,Modificado por,Forma de pago\n";
+
     datosBoletos.forEach(b => {
-      csv += `#${b.boleto},"${b.nombre || ""}","${b.telefono || ""}","${b.poblacion || ""}","${b.estado}","${b.fecha ? new Date(b.fecha).toLocaleString() : ""}","${b.modificadoPor || ""}","${b.formaPago || ""}"
-`;
+      csv += `#${b.boleto},"${b.nombre || ""}","${b.telefono || ""}","${b.poblacion || ""}","${b.estado}","${b.fecha ? new Date(b.fecha).toLocaleString() : ""}","${b.modificadoPor || ""}","${b.formaPago || ""}"\n`;
     });
+
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -208,6 +186,7 @@ function exportarExcel() {
     noti.style.display = "block";
     setTimeout(() => noti.style.display = "none", 2000);
   }
+
 </script>
 </body>
 </html>
