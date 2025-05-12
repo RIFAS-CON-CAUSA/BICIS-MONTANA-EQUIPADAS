@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>BNR - Verificación de Series Repetidas</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
+      authDomain: "rifas-con-causa.firebaseapp.com",
+      projectId: "rifas-con-causa",
+      storageBucket: "rifas-con-causa.appspot.com",
+      messagingSenderId: "347417635634",
+      appId: "1:347417635634:web:3ddab8921d26707910452b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function verificarDuplicados() {
+      const querySnapshot = await getDocs(collection(db, "BoletosRifa"));
+      const seriesMap = new Map();
+      const duplicados = [];
+
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const boleto = data.boleto;
+
+        data.series.forEach((num) => {
+          if (seriesMap.has(num)) {
+            duplicados.push(`❗ Repetido: número ${num} en boletos ${seriesMap.get(num)} y ${boleto}`);
+          } else {
+            seriesMap.set(num, boleto);
+          }
+        });
+      });
+
+      const resultado = document.getElementById("resultado");
+      if (duplicados.length > 0) {
+        resultado.innerHTML = duplicados.join("<br>");
+        resultado.style.color = "red";
+      } else {
+        resultado.innerHTML = "✅ No hay series repetidas.";
+        resultado.style.color = "green";
+      }
+    }
+
+    function validarAcceso() {
+      const clave = prompt("Introduce la clave de acceso al BNR:");
+      if (clave === "BNR2024") {
+        document.getElementById("accesoBNR").style.display = "block";
+      } else {
+        alert("Clave incorrecta. Acceso denegado.");
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", validarAcceso);
+  </script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+    button { padding: 10px 20px; font-size: 1em; background: #004aad; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    #resultado { margin-top: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>BNR - Verificación de Series Repetidas</h1>
+  <div id="accesoBNR" style="display: none;">
+    <button onclick="verificarDuplicados()">Ejecutar BNR</button>
+    <div id="resultado"></div>
+  </div>
+</body>
+</html>
