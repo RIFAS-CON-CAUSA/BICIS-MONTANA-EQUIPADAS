@@ -31,12 +31,10 @@ grid.innerHTML = "";
 const boletos = [];
 querySnapshot.forEach((docSnap) => {
   const data = docSnap.data();
-  data.id = docSnap.id; // Se guarda el ID del documento para futuras acciones
+  data.id = docSnap.id; // 💡 Mantener el ID para referencias futuras si editas
   boletos.push(data);
 });
 
-
-      
 
       boletos.sort((a, b) => parseInt(a.boleto) - parseInt(b.boleto));
 
@@ -48,18 +46,18 @@ querySnapshot.forEach((docSnap) => {
         const div = document.createElement("div");
         div.className = "boletoCard";
         div.style.backgroundColor = color;
-        div.innerHTML = `
+        div.innerHTML = 
           <h3>Boleto ${boleto.boleto}</h3>
           <div class="seriesGrid">
-            ${boleto.series.map(num => `<span>${num}</span>`).join("")}
+            ${boleto.series.map(num => <span>${num}</span>).join("")}
           </div>
-        `;
+        ;
 
         // ✅ CLIC SOLO SI ESTÁ LIBRE
         if (boleto.estado === "libre") {
           div.style.cursor = "pointer";
           div.addEventListener("click", () => {
-            window.location.href = `registro.html?boleto=${boleto.boleto}`;
+            window.location.href = registro.html?boleto=${boleto.boleto};
           });
         }
 
