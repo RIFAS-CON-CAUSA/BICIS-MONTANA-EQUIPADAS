@@ -77,16 +77,37 @@
     tablaBody.innerHTML = "";
     querySnapshot.forEach(docSnap => datosBoletos.push(docSnap.data()));
 
-    console.log("Datos cargados:", datosBoletos); // Debug log
+    console.log("Datos cargados:", datosBoletos);
 
     mostrarBoletos(datosBoletos);
   }
 
-  function mostrarBoletos(lista) { /* sin cambios */ }
-  window.cambiarEstado = function() { /* sin cambios */ }
-  window.exportarExcel = function() { /* sin cambios */ }
-  window.exportarExcelPagadosPorUsuario = function() { /* sin cambios */ }
-  window.exportarPorVerificador = function() { /* sin cambios */ }
+  function mostrarBoletos(lista) {
+    const tablaBody = document.querySelector("#tablaBoletos tbody");
+    tablaBody.innerHTML = "";
+
+    lista.forEach(boleto => {
+      console.log("Mostrando boleto:", boleto);
+
+      const idDoc = boleto.boleto ? boleto.boleto.padStart(3, '0') : "---";
+      let opcionesEstado = "";
+
+      if (usuarioRol === "Administrador") {
+        opcionesEstado = `<option disabled selected>Editar</option><option value="libre">Disponible</option><option value="apartado">Apartado</option><option value="pagado">Pagado</option>`;
+      } else if (usuarioRol === "Verificador" && boleto.estado === "apartado") {
+        opcionesEstado = `<option disabled selected>Editar</option><option value="pagado">Pagado</option>`;
+      }
+
+      const selectHtml = opcionesEstado ? `<select onchange="cambiarEstado('${idDoc}', this.value)">${opcionesEstado}</select>` : "🔒";
+
+      tablaBody.innerHTML += `<tr><td>#${idDoc}</td><td>${boleto.nombre || ""}</td><td>${boleto.telefono || ""}</td><td>${boleto.poblacion || ""}</td><td class="${boleto.estado}">${boleto.estado}</td><td>${boleto.fecha ? new Date(boleto.fecha).toLocaleString() : ""}</td><td>${selectHtml}</td><td>${boleto.modificadoPor || ""}</td><td>${boleto.formaPago || ""}</td></tr>`;
+    });
+  }
+
+  window.cambiarEstado = function() { /* igual */ }
+  window.exportarExcel = function() { /* igual */ }
+  window.exportarExcelPagadosPorUsuario = function() { /* igual */ }
+  window.exportarPorVerificador = function() { /* igual */ }
 
 </script>
 </body>
