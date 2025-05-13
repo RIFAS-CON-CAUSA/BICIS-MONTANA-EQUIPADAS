@@ -132,7 +132,7 @@
     cargarBoletos();
   };
 
-  function exportarExcel() {
+  window.exportarExcel = function() {
     let csv = "Boleto,Nombre,Teléfono,Población,Estado,Fecha,Modificado por,Forma de pago\n";
     datosBoletos.forEach(b => {
       csv += `#${b.boleto},"${b.nombre || ""}","${b.telefono || ""}","${b.poblacion || ""}","${b.estado}","${b.fecha ? new Date(b.fecha).toLocaleString() : ""}","${b.modificadoPor || ""}","${b.formaPago || ""}"\n`;
@@ -144,9 +144,9 @@
     a.download = `Boletos-Rifa-${new Date().toLocaleDateString()}.csv`;
     a.click();
     URL.revokeObjectURL(url);
-  }
+  };
 
-  function exportarExcelPagadosPorUsuario() {
+  window.exportarExcelPagadosPorUsuario = function() {
     const pagadosUsuario = datosBoletos.filter(b => b.estado === "pagado" && b.modificadoPor === usuarioNombre);
     if (pagadosUsuario.length === 0) {
       alert("No tienes boletos pagados registrados.");
@@ -163,7 +163,7 @@
     a.download = `Pagados-${usuarioNombre}-${new Date().toLocaleDateString()}.csv`;
     a.click();
     URL.revokeObjectURL(url);
-  }
+  };
 
 </script>
 </body>
