@@ -1,0 +1,115 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Admin - Rifas con Causa V17</title>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
+      authDomain: "rifas-con-causa.firebaseapp.com",
+      projectId: "rifas-con-causa",
+      storageBucket: "rifas-con-causa.appspot.com",
+      messagingSenderId: "347417635634",
+      appId: "1:347417635634:web:3ddab8921d26707910452b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+    let usuarioRol = "";
+
+    window.addEventListener('load', () => {
+      usuarioRol = prompt("Ingresa tu nombre de usuario:");
+      if (!usuarioRol) usuarioRol = "Anónimo";
+      cargarBoletos();
+    });
+
+    async function cargarBoletos() {
+      const querySnapshot = await getDocs(collection(db, "boletos"));
+      const tbody = document.querySelector("#tablaBoletos tbody");
+      tbody.innerHTML = "";
+      querySnapshot.forEach(docSnap => {
+        const b = docSnap.data();
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${b.idboleto}</td>
+          <td>${b.nombre || ""}</td>
+          <td>${b.telefono || ""}</td>
+          <td>${b.poblacion || ""}</td>
+          <td class="${b.estado}">${b.estado}</td>
+          <td>${b.fecha ? new Date(b.fecha).toLocaleString() : ""}</td>
+          <td><button onclick="cambiarEstado('${b.idboleto}', 'pagado')">Marcar Pagado</button></td>
+          <td>${b.modificadoPor || ""}</td>
+          <td>${b.formaPago || ""}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    window.cambiarEstado = async function(id, nuevoEstado) {
+      const formaPago = prompt("Forma de pago (Efectivo, Transferencia, etc.):") || "Efectivo";
+      const ref = doc(db, "boletos", id);
+      await updateDoc(ref, {
+        estado: nuevoEstado,
+        modificadoPor: `${usuarioRol} (Verificador)`,
+        formaPago: formaPago
+      });
+      generarYSubirBoletoPNG(id);
+      cargarBoletos();
+    }
+
+    async function generarYSubirBoletoPNG(id) {
+      const recibo = document.createElement("div");
+      recibo.style.width = "400px";
+      recibo.style.height = "200px";
+      recibo.style.background = "#fff";
+      recibo.style.border = "1px solid #000";
+      recibo.style.padding = "20px";
+      recibo.innerHTML = `<h3>Boleto ${id}</h3><p>Gracias por tu apoyo</p>`;
+
+      document.body.appendChild(recibo);
+      const canvas = await html2canvas(recibo);
+      const dataURL = canvas.toDataURL("image/png");
+      document.body.removeChild(recibo);
+
+      const storageRef = ref(storage, `boletos/${id}.png`);
+      await uploadString(storageRef, dataURL, 'data_url');
+
+      const url = await getDownloadURL(storageRef);
+      window.open(`https://wa.me/?text=Gracias por tu donativo. Aquí está tu boleto digital: ${url}`, "_blank");
+    }
+  </script>
+  <style>
+    table { width: 100%; border-collapse: collapse; }
+    td, th { border: 1px solid #ccc; padding: 8px; }
+    .pagado { background: red; color: white; }
+    .apartado { background: yellow; color: black; }
+    .disponible { background: green; color: white; }
+  </style>
+</head>
+<body>
+  <h1>Panel Admin - Rifas con Causa V17</h1>
+  <table id="tablaBoletos">
+    <thead>
+      <tr>
+        <th>Boleto</th>
+        <th>Nombre</th>
+        <th>Teléfono</th>
+        <th>Población</th>
+        <th>Estado</th>
+        <th>Fecha</th>
+        <th>Cambiar Estado</th>
+        <th>Modificado por</th>
+        <th>Forma de pago</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</body>
+</html>
