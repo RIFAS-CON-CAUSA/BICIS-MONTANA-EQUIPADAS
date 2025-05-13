@@ -1,0 +1,147 @@
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
+    authDomain: "rifas-con-causa.firebaseapp.com",
+    projectId: "rifas-con-causa",
+    storageBucket: "rifas-con-causa.appspot.com",
+    messagingSenderId: "347417635634",
+    appId: "1:347417635634:web:3ddab8921d26707910452b"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const accesos = {
+    "Admin2024": "Administrador",
+    "Miriam25": "Verificador",
+    "VerifPatty26": "Verificador",
+    "VerifDiane27": "Verificador",
+    "VerifSteven28": "Verificador"
+  };
+
+  const verificadoresNombres = {
+    "Miriam25": "Miriam",
+    "VerifPatty26": "Patty",
+    "VerifDiane27": "Diane",
+    "VerifSteven28": "Steven"
+  };
+
+  let usuarioRol = null;
+  let claveIngresada = "";
+  let datosBoletos = [];
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const clave = prompt("🔒 Introduce tu contraseña:");
+    if (accesos[clave]) {
+      usuarioRol = accesos[clave];
+      claveIngresada = clave;
+      alert(`Bienvenido: ${usuarioRol}`);
+      cargarBoletos();
+    } else {
+      alert("Acceso denegado.");
+      window.location.href = "index.html";
+    }
+  });
+
+  async function cargarBoletos() {
+    const querySnapshot = await getDocs(collection(db, "BoletosRifa"));
+    datosBoletos = [];
+    document.querySelector("#tablaBoletos tbody").innerHTML = "";
+    querySnapshot.forEach(docSnap => datosBoletos.push(docSnap.data()));
+    mostrarBoletos(datosBoletos);
+  }
+
+  function mostrarBoletos(lista) {
+    const tbody = document.querySelector("#tablaBoletos tbody");
+    tbody.innerHTML = "";
+    lista.forEach(boleto => {
+      const idDoc = boleto.boleto.padStart(3, '0');
+      let opcionesEstado = "";
+
+      if (usuarioRol === "Administrador") {
+        opcionesEstado = `<option disabled selected>Editar</option>
+        <option value="libre">Disponible</option>
+        <option value="apartado">Apartado</option>
+        <option value="pagado">Pagado</option>`;
+      } else if (usuarioRol === "Verificador" && boleto.estado === "apartado") {
+        opcionesEstado = `<option disabled selected>Editar</option>
+        <option value="pagado">Pagado</option>`;
+      }
+
+      const selectHtml = opcionesEstado ? `<select onchange="cambiarEstado('${idDoc}', this.value)">${opcionesEstado}</select>` : "🔒";
+
+      tbody.innerHTML += `<tr>
+        <td>#${idDoc}</td>
+        <td>${boleto.nombre || ""}</td>
+        <td>${boleto.telefono || ""}</td>
+        <td>${boleto.poblacion || ""}</td>
+        <td class="${boleto.estado}">${boleto.estado}</td>
+        <td>${boleto.fecha ? new Date(boleto.fecha).toLocaleString() : ""}</td>
+        <td>${selectHtml}</td>
+        <td>${boleto.modificadoPor || ""}</td>
+        <td>${boleto.formaPago || ""}</td>
+      </tr>`;
+    });
+  }
+
+  window.cambiarEstado = async function(id, nuevoEstado) {
+    const formaPago = nuevoEstado === "pagado" ? prompt("¿Forma de pago? (Efectivo, OXXO, etc.)") : "";
+    const ref = doc(db, "BoletosRifa", id);
+
+    let modificadoPorTexto = usuarioRol;
+    if (usuarioRol === "Verificador") {
+      if (verificadoresNombres[claveIngresada]) {
+        modificadoPorTexto += " " + verificadoresNombres[claveIngresada];
+      }
+    }
+
+    await updateDoc(ref, { estado: nuevoEstado, modificadoPor: modificadoPorTexto, formaPago: formaPago });
+    mostrarNotificacion("✅ Guardado correctamente");
+    cargarBoletos();
+  };
+
+  function filtrar(estado) {
+    const lista = estado === "todos" ? datosBoletos : datosBoletos.filter(b => b.estado === estado);
+    mostrarBoletos(lista);
+  }
+
+  function filtrarBusqueda() {
+    const q = document.getElementById("busqueda").value.toLowerCase();
+    const filtrados = datosBoletos.filter(b =>
+      (b.nombre || "").toLowerCase().includes(q) ||
+      (b.poblacion || "").toLowerCase().includes(q) ||
+      b.boleto.toString().includes(q));
+    mostrarBoletos(filtrados);
+  }
+
+  function exportarExcel() {
+    if (usuarioRol !== "Administrador") {
+      alert("Solo el Administrador puede exportar reportes.");
+      return;
+    }
+
+    let csv = "Boleto,Nombre,Teléfono,Población,Estado,Fecha,Modificado por,Forma de pago\n";
+
+    datosBoletos.forEach(b => {
+      csv += `#${b.boleto},"${b.nombre || ""}","${b.telefono || ""}","${b.poblacion || ""}","${b.estado}","${b.fecha ? new Date(b.fecha).toLocaleString() : ""}","${b.modificadoPor || ""}","${b.formaPago || ""}"\n`;
+    });
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Boletos-Rifa-${new Date().toLocaleDateString()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function mostrarNotificacion(mensaje) {
+    const noti = document.getElementById("notificacion");
+    noti.textContent = mensaje;
+    noti.style.display = "block";
+    setTimeout(() => noti.style.display = "none", 2000);
+  }
+</script>
