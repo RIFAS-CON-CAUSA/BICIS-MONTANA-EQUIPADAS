@@ -1,0 +1,162 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Admin - Rifas V17.6 FIX LIVE</title>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
+    .libre { background: #00aa00; color: white; }
+    .apartado { background: #ffbb00; color: black; }
+    .pagado { background: #cc0000; color: white; }
+  </style>
+</head>
+<body>
+  <h2>Panel Administrativo - Rifas V17.6 FIX LIVE</h2>
+  <div id="login">
+    <h3>Acceso</h3>
+    <input type="password" id="clave" placeholder="Contraseña">
+    <button onclick="login()">Ingresar</button>
+  </div>
+  <div id="panel" style="display:none;">
+    <table>
+      <thead>
+        <tr>
+          <th>Boleto</th>
+          <th>Nombre</th>
+          <th>Teléfono</th>
+          <th>Población</th>
+          <th>Estado</th>
+          <th>Fecha</th>
+          <th>Cambiar Estado</th>
+          <th>Reenviar VIP</th>
+          <th>Modificado por</th>
+          <th>Forma de pago</th>
+        </tr>
+      </thead>
+      <tbody id="tablaBoletos"></tbody>
+    </table>
+  </div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, onSnapshot, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
+      authDomain: "rifas-con-causa.firebaseapp.com",
+      projectId: "rifas-con-causa",
+      storageBucket: "rifas-con-causa.appspot.com",
+      messagingSenderId: "347417635634",
+      appId: "1:347417635634:web:3ddab8921d26707910452b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+    let userRole = "";
+
+    window.login = () => {
+      const clave = document.getElementById("clave").value.trim();
+      const roles = { "Admin2024": "admin", "Miriam25": "verificador", "VerifPatty26": "verificador", "VerifDiane27": "verificador", "VerifSteven28": "verificador" };
+      if (roles[clave]) {
+        userRole = roles[clave];
+        document.getElementById("login").style.display = "none";
+        document.getElementById("panel").style.display = "block";
+        activarLiveUpdate();
+      } else {
+        alert("Contraseña incorrecta");
+      }
+    };
+
+    function activarLiveUpdate() {
+      onSnapshot(collection(db, "BoletosRifa"), snapshot => {
+        const tbody = document.getElementById("tablaBoletos");
+        tbody.innerHTML = "";
+        snapshot.forEach(docSnap => {
+          const b = docSnap.data();
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>#${b.boleto}</td>
+            <td>${b.nombre || ""}</td>
+            <td>${b.telefono || ""}</td>
+            <td>${b.poblacion || ""}</td>
+            <td class="${b.estado}">${b.estado}</td>
+            <td>${b.fecha ? new Date(b.fecha).toLocaleString() : ""}</td>
+            <td>${(userRole === "admin" || (userRole === "verificador" && b.estado !== "pagado")) ? estadoSelector(docSnap.id, b) : ""}</td>
+            <td>${b.estado === "pagado" && userRole === "admin" ? `<button onclick="reenviarVIP('${b.telefono}', '${b.nombre}', '${b.urlBoleto}')">Reenviar VIP</button>` : ""}</td>
+            <td>${b.modificadoPor || ""}</td>
+            <td>${b.formaPago || ""}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      });
+    }
+
+    function estadoSelector(idDoc, b) {
+      return `<select onchange="cambiarEstado('${idDoc}', this.value, ${JSON.stringify(b)})">
+        <option disabled selected>Seleccionar</option>
+        <option value="libre">Libre</option>
+        <option value="apartado">Apartado</option>
+        <option value="pagado">Pagado</option>
+      </select>`;
+    }
+
+    window.cambiarEstado = async (idDoc, nuevoEstado, b) => {
+      const formaPago = nuevoEstado === "pagado" ? prompt("Forma de pago:") : "";
+      const modificadoPor = prompt("¿Quién realiza el cambio?");
+
+      const refDoc = doc(db, "BoletosRifa", idDoc);
+      await updateDoc(refDoc, { estado: nuevoEstado, formaPago, modificadoPor, fecha: new Date().toISOString() });
+
+      if (nuevoEstado === "pagado") {
+        const url = await generarYSubirBoleto(b);
+        await updateDoc(refDoc, { urlBoleto: url });
+        enviarWhatsapp(b.telefono, b.nombre, url);
+      }
+    };
+
+    async function generarYSubirBoleto(b) {
+      const div = document.createElement("div");
+      div.style.width = "400px";
+      div.style.padding = "20px";
+      div.style.border = "2px solid green";
+      div.style.textAlign = "center";
+      div.style.background = "#ffffff";
+      div.innerHTML = `
+        <h2>Boleto #${b.boleto}</h2>
+        <p><strong>Nombre:</strong> ${b.nombre}</p>
+        <p><strong>Teléfono:</strong> ${b.telefono}</p>
+        <p><strong>Series:</strong> ${b.series.join(", ")}</p>
+        <p style="font-size: 12px; margin-top: 10px; color: #555;">🎁 Premio VIP adicional:<br>Si resultas ganador:<br>- Compra 2 boletos más<br>- Comparte en Facebook<br>- Anota tu serie<br>- ¡Envío Gratis!</p>
+        <p style="font-size: 10px; margin-top: 5px;">Fecha: ${new Date().toLocaleString()}</p>
+      `;
+
+      document.body.appendChild(div);
+      const canvas = await html2canvas(div);
+      const dataURL = canvas.toDataURL("image/png");
+      document.body.removeChild(div);
+
+      const storageRef = ref(storage, `boletos/${b.boleto}.png`);
+      await uploadString(storageRef, dataURL, 'data_url');
+      return await getDownloadURL(storageRef);
+    }
+
+    function enviarWhatsapp(telefono, nombre, url) {
+      const mensaje = `Hola ${nombre}! 🎉 Recuerda que puedes ganar el 3er Premio VIP (Bicicleta Mercurio 26 🚲) si resultas ganador del sorteo principal y:
+✅ Compras 2 boletos más.
+✅ Compartes la rifa en Facebook.
+✅ Anotas tu serie en la publicación.
+📦 Incluye Envío GRATIS a todo México.
+🔗 Aquí está tu boleto: ${url}
+Guarda captura, ¡es tu pase al regalo!`;
+      window.open(`https://wa.me/52${telefono}?text=${encodeURIComponent(mensaje)}`, "_blank");
+    }
+
+    window.reenviarVIP = (telefono, nombre, url) => enviarWhatsapp(telefono, nombre, url);
+  </script>
+</body>
+</html>
