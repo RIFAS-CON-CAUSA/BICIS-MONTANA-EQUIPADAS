@@ -4,163 +4,55 @@
   <meta charset="UTF-8">
   <title>Panel Admin - Rifas con Causa</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px; }
-    h1 { text-align: center; color: #1b5e20; }
-    .filtros, .acciones { display: flex; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; gap: 10px; }
-    .filtros button, .acciones button { padding: 8px 15px; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; }
-    .disponible { background: #2ecc71; color: white; }
-    .apartado { background: #f1c40f; color: black; }
-    .pagado { background: #e74c3c; color: white; }
-    table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 0 8px rgba(0,0,0,0.1); }
-    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
-    th { background: #1976d2; color: white; }
-    .filtro-busqueda input { padding: 8px; border: 1px solid #ccc; border-radius: 20px; width: 250px; }
-    #notificacion { display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #2ecc71; color: white; padding: 10px 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); font-weight: bold; z-index: 1000; }
-  </style>
+  <!-- (Estilos y estructura igual que antes) -->
 </head>
 <body>
-
-<h1>Panel Administrativo - Rifas con Causa</h1>
-
-<div class="filtros">
-  <button onclick="filtrar('todos')">Mostrar Todos</button>
-  <button class="disponible" onclick="filtrar('libre')">Disponibles</button>
-  <button class="apartado" onclick="filtrar('apartado')">Apartados</button>
-  <button class="pagado" onclick="filtrar('pagado')">Pagados</button>
-</div>
-
-<div class="acciones">
-  <div class="filtro-busqueda">
-    <input type="text" id="busqueda" placeholder="Buscar por nombre, población o número..." oninput="filtrarBusqueda()">
-  </div>
-  <button onclick="exportarExcel()">📤 Exportar a Excel</button>
-  <button onclick="exportarExcelPagadosPorUsuario()">📥 Exportar Pagados (solo míos)</button>
-</div>
-
-<table id="tablaBoletos">
-  <thead>
-    <tr>
-      <th>Boleto</th>
-      <th>Nombre</th>
-      <th>Teléfono</th>
-      <th>Población</th>
-      <th>Estado</th>
-      <th>Fecha</th>
-      <th>Cambiar Estado</th>
-      <th>Modificado por</th>
-      <th>Forma de Pago</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
-</table>
-
-<div id="notificacion">✅ Guardado correctamente</div>
+  <!-- (Encabezados, filtros y tabla igual que antes) -->
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
-    authDomain: "rifas-con-causa.firebaseapp.com",
-    projectId: "rifas-con-causa",
-    storageBucket: "rifas-con-causa.appspot.com",
-    messagingSenderId: "347417635634",
-    appId: "1:347417635634:web:3ddab8921d26707910452b"
-  };
-
+  const firebaseConfig = { /* tu config */ };
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  const accesos = {
-    "Admin2024": { rol: "Administrador", nombre: "Administrador" },
-    "Miriam25": { rol: "Verificador", nombre: "Miriam" },
-    "VerifPatty26": { rol: "Verificador", nombre: "Patty" },
-    "VerifDiane27": { rol: "Verificador", nombre: "Diane" },
-    "VerifSteven28": { rol: "Verificador", nombre: "Steven" }
-  };
+  const accesos = { /* tus accesos con nombres */ };
 
   let usuarioRol = null;
   let usuarioNombre = null;
   let datosBoletos = [];
 
-  document.addEventListener("DOMContentLoaded", () => {
-    const clave = prompt("🔒 Introduce tu contraseña:");
-    if (accesos[clave]) {
-      usuarioRol = accesos[clave].rol;
-      usuarioNombre = accesos[clave].nombre;
-      alert(`Bienvenido: ${usuarioNombre}`);
-      cargarBoletos();
-    } else {
-      alert("Acceso denegado.");
-      window.location.href = "index.html";
-    }
-  });
+  document.addEventListener("DOMContentLoaded", () => { /* login clave */ });
+  async function cargarBoletos() { /* carga de boletos */ }
+  function mostrarBoletos(lista) { /* renderiza tabla */ }
 
-  async function cargarBoletos() {
-    const querySnapshot = await getDocs(collection(db, "BoletosRifa"));
-    datosBoletos = [];
-    document.querySelector("#tablaBoletos tbody").innerHTML = "";
-    querySnapshot.forEach(docSnap => datosBoletos.push(docSnap.data()));
-    mostrarBoletos(datosBoletos);
-  }
+  window.cambiarEstado = async function(id, nuevoEstado) { /* actualiza estado */ };
 
-  function mostrarBoletos(lista) {
-    const tbody = document.querySelector("#tablaBoletos tbody");
-    tbody.innerHTML = "";
-    lista.forEach(boleto => {
-      const idDoc = boleto.boleto.padStart(3, '0');
-      let opcionesEstado = "";
-
-      if (usuarioRol === "Administrador") {
-        opcionesEstado = `<option disabled selected>Editar</option>
-        <option value="libre">Disponible</option>
-        <option value="apartado">Apartado</option>
-        <option value="pagado">Pagado</option>`;
-      } else if (usuarioRol === "Verificador" && boleto.estado === "apartado") {
-        opcionesEstado = `<option disabled selected>Editar</option>
-        <option value="pagado">Pagado</option>`;
-      }
-
-      const selectHtml = opcionesEstado ? `<select onchange="cambiarEstado('${idDoc}', this.value)">${opcionesEstado}</select>` : "🔒";
-
-      tbody.innerHTML += `<tr>
-        <td>#${idDoc}</td>
-        <td>${boleto.nombre || ""}</td>
-        <td>${boleto.telefono || ""}</td>
-        <td>${boleto.poblacion || ""}</td>
-        <td class="${boleto.estado}">${boleto.estado}</td>
-        <td>${boleto.fecha ? new Date(boleto.fecha).toLocaleString() : ""}</td>
-        <td>${selectHtml}</td>
-        <td>${boleto.modificadoPor || ""}</td>
-        <td>${boleto.formaPago || ""}</td>
-      </tr>`;
+  function exportarExcel() {
+    let csv = "Boleto,Nombre,Teléfono,Población,Estado,Fecha,Modificado por,Forma de pago\n";
+    datosBoletos.forEach(b => {
+      csv += `#${b.boleto},"${b.nombre || ""}","${b.telefono || ""}","${b.poblacion || ""}","${b.estado}","${b.fecha ? new Date(b.fecha).toLocaleString() : ""}","${b.modificadoPor || ""}","${b.formaPago || ""}"\n`;
     });
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Boletos-Rifa-${new Date().toLocaleDateString()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
-
-  window.cambiarEstado = async function(id, nuevoEstado) {
-    const formaPago = nuevoEstado === "pagado" ? prompt("¿Forma de pago? (Efectivo, OXXO, etc.)") : "";
-    const ref = doc(db, "BoletosRifa", id);
-    await updateDoc(ref, { estado: nuevoEstado, modificadoPor: usuarioNombre, formaPago: formaPago });
-    mostrarNotificacion("✅ Guardado correctamente");
-    cargarBoletos();
-  };
 
   function exportarExcelPagadosPorUsuario() {
     const pagadosUsuario = datosBoletos.filter(b => b.estado === "pagado" && b.modificadoPor === usuarioNombre);
-
     if (pagadosUsuario.length === 0) {
       alert("No tienes boletos pagados registrados.");
       return;
     }
-
     let csv = "Boleto,Nombre,Teléfono,Población,Estado,Fecha,Modificado por,Forma de pago\n";
-
     pagadosUsuario.forEach(b => {
       csv += `#${b.boleto},"${b.nombre || ""}","${b.telefono || ""}","${b.poblacion || ""}","${b.estado}","${b.fecha ? new Date(b.fecha).toLocaleString() : ""}","${b.modificadoPor || ""}","${b.formaPago || ""}"\n`;
     });
-
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -170,7 +62,7 @@
     URL.revokeObjectURL(url);
   }
 
-  // Las funciones filtrar, filtrarBusqueda, exportarExcel y mostrarNotificacion siguen igual...
+  // funciones filtrar, filtrarBusqueda, mostrarNotificacion...
 
 </script>
 </body>
