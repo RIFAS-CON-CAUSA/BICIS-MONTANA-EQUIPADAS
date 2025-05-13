@@ -46,7 +46,6 @@
           </div>
         `;
 
-        // ✅ CLIC SOLO SI ESTÁ LIBRE
         if (boleto.estado === "libre") {
           div.style.cursor = "pointer";
           div.addEventListener("click", () => {
@@ -58,18 +57,6 @@
       });
     }
 
-    function filtrarBoletos() {
-      const filtro = document.getElementById("filtroInput").value.trim();
-      const cards = document.querySelectorAll(".boletoCard");
-      cards.forEach(card => {
-        if (filtro === "" || card.textContent.includes(filtro.padStart(3, '0'))) {
-          card.style.display = "flex";
-        } else {
-          card.style.display = "none";
-        }
-      });
-    }
-
     document.addEventListener("DOMContentLoaded", cargarBoletos);
   </script>
   <style>
@@ -78,9 +65,19 @@
     footer { background: #00aa00; color: white; }
     .agradecimiento { text-align: center; margin: 10px; font-size: 0.9em; color: white; }
     .contenedor { padding: 10px; }
-    .tools { text-align: center; margin-bottom: 10px; position: relative; }
-    .tools input { padding: 10px; width: 200px; border-radius: 5px; border: 2px solid #004aad; text-align: center; font-size: 1em; }
-    .tools label { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); color: #004aad; font-weight: bold; pointer-events: none; font-size: 0.9em; }
+    .leyenda { margin: 10px auto; text-align: center; font-weight: bold; }
+    .leyenda span { margin: 0 10px; display: inline-flex; align-items: center; gap: 5px; }
+    .leyenda span::before {
+      content: "";
+      display: inline-block;
+      width: 15px;
+      height: 15px;
+      border-radius: 3px;
+      border: 1px solid #004aad;
+    }
+    .verde::before { background: #00aa00; }
+    .amarillo::before { background: #ffbb00; }
+    .rojo::before { background: #cc0000; }
     #boletosGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
     .boletoCard {
       border: 2px solid #004aad;
@@ -118,6 +115,13 @@
       margin: 5px;
       font-weight: bold;
     }
+    .subtitulo {
+      text-align: center;
+      margin: 10px;
+      font-size: 0.95em;
+      color: #004aad;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -126,17 +130,18 @@
     <a href="index.html" class="button-link">Regresar a Inicio</a>
   </header>
 
-  <div class="contenedor">
-    <div class="tools">
-      <label for="filtroInput">SI YA TIENES BOLETO... FELICIDADES¡¡¡ YA ERES UNO DE LOS PROBABLES GANADORES... ">
-    >Son 10 oportunidades por $160.00 con la loteria nacional</label>
-      <input type="text" id="filtroInput" oninput="filtrarBoletos()" placeholder="">
-<div class="leyenda">
-<span class="verde">Disponibles VERDES------------</span>
-<span class="amarillo">Apartados AMARILLOS------------- </span>
-<span class="rojo">Pagados ROJOS </span>
-</div>
+  <div class="subtitulo">
+    ¡SI YA TIENES BOLETO... FELICIDADES! YA ERES UNO DE LOS PROBABLES GANADORES.
+    Son 10 oportunidades por $160.00 con la lotería nacional.
+  </div>
 
+  <div class="leyenda">
+    <span class="verde">Disponibles VERDES</span>
+    <span class="amarillo">Apartados AMARILLOS</span>
+    <span class="rojo">Pagados ROJOS</span>
+  </div>
+
+  <div class="contenedor">
     <div id="boletosGrid"></div>
   </div>
 
