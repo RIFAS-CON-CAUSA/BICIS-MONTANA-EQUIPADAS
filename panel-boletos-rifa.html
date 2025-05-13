@@ -21,13 +21,22 @@
 
     async function cargarBoletos() {
       const querySnapshot = await getDocs(collection(db, "BoletosRifa"));
-      const grid = document.getElementById("boletosGrid");
-      grid.innerHTML = "";
+const grid = document.getElementById("boletosGrid");
+if (!grid) {
+  console.error("No se encontró el elemento #boletosGrid");
+  return;
+}
+grid.innerHTML = "";
 
-      const boletos = [];
-      querySnapshot.forEach((doc) => {
-        boletos.push(doc.data());
-      });
+const boletos = [];
+querySnapshot.forEach((docSnap) => {
+  const data = docSnap.data();
+  data.id = docSnap.id; // Se guarda el ID del documento para futuras acciones
+  boletos.push(data);
+});
+
+
+      
 
       boletos.sort((a, b) => parseInt(a.boleto) - parseInt(b.boleto));
 
