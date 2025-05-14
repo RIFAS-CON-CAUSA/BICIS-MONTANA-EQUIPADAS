@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -44,12 +45,25 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  const firebaseConfig = { apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g", authDomain: "rifas-con-causa.firebaseapp.com", projectId: "rifas-con-causa", storageBucket: "rifas-con-causa.appspot.com", messagingSenderId: "347417635634", appId: "1:347417635634:web:3ddab8921d26707910452b" };
+  const firebaseConfig = {
+    apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
+    authDomain: "rifas-con-causa.firebaseapp.com",
+    projectId: "rifas-con-causa",
+    storageBucket: "rifas-con-causa.appspot.com",
+    messagingSenderId: "347417635634",
+    appId: "1:347417635634:web:3ddab8921d26707910452b"
+  };
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  const accesos = { "Admin2024": { rol: "Administrador", nombre: "Administrador" }, "Miriam25": { rol: "Verificador", nombre: "Miriam" }, "VerifPatty26": { rol: "Verificador", nombre: "Patty" }, "VerifDiane27": { rol: "Verificador", nombre: "Diane" }, "VerifSteven28": { rol: "Verificador", nombre: "Steven" } };
+  const accesos = {
+    "Admin2024": { rol: "Administrador", nombre: "Administrador" },
+    "Miriam25": { rol: "Verificador", nombre: "Miriam" },
+    "VerifPatty26": { rol: "Verificador", nombre: "Patty" },
+    "VerifDiane27": { rol: "Verificador", nombre: "Diane" },
+    "VerifSteven28": { rol: "Verificador", nombre: "Steven" }
+  };
 
   let usuarioRol = null;
   let usuarioNombre = null;
@@ -76,9 +90,6 @@
 
     tablaBody.innerHTML = "";
     querySnapshot.forEach(docSnap => datosBoletos.push(docSnap.data()));
-
-    console.log("Datos cargados:", datosBoletos);
-
     mostrarBoletos(datosBoletos);
   }
 
@@ -87,8 +98,6 @@
     tablaBody.innerHTML = "";
 
     lista.forEach(boleto => {
-      console.log("Mostrando boleto:", boleto);
-
       const idDoc = boleto.boleto ? boleto.boleto.padStart(3, '0') : "---";
       let opcionesEstado = "";
 
@@ -104,11 +113,66 @@
     });
   }
 
-  window.cambiarEstado = function() { /* igual */ }
-  window.exportarExcel = function() { /* igual */ }
-  window.exportarExcelPagadosPorUsuario = function() { /* igual */ }
-  window.exportarPorVerificador = function() { /* igual */ }
+  window.cambiarEstado = async function(id, nuevoEstado) {
+    const formaPago = nuevoEstado === "pagado" ? prompt("¿Forma de pago? (Efectivo, OXXO, etc.)") : "";
+    const ref = doc(db, "BoletosRifa", id);
+    await updateDoc(ref, { estado: nuevoEstado, modificadoPor: usuarioNombre, formaPago: formaPago });
+    alert("✅ Guardado correctamente");
+    cargarBoletos();
+  };
 
+  window.exportarExcel = function() {
+    let csv = "Boleto,Nombre,Teléfono,Población,Estado,Fecha,Modificado por,Forma de pago
+";
+    datosBoletos.forEach(b => {
+      csv += `#${b.boleto},"${b.nombre || ""}","${b.telefono || ""}","${b.poblacion || ""}","${b.estado}","${b.fecha ? new Date(b.fecha).toLocaleString() : ""}","${b.modificadoPor || ""}","${b.formaPago || ""}"
+`;
+    });
+    descargarCSV(csv, "Boletos-Rifa");
+  };
+
+  window.exportarExcelPagadosPorUsuario = function() {
+    const pagados = datosBoletos.filter(b => b.estado === "pagado" && b.modificadoPor === usuarioNombre);
+    if (pagados.length === 0) return alert("No tienes boletos pagados registrados.");
+    let csv = "Boleto,Nombre,Teléfono,Población,Estado,Fecha,Modificado por,Forma de pago
+";
+    pagados.forEach(b => {
+      csv += `#${b.boleto},"${b.nombre || ""}","${b.telefono || ""}","${b.poblacion || ""}","${b.estado}","${b.fecha ? new Date(b.fecha).toLocaleString() : ""}","${b.modificadoPor || ""}","${b.formaPago || ""}"
+`;
+    });
+    descargarCSV(csv, `Pagados-${usuarioNombre}`);
+  };
+
+  window.exportarPorVerificador = function() {
+    const verificador = prompt("¿Qué verificador quieres exportar? (Miriam, Patty, Diane, Steven)");
+    if (!verificador) return;
+    const precio = parseFloat(prompt("¿Cuál es el precio unitario por boleto?"));
+    if (isNaN(precio)) return alert("Precio no válido.");
+    const pagados = datosBoletos.filter(b => b.estado === "pagado" && b.modificadoPor === verificador);
+    if (pagados.length === 0) return alert(`No hay boletos pagados por ${verificador}.`);
+    let csv = "Boleto,Nombre,Teléfono,Población,Estado,Fecha,Modificado por,Forma de pago
+";
+    pagados.forEach(b => {
+      csv += `#${b.boleto},"${b.nombre || ""}","${b.telefono || ""}","${b.poblacion || ""}","${b.estado}","${b.fecha ? new Date(b.fecha).toLocaleString() : ""}","${b.modificadoPor || ""}","${b.formaPago || ""}"
+`;
+    });
+    csv += `
+Total Boletos: ${pagados.length}
+Precio Unitario: $${precio.toFixed(2)}
+Total Recaudado: $${(pagados.length * precio).toFixed(2)}
+`;
+    descargarCSV(csv, `Pagados-${verificador}`);
+  };
+
+  function descargarCSV(contenido, nombreBase) {
+    const blob = new Blob([contenido], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${nombreBase}-${new Date().toLocaleDateString()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 </script>
 </body>
 </html>
