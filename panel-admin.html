@@ -1,0 +1,53 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Admin - Rifas con Causa</title>
+</head>
+<body>
+<h1>Panel Admin - Rifas con Causa</h1>
+<div>
+  <button onclick="exportarExcel()">Exportar Excel</button>
+</div>
+<table border="1" id="tablaBoletos">
+  <thead>
+    <tr>
+      <th>Boleto</th><th>Nombre</th><th>Teléfono</th><th>Población</th>
+      <th>Estado</th><th>Fecha</th><th>Modificado por</th><th>Forma Pago</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+<script>
+let datosBoletos = [
+  { boleto: "001", nombre: "Dummy Juan", telefono: "1234567890", poblacion: "Zacualpan", estado: "libre", fecha: "2025-05-13", modificadoPor: "Miriam", formaPago: "Efectivo" },
+  { boleto: "002", nombre: "Dummy Maria", telefono: "0987654321", poblacion: "Cuisillos", estado: "pagado", fecha: "2025-05-12", modificadoPor: "Patty", formaPago: "OXXO" }
+];
+
+function mostrarBoletos() {
+  const tbody = document.querySelector("#tablaBoletos tbody");
+  tbody.innerHTML = "";
+  datosBoletos.forEach(b => {
+    tbody.innerHTML += `<tr><td>${b.boleto}</td><td>${b.nombre}</td><td>${b.telefono}</td><td>${b.poblacion}</td><td>${b.estado}</td><td>${b.fecha}</td><td>${b.modificadoPor}</td><td>${b.formaPago}</td></tr>`;
+  });
+}
+
+function exportarExcel() {
+  let csv = "Boleto,Nombre,Teléfono,Población,Estado,Fecha,Modificado por,Forma Pago\n";
+  datosBoletos.forEach(b => {
+    csv += `${b.boleto},${b.nombre},${b.telefono},${b.poblacion},${b.estado},${b.fecha},${b.modificadoPor},${b.formaPago}\n`;
+  });
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "BoletosRifa.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+mostrarBoletos();
+</script>
+</body>
+</html>
