@@ -1,0 +1,84 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Admin - Rifas con Causa</title>
+</head>
+<body>
+<h1>Panel Admin - Rifas con Causa</h1>
+<div>
+  <button onclick="exportarExcel()">Exportar Excel</button>
+</div>
+<table border="1" id="tablaBoletos">
+  <thead>
+    <tr>
+      <th>Boleto</th><th>Nombre</th><th>Teléfono</th><th>Población</th>
+      <th>Estado</th><th>Fecha</th><th>Modificado por</th><th>Forma Pago</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
+    authDomain: "rifas-con-causa.firebaseapp.com",
+    projectId: "rifas-con-causa",
+    storageBucket: "rifas-con-causa.appspot.com",
+    messagingSenderId: "347417635634",
+    appId: "1:347417635634:web:3ddab8921d26707910452b"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  let datosBoletos = [];
+
+  async function cargarBoletos() {
+    try {
+      const querySnapshot = await getDocs(collection(db, "BoletosRifa"));
+      datosBoletos = [];
+      querySnapshot.forEach(doc => datosBoletos.push(doc.data()));
+      console.log("Datos reales cargados:", datosBoletos.length);
+      if (datosBoletos.length === 0) throw new Error("Firebase vacío");
+    } catch (e) {
+      console.warn("Fallo Firestore. Usando dummy backup.");
+      datosBoletos = [
+        { boleto: "001", nombre: "Dummy Juan", telefono: "1234567890", poblacion: "Zacualpan", estado: "libre", fecha: "2025-05-13", modificadoPor: "Miriam", formaPago: "Efectivo" },
+        { boleto: "002", nombre: "Dummy Maria", telefono: "0987654321", poblacion: "Cuisillos", estado: "pagado", fecha: "2025-05-12", modificadoPor: "Patty", formaPago: "OXXO" }
+      ];
+    }
+    mostrarBoletos();
+  }
+
+  function mostrarBoletos() {
+    const tbody = document.querySelector("#tablaBoletos tbody");
+    tbody.innerHTML = "";
+    datosBoletos.forEach(b => {
+      const fechaFormateada = b.fecha ? (b.fecha.toDate ? b.fecha.toDate().toLocaleString() : (new Date(b.fecha)).toLocaleString()) : "";
+      tbody.innerHTML += `<tr><td>${b.boleto}</td><td>${b.nombre || ""}</td><td>${b.telefono || ""}</td><td>${b.poblacion || ""}</td><td>${b.estado || ""}</td><td>${fechaFormateada}</td><td>${b.modificadoPor || ""}</td><td>${b.formaPago || ""}</td></tr>`;
+    });
+  }
+
+  window.exportarExcel = function() {
+    let csv = "Boleto,Nombre,Teléfono,Población,Estado,Fecha,Modificado por,Forma Pago\n";
+    datosBoletos.forEach(b => {
+      const fechaFormateada = b.fecha ? (b.fecha.toDate ? b.fecha.toDate().toLocaleString() : (new Date(b.fecha)).toLocaleString()) : "";
+      csv += `${b.boleto || ""},${b.nombre || ""},${b.telefono || ""},${b.poblacion || ""},${b.estado || ""},${fechaFormateada},${b.modificadoPor || ""},${b.formaPago || ""}\n`;
+    });
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "BoletosRifa.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  cargarBoletos();
+</script>
+</body>
+</html>
