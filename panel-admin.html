@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Admin - Boleto Clásico</title>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+  <style>
+    .boleto-clasico { width: 350px; background: white; border: 2px solid #004aad; border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2); padding: 15px; position: relative;
+      background-image: url('https://github.com/RIFAS-CON-CAUSA/BICIS-MONTANA-EQUIPADAS/blob/main/las%202%20bicis.jpeg?raw=true');
+      background-size: cover; background-position: center; overflow: hidden; }
+    .boleto-clasico::before { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 10px;
+      background: repeating-linear-gradient(to bottom, transparent, transparent 4px, #fff 4px, #fff 8px);
+      border-right: 2px dotted #004aad; }
+    .overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255, 255, 255, 0.7); border-radius: 10px; z-index: 1; }
+    .content { position: relative; z-index: 2; text-align: center; }
+    .nro-boleto { font-size: 2em; font-weight: bold; color: #004aad; margin-bottom: 10px; }
+    .datos { font-size: 0.9em; margin-bottom: 10px; }
+    .promo { background: #fff3cd; border: 1px solid #ffeeba; padding: 10px; font-size: 0.8em;
+      border-radius: 5px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<h2>Panel Admin - Flujo Final</h2>
+
+<div id="boletoVisual" class="boleto-clasico">
+  <div class="overlay"></div>
+  <div class="content">
+    <div class="nro-boleto">#034</div>
+    <div class="datos">
+      Ivana Getzemani<br>Cuisillos, Jalisco<br>
+      Series: 103, 204, 305, 406, 507, 608, 709, 810, 911, 1012
+    </div>
+    <div>¡Participas por las Bicis! Sorteo 30 Mayo</div>
+    <div class="promo">
+      🎁 3.er Premio: Bicicleta Mercurio 26<br>
+      Compra 3 boletos o más, comparte en Facebook.<br>
+      📦 Envío gratis a todo México.<br>
+      Publica tu serie en redes y guarda captura para reclamar.
+    </div>
+  </div>
+</div>
+
+<button onclick="subirBoleto()">Subir a Storage</button>
+<button onclick="enviarWhatsApp()">Enviar WhatsApp</button>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+  import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
+    authDomain: "rifas-con-causa.firebaseapp.com",
+    projectId: "rifas-con-causa",
+    storageBucket: "rifas-con-causa.appspot.com",
+    messagingSenderId: "347417635634",
+    appId: "1:347417635634:web:3ddab8921d26707910452b"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const storage = getStorage(app);
+  const db = getFirestore(app);
+
+  async function subirBoleto() {
+    const canvas = await html2canvas(document.getElementById("boletoVisual"));
+    canvas.toBlob(async (blob) => {
+      const storageRef = ref(storage, 'boletos/034.png');
+      await uploadBytes(storageRef, blob);
+      const downloadURL = await getDownloadURL(storageRef);
+      console.log('Subido URL:', downloadURL);
+      await updateDoc(doc(db, 'BoletosRifa', '034'), { urlImagenBoleto: downloadURL });
+      alert('Imagen subida y URL guardada en Firestore');
+    });
+  }
+
+  function enviarWhatsApp() {
+    const telefono = '3312345678';
+    const nombre = 'Ivana Getzemani';
+    const nroBoleto = '034';
+    const urlBoleto = 'https://storage.googleapis.com/rifas-con-causa/boletos/034.png';
+    const mensaje = `Hola ${nombre}, gracias por tu apoyo en la rifa.\nAquí tienes tu boleto #${nroBoleto}: ${urlBoleto}\n¡Mucha suerte en el sorteo!`;
+    const enlace = `https://api.whatsapp.com/send?phone=52${telefono}&text=${encodeURIComponent(mensaje)}`;
+    window.open(enlace, '_blank');
+  }
+</script>
+
+</body>
+</html>
