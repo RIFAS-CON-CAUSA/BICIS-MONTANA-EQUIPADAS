@@ -1,0 +1,178 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Admin - Rifas con Causa</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+    .disponible { background: #2ecc71; color: white; }
+    .apartado { background: #f1c40f; color: black; }
+    .pagado { background: #e74c3c; color: white; }
+  </style>
+</head>
+<body>
+
+<h1>Panel Admin - Rifas con Causa</h1>
+
+<div class="acciones">
+  <button onclick="exportarExcel()">📤 Exportar a Excel</button>
+  <button onclick="exportarExcelPagadosPorUsuario()">📥 Exportar Pagados (solo míos)</button>
+  <button onclick="exportarPorVerificador()">📥 Exportar por Verificador</button>
+</div>
+
+<table id="tablaBoletos">
+  <thead>
+    <tr>
+      <th>Boleto</th>
+      <th>Nombre</th>
+      <th>Teléfono</th>
+      <th>Población</th>
+      <th>Estado</th>
+      <th>Fecha</th>
+      <th>Cambiar Estado</th>
+      <th>Modificado por</th>
+      <th>Forma de Pago</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
+    authDomain: "rifas-con-causa.firebaseapp.com",
+    projectId: "rifas-con-causa",
+    storageBucket: "rifas-con-causa.appspot.com",
+    messagingSenderId: "347417635634",
+    appId: "1:347417635634:web:3ddab8921d26707910452b"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const accesos = {
+    "Admin2024": { rol: "Administrador", nombre: "Administrador" },
+    "Miriam25": { rol: "Verificador", nombre: "Miriam" },
+    "VerifPatty26": { rol: "Verificador", nombre: "Patty" },
+    "VerifDiane27": { rol: "Verificador", nombre: "Diane" },
+    "VerifSteven28": { rol: "Verificador", nombre: "Steven" }
+  };
+
+  let usuarioRol = null;
+  let usuarioNombre = null;
+  let datosBoletos = [];
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const clave = prompt("🔒 Introduce tu contraseña:");
+    if (accesos[clave]) {
+      usuarioRol = accesos[clave].rol;
+      usuarioNombre = accesos[clave].nombre;
+      alert(`Bienvenido: ${usuarioNombre}`);
+      cargarBoletos();
+    } else {
+      alert("Acceso denegado.");
+      window.location.href = "index.html";
+    }
+  });
+
+  async function cargarBoletos() {
+    const querySnapshot = await getDocs(collection(db, "BoletosRifa"));
+    datosBoletos = [];
+    const tablaBody = document.querySelector("#tablaBoletos tbody");
+    if (!tablaBody) return;
+
+    tablaBody.innerHTML = "";
+    querySnapshot.forEach(docSnap => datosBoletos.push(docSnap.data()));
+    mostrarBoletos(datosBoletos);
+  }
+
+  function mostrarBoletos(lista) {
+    const tablaBody = document.querySelector("#tablaBoletos tbody");
+    tablaBody.innerHTML = "";
+
+    lista.forEach(boleto => {
+      const idDoc = boleto.boleto ? boleto.boleto.padStart(3, '0') : "---";
+      let opcionesEstado = "";
+
+      if (usuarioRol === "Administrador") {
+        opcionesEstado = `<option disabled selected>Editar</option><option value="libre">Disponible</option><option value="apartado">Apartado</option><option value="pagado">Pagado</option>`;
+      } else if (usuarioRol === "Verificador" && boleto.estado === "apartado") {
+        opcionesEstado = `<option disabled selected>Editar</option><option value="pagado">Pagado</option>`;
+      }
+
+      const selectHtml = opcionesEstado ? `<select onchange="cambiarEstado('${idDoc}', this.value)">${opcionesEstado}</select>` : "🔒";
+
+      tablaBody.innerHTML += `<tr><td>#${idDoc}</td><td>${boleto.nombre || ""}</td><td>${boleto.telefono || ""}</td><td>${boleto.poblacion || ""}</td><td class="${boleto.estado}">${boleto.estado}</td><td>${boleto.fecha ? new Date(boleto.fecha).toLocaleString() : ""}</td><td>${selectHtml}</td><td>${boleto.modificadoPor || ""}</td><td>${boleto.formaPago || ""}</td></tr>`;
+    });
+  }
+
+  window.cambiarEstado = async function(id, nuevoEstado) {
+    const formaPago = nuevoEstado === "pagado" ? prompt("¿Forma de pago? (Efectivo, OXXO, etc.)") : "";
+    const ref = doc(db, "BoletosRifa", id);
+    await updateDoc(ref, { estado: nuevoEstado, modificadoPor: usuarioNombre, formaPago: formaPago });
+    alert("✅ Guardado correctamente");
+    cargarBoletos();
+  };
+
+  window.exportarExcel = function() {
+    let csv = "Boleto,Nombre,Teléfono,Población,Estado,Fecha,Modificado por,Forma de pago
+";
+    datosBoletos.forEach(b => {
+      csv += `#${b.boleto},"${b.nombre || ""}","${b.telefono || ""}","${b.poblacion || ""}","${b.estado}","${b.fecha ? new Date(b.fecha).toLocaleString() : ""}","${b.modificadoPor || ""}","${b.formaPago || ""}"
+`;
+    });
+    descargarCSV(csv, "Boletos-Rifa");
+  };
+
+  window.exportarExcelPagadosPorUsuario = function() {
+    const pagados = datosBoletos.filter(b => b.estado === "pagado" && b.modificadoPor === usuarioNombre);
+    if (pagados.length === 0) return alert("No tienes boletos pagados registrados.");
+    let csv = "Boleto,Nombre,Teléfono,Población,Estado,Fecha,Modificado por,Forma de pago
+";
+    pagados.forEach(b => {
+      csv += `#${b.boleto},"${b.nombre || ""}","${b.telefono || ""}","${b.poblacion || ""}","${b.estado}","${b.fecha ? new Date(b.fecha).toLocaleString() : ""}","${b.modificadoPor || ""}","${b.formaPago || ""}"
+`;
+    });
+    descargarCSV(csv, `Pagados-${usuarioNombre}`);
+  };
+
+  window.exportarPorVerificador = function() {
+    const verificador = prompt("¿Qué verificador quieres exportar? (Miriam, Patty, Diane, Steven)");
+    if (!verificador) return;
+    const precio = parseFloat(prompt("¿Cuál es el precio unitario por boleto?"));
+    if (isNaN(precio)) return alert("Precio no válido.");
+    const pagados = datosBoletos.filter(b => b.estado === "pagado" && b.modificadoPor === verificador);
+    if (pagados.length === 0) return alert(`No hay boletos pagados por ${verificador}.`);
+    let csv = "Boleto,Nombre,Teléfono,Población,Estado,Fecha,Modificado por,Forma de pago
+";
+    pagados.forEach(b => {
+      csv += `#${b.boleto},"${b.nombre || ""}","${b.telefono || ""}","${b.poblacion || ""}","${b.estado}","${b.fecha ? new Date(b.fecha).toLocaleString() : ""}","${b.modificadoPor || ""}","${b.formaPago || ""}"
+`;
+    });
+    csv += `
+Total Boletos: ${pagados.length}
+Precio Unitario: $${precio.toFixed(2)}
+Total Recaudado: $${(pagados.length * precio).toFixed(2)}
+`;
+    descargarCSV(csv, `Pagados-${verificador}`);
+  };
+
+  function descargarCSV(contenido, nombreBase) {
+    const blob = new Blob([contenido], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${nombreBase}-${new Date().toLocaleDateString()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+</script>
+</body>
+</html>
