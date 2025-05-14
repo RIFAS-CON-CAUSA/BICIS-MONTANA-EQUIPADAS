@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Público - Rifa Bicis Montaña</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
+      authDomain: "rifas-con-causa.firebaseapp.com",
+      projectId: "rifas-con-causa",
+      storageBucket: "rifas-con-causa.appspot.com",
+      messagingSenderId: "347417635634",
+      appId: "1:347417635634:web:3ddab8921d26707910452b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function cargarBoletos() {
+      const querySnapshot = await getDocs(collection(db, "BoletosRifa"));
+      const boletos = [];
+      querySnapshot.forEach(doc => boletos.push(doc.data()));
+
+      const existentes = boletos.length;
+      console.log(`Boletos reales cargados: ${existentes}`);
+
+      // Rellenar dummy hasta 100
+      for (let i = existentes + 1; i <= 100; i++) {
+        boletos.push({
+          boleto: i.toString().padStart(3, '0'),
+          estado: "libre",
+          nombre: "",
+          telefono: "",
+          poblacion: "",
+          formaPago: ""
+        });
+      }
+
+      boletos.sort((a, b) => parseInt(a.boleto) - parseInt(b.boleto));
+      mostrarBoletos(boletos);
+    }
+
+    function mostrarBoletos(lista) {
+      const grid = document.getElementById("boletosGrid");
+      grid.innerHTML = "";
+
+      lista.forEach(boleto => {
+        let color = "#2ecc71"; // libre
+        if (boleto.estado === "apartado") color = "#f1c40f";
+        if (boleto.estado === "pagado") color = "#e74c3c";
+
+        const div = document.createElement("div");
+        div.className = "boletoCard";
+        div.style.backgroundColor = color;
+        div.innerHTML = `<h3>#${boleto.boleto}</h3>`;
+
+        if (boleto.estado === "libre") {
+          div.style.cursor = "pointer";
+          div.addEventListener("click", () => {
+            window.location.href = `registro.html?boleto=${boleto.boleto}`;
+          });
+        }
+
+        grid.appendChild(div);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", cargarBoletos);
+  </script>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 0; }
+    h1 { text-align: center; padding: 20px; background: #004aad; color: white; }
+    #boletosGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 10px; padding: 10px; }
+    .boletoCard { border: 2px solid #004aad; border-radius: 8px; padding: 10px; color: white; text-align: center; font-weight: bold; }
+  </style>
+</head>
+<body>
+<h1>Rifa Bicis Montaña - Boletos</h1>
+<div id="boletosGrid"></div>
+</body>
+</html>
