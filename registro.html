@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro de Boleto</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
+      authDomain: "rifas-con-causa.firebaseapp.com",
+      projectId: "rifas-con-causa",
+      storageBucket: "rifas-con-causa.appspot.com",
+      messagingSenderId: "347417635634",
+      appId: "1:347417635634:web:3ddab8921d26707910452b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.registrarBoleto = async function(e) {
+      e.preventDefault();
+      const params = new URLSearchParams(window.location.search);
+      const numBoleto = params.get("boleto") || "???";
+
+      const nombre = document.getElementById("nombre").value;
+      const telefono = document.getElementById("telefono").value;
+      const poblacion = document.getElementById("poblacion").value;
+      const formaPago = document.getElementById("formaPago").value;
+
+      if (!nombre || !telefono || !poblacion || !formaPago) {
+        Swal.fire("Completa todos los campos", "", "warning");
+        return;
+      }
+
+      await setDoc(doc(db, "BoletosRifa", numBoleto), {
+        boleto: numBoleto,
+        nombre: nombre,
+        telefono: telefono,
+        poblacion: poblacion,
+        estado: "apartado",
+        formaPago: formaPago,
+        modificadoPor: "Cliente",
+        fecha: serverTimestamp()
+      });
+
+      Swal.fire({
+        title: `✅ ¡Boleto #${numBoleto} registrado correctamente!`,
+        html: `
+          <p>GRACIAS... El sistema te da 2 horas para pagar, y lo pone disponible otra vez si no se paga.</p>
+          <p>Envía comprobante de pago al WhatsApp <strong>3311571619</strong>.</p>
+          <p><strong>Cuenta Spin OXXO:</strong> 4217 4701 5601 6160<br>
+          <strong>CLABE:</strong> 7289 6900 0143 3179 21</p>
+          <p><em>Tómale captura de pantalla.</em></p>
+        `,
+        icon: 'success',
+        confirmButtonText: 'Aceptar',
+        width: '600px'
+      }).then(() => {
+        window.location.href = 'panel-boletos-rifa.html';
+      });
+    };
+  </script>
+</head>
+<body>
+<h1>Registro de Boleto</h1>
+<form onsubmit="registrarBoleto(event)">
+  <label>Nombre:<br><input type="text" id="nombre" required></label><br><br>
+  <label>Teléfono:<br><input type="text" id="telefono" required></label><br><br>
+  <label>Población:<br><input type="text" id="poblacion" required></label><br><br>
+  <label>Forma de Pago:<br>
+    <select id="formaPago" required>
+      <option value="">Selecciona...</option>
+      <option value="Efectivo">Efectivo</option>
+      <option value="OXXO">OXXO</option>
+      <option value="Transferencia">Transferencia</option>
+    </select>
+  </label><br><br>
+  <button type="submit">Registrar Boleto</button>
+</form>
+</body>
+</html>
