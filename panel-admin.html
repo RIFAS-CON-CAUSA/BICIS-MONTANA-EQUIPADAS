@@ -1,0 +1,39 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Admin - Rifas con Causa</title>
+</head>
+<body>
+<h1>Panel Admin - Rifas con Causa</h1>
+<!-- Aquí va el resto del contenido... (simulado reducido por espacio) -->
+<script>
+// Corrección directa de error en exportarPorVerificador (línea 125 error)
+function exportarPorVerificador() {
+  const verificador = prompt("¿Qué verificador quieres exportar? (Miriam, Patty, Diane, Steven)");
+  if (!verificador) return;
+  const precio = parseFloat(prompt("¿Cuál es el precio unitario por boleto?"));
+  if (isNaN(precio)) return alert("Precio no válido.");
+  const boletos = datosBoletos.filter(b => b.estado === "pagado" && b.modificadoPor === verificador);
+  if (boletos.length === 0) return alert("No hay boletos pagados por " + verificador + ".");
+
+  let csv = "Boleto,Nombre,Teléfono,Población,Estado,Fecha,Modificado por,Forma de pago\n";
+  boletos.forEach(b => {
+    csv += `#${b.boleto},"${b.nombre || ""}","${b.telefono || ""}","${b.poblacion || ""}","${b.estado}","${b.fecha}","${b.modificadoPor}","${b.formaPago}"\n`;
+  });
+
+  const total = boletos.length * precio;
+  csv += `\nTotal Boletos: ${boletos.length}\nPrecio Unitario: $${precio.toFixed(2)}\nTotal Recaudado: $${total.toFixed(2)}\n`;
+
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `Pagados-${verificador}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>
