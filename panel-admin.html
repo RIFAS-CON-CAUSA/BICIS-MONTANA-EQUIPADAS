@@ -4,10 +4,54 @@
 <head>
   <meta charset="UTF-8">
   <title>Panel Admin Storage Final</title>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js">
+  function enviarWhatsApp() {
+    const telefono = '3312345678';  // Simulado, este valor se tomaría de Firestore
+    const nombre = 'Ivana Getzemani';
+    const nroBoleto = '034';
+    const urlBoleto = 'https://storage.googleapis.com/rifas-con-causa/boletos/034.png';
+    const mensaje = `Hola ${nombre}, gracias por tu apoyo en la rifa.\nAquí tienes tu boleto #${nroBoleto}: ${urlBoleto}\n¡Mucha suerte en el sorteo!`;
+    const enlace = `https://api.whatsapp.com/send?phone=52${telefono}&text=${encodeURIComponent(mensaje)}`;
+    window.open(enlace, '_blank');
+  }
+  </script>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js">
+  function enviarWhatsApp() {
+    const telefono = '3312345678';  // Simulado, este valor se tomaría de Firestore
+    const nombre = 'Ivana Getzemani';
+    const nroBoleto = '034';
+    const urlBoleto = 'https://storage.googleapis.com/rifas-con-causa/boletos/034.png';
+    const mensaje = `Hola ${nombre}, gracias por tu apoyo en la rifa.\nAquí tienes tu boleto #${nroBoleto}: ${urlBoleto}\n¡Mucha suerte en el sorteo!`;
+    const enlace = `https://api.whatsapp.com/send?phone=52${telefono}&text=${encodeURIComponent(mensaje)}`;
+    window.open(enlace, '_blank');
+  }
+  </script>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js">
+  function enviarWhatsApp() {
+    const telefono = '3312345678';  // Simulado, este valor se tomaría de Firestore
+    const nombre = 'Ivana Getzemani';
+    const nroBoleto = '034';
+    const urlBoleto = 'https://storage.googleapis.com/rifas-con-causa/boletos/034.png';
+    const mensaje = `Hola ${nombre}, gracias por tu apoyo en la rifa.\nAquí tienes tu boleto #${nroBoleto}: ${urlBoleto}\n¡Mucha suerte en el sorteo!`;
+    const enlace = `https://api.whatsapp.com/send?phone=52${telefono}&text=${encodeURIComponent(mensaje)}`;
+    window.open(enlace, '_blank');
+  }
+  </script>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js">
+  function enviarWhatsApp() {
+    const telefono = '3312345678';  // Simulado, este valor se tomaría de Firestore
+    const nombre = 'Ivana Getzemani';
+    const nroBoleto = '034';
+    const urlBoleto = 'https://storage.googleapis.com/rifas-con-causa/boletos/034.png';
+    const mensaje = `Hola ${nombre}, gracias por tu apoyo en la rifa.\nAquí tienes tu boleto #${nroBoleto}: ${urlBoleto}\n¡Mucha suerte en el sorteo!`;
+    const enlace = `https://api.whatsapp.com/send?phone=52${telefono}&text=${encodeURIComponent(mensaje)}`;
+    window.open(enlace, '_blank');
+  }
+  </script>
+
   <style>
     .boleto-visual { width: 600px; height: 500px; border: 2px solid #004aad; position: relative; font-family: Arial, sans-serif; }
     .fondo, .logo { position: absolute; }
@@ -40,7 +84,7 @@
   </div>
 </div>
 
-<button onclick="subirBoleto()">Subir a Storage + Firestore</button>
+<button onclick="subirBoleto()">Subir a Storage + Firestore</button> <button onclick="enviarWhatsApp()">Enviar por WhatsApp</button>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -73,7 +117,18 @@ const firebaseConfig = {
       alert('Subido y guardado URL en Firestore');
     });
   }
-</script>
+
+  function enviarWhatsApp() {
+    const telefono = '3312345678';  // Simulado, este valor se tomaría de Firestore
+    const nombre = 'Ivana Getzemani';
+    const nroBoleto = '034';
+    const urlBoleto = 'https://storage.googleapis.com/rifas-con-causa/boletos/034.png';
+    const mensaje = `Hola ${nombre}, gracias por tu apoyo en la rifa.\nAquí tienes tu boleto #${nroBoleto}: ${urlBoleto}\n¡Mucha suerte en el sorteo!`;
+    const enlace = `https://api.whatsapp.com/send?phone=52${telefono}&text=${encodeURIComponent(mensaje)}`;
+    window.open(enlace, '_blank');
+  }
+  </script>
+
 
 </body>
 </html>
