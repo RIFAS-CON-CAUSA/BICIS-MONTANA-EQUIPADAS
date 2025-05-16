@@ -107,28 +107,62 @@ document.addEventListener("DOMContentLoaded", function () {
     "steven": "sv27",
     "manuel": "admin2024"
   };
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  const clave = prompt("🔒 Ingresa tu clave de acceso:");
-  const usuario = Object.keys(accesos).find(k => accesos[k] === clave);
+  let rolActivo = ""; // ← global para que se use en cambiarEstado
 
-  if (usuario) {
-    alert("✅ Bienvenido, " + usuario.toUpperCase());
-    // Cambiar el título de la pestaña
-document.title = "Panel - Bienvenido " + usuario.charAt(0).toUpperCase() + usuario.slice(1);
+  const firebaseConfig = {
+    apiKey: "...",
+    authDomain: "...",
+    projectId: "...",
+    storageBucket: "...",
+    messagingSenderId: "...",
+    appId: "..."
+  };
 
-// Opcional: cambiar un encabezado si existe en el HTML
-const encabezado = document.getElementById("tituloPanel");
-if (encabezado) {
-  encabezado.innerText = "Bienvenido " + usuario.charAt(0).toUpperCase() + usuario.slice(1);
-}
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-    document.querySelectorAll(".solo-" + usuario).forEach(el => el.style.display = "inline-block");
-    document.querySelectorAll(".solo-" + usuario).forEach(el => el.classList.remove("oculto"));
-  } else {
-    alert("🚫 Clave incorrecta. No tienes acceso.");
-    document.body.innerHTML = "<h2 style='color:red;text-align:center;'>ACCESO DENEGADO</h2>";
-  }
-});
+  // 🔽 A partir de aquí pega el bloque completo:
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const accesos = {
+      "admin": "admin2024",
+      "miriam": "mc24",
+      "patty": "pt25",
+      "diane": "dn26",
+      "steven": "sv27",
+      "manuel": "admin2024"
+    };
+
+    const clave = prompt("🔒 Ingresa tu clave de acceso:");
+    const usuario = Object.keys(accesos).find(k => accesos[k] === clave);
+
+    if (usuario) {
+      rolActivo = usuario; // ✅ Asignado globalmente
+      console.log("🔐 Rol activo definido como:", rolActivo);
+
+      alert("✅ Bienvenido, " + usuario.toUpperCase());
+
+      document.title = "Panel - Bienvenido " + usuario.charAt(0).toUpperCase() + usuario.slice(1);
+
+      const encabezado = document.getElementById("tituloPanel");
+      if (encabezado) {
+        encabezado.innerText = "Bienvenido " + usuario.charAt(0).toUpperCase() + usuario.slice(1);
+      }
+
+      document.querySelectorAll(".solo-" + usuario).forEach(el => el.style.display = "inline-block");
+      document.querySelectorAll(".solo-" + usuario).forEach(el => el.classList.remove("oculto"));
+
+      cargarBoletos(); // ✅ Ya con rolActivo definido
+
+    } else {
+      alert("🚫 Clave incorrecta. No tienes acceso.");
+      document.body.innerHTML = "<h2 style='color:red;text-align:center;'>ACCESO DENEGADO</h2>";
+    }
+  });
 </script>
 
 </body>
