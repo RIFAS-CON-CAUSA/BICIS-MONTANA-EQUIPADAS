@@ -57,7 +57,6 @@ let rolActivo = "";
         <td>
          <select onchange="cambiarEstado('${b.id}', this.value)">
 
-
             <option disabled selected>Cambiar</option>
             <option value="libre">Libre</option>
             <option value="apartado">Apartado</option>
@@ -95,16 +94,6 @@ window.cambiarEstado = async function(id, nuevoEstado) {
     alert("Error al actualizar el boleto.");
   }
 };
-
-
-    alert("✅ Estado actualizado correctamente por: " + quienCambio);
-    await cargarBoletos();
-  } catch (error) {
-    console.error("❌ Error al actualizar el boleto:", error);
-    alert("Error al actualizar el boleto.");
-  }
-};
-
 
   cargarBoletos();
 </script>
