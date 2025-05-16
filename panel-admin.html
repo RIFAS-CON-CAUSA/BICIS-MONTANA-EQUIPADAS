@@ -71,13 +71,22 @@
           <td>${b.boleto}</td><td>${b.nombre || ""}</td><td>${b.telefono || ""}</td><td>${b.poblacion || ""}</td><td>${b.estado}</td>
           <td>${fechaFormateada}</td><td>${b.modificadoPor || ""}</td><td>${b.formaPago || ""}</td>
           <td>
-            <select onchange="cambiarEstado('${b.id}', this.value)">
-              <option disabled selected>Cambiar</option>
-              <option value="libre">Libre</option>
-              <option value="apartado">Apartado</option>
-              <option value="pagado">Pagado</option>
-            </select>
-          </td>
+  <select onchange="cambiarEstado('${b.id}', this.value)">
+    <option disabled selected>Cambiar</option>
+    <option value="libre">Libre</option>
+    <option value="apartado">Apartado</option>
+    <option value="pagado">Pagado</option>
+  </select>
+  <br>
+  <label class="solo-miriam solo-patty solo-steven" style="font-size: 0.85em; display: none;">
+    📎 Subir comprobante:
+    <input type="file" accept="image/*" onchange="subirComprobante('${b.id}', this)" style="font-size: 0.85em; margin-top: 5px;">
+  </label>
+  <small style="color: #555; font-style: italic; display:block;">
+    ⚠️ El comprobante debe tener escrito el nombre del titular. Si es digital, edítalo antes de subirlo.
+  </small>
+</td>
+
         </tr>`;
       });
     }
