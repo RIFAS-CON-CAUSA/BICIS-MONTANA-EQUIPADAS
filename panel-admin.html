@@ -68,23 +68,33 @@ let rolActivo = "";
   }
 
 window.cambiarEstado = async function(id, nuevoEstado, quienCambio) {
+  let formaPago = "";
 
-    let formaPago = "";
-    if (nuevoEstado === "pagado") {
-      formaPago = prompt("Forma de pago (Efectivo, OXXO, etc):");
-      if (!formaPago) formaPago = "No especificado";
-    }
+  if (nuevoEstado === "pagado") {
+    formaPago = prompt("Forma de pago (Efectivo, OXXO, etc):");
+    if (!formaPago) formaPago = "No especificado";
+  }
+
+  try {
     const ref = doc(db, "BoletosRifa", id);
+
+    console.log("Modificando boleto:", id, "Estado:", nuevoEstado, "Por:", quienCambio);
+
     await updateDoc(ref, {
       estado: nuevoEstado,
-     modificadoPor: quienCambio,
-
+      modificadoPor: quienCambio,
       formaPago: formaPago,
       fecha: serverTimestamp()
     });
-    alert("Estado actualizado correctamente.");
-    cargarBoletos();
-  };
+
+    alert("✅ Estado actualizado correctamente por: " + quienCambio);
+    await cargarBoletos();
+  } catch (error) {
+    console.error("❌ Error al actualizar el boleto:", error);
+    alert("Error al actualizar el boleto.");
+  }
+};
+
 
   cargarBoletos();
 </script>
