@@ -55,7 +55,8 @@ let rolActivo = "";
         <td>${b.boleto}</td><td>${b.nombre || ""}</td><td>${b.telefono || ""}</td><td>${b.poblacion || ""}</td><td>${b.estado}</td>
         <td>${fechaFormateada}</td><td>${b.modificadoPor || ""}</td><td>${b.formaPago || ""}</td>
         <td>
-           <select onchange="cambiarEstado('${b.id}', this.value, rolActivo)">
+           <select onchange="cambiarEstado('${b.id}', this.value, '${rolActivo}')">
+
             <option disabled selected>Cambiar</option>
             <option value="libre">Libre</option>
             <option value="apartado">Apartado</option>
