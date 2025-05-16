@@ -153,10 +153,52 @@ window.cambiarEstado = async function(id, nuevoEstado) {
     });
     import * as XLSX from "https://cdn.sheetjs.com/xlsx-0.20.0/package/xlsx.mjs";
 
+import * as XLSX from "https://cdn.sheetjs.com/xlsx-0.20.0/package/xlsx.mjs";
+
 window.exportarExcel = function () {
   const precio = parseFloat(document.getElementById("precioUnitario").value);
   if (!precio || precio <= 0) {
     alert("⚠️ Ingresa un precio válido para calcular los totales.");
+    return;
+  }
+
+  const boletosDetallados = datosBoletos.map(b => ({
+    Boleto: b.boleto,
+    Nombre: b.nombre || "",
+    Teléfono: b.telefono || "",
+    Población: b.poblacion || "",
+    Estado: b.estado || "",
+    Fecha: b.fecha ? (b.fecha.toDate ? b.fecha.toDate().toLocaleString() : new Date(b.fecha).toLocaleString()) : "",
+    "Modificado por": b.modificadoPor || "",
+    "Forma Pago": b.formaPago || ""
+  }));
+
+  // Calcular resumen
+  const resumen = {};
+  datosBoletos.forEach(b => {
+    if (b.estado === "pagado" && b.modificadoPor) {
+      resumen[b.modificadoPor] = (resumen[b.modificadoPor] || 0) + 1;
+    }
+  });
+
+  const resumenFinal = Object.keys(resumen).map(rol => ({
+    Rol: rol,
+    "Boletos Pagados": resumen[rol],
+    "Total a entregar": "$" + (resumen[rol] * precio).toFixed(2)
+  }));
+
+  const libro = XLSX.utils.book_new();
+
+  const hojaDetalle = XLSX.utils.json_to_sheet(boletosDetallados);
+  XLSX.utils.book_append_sheet(libro, hojaDetalle, "Detalle Boletos");
+
+  const hojaResumen = XLSX.utils.json_to_sheet([], { header: ["Rol", "Boletos Pagados", "Total a entregar"] });
+  XLSX.utils.sheet_add_json(hojaResumen, resumenFinal, { skipHeader: true, origin: "A2" });
+  XLSX.utils.book_append_sheet(libro, hojaResumen, "Resumen por Rol");
+
+  XLSX.writeFile(libro, "reporte_boletos.xlsx");
+};
+
     return;
   }
 
