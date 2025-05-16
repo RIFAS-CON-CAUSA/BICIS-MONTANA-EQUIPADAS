@@ -1,42 +1,94 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Panel Admin - Rifas con Causa</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/xlsx@0.20.0/dist/xlsx.full.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #004aad;
+    }
+    .alerta {
+      background: #fff3cd;
+      border-left: 5px solid #ffa500;
+      padding: 10px;
+      margin-bottom: 20px;
+      font-size: 0.95em;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 10px;
+      text-align: center;
+      border: 1px solid #ccc;
+      font-size: 0.95em;
+    }
+    th {
+      background: #004aad;
+      color: white;
+    }
+    .pagado {
+      background: #e74c3c;
+      color: white;
+    }
+    .apartado {
+      background: #f1c40f;
+    }
+    .libre {
+      background: #2ecc71;
+      color: white;
+    }
+    input[type="file"] {
+      width: 90%;
+    }
+    small {
+      display: block;
+      font-size: 0.75em;
+      color: #666;
+    }
+  </style>
 </head>
 <body>
   <h1 id="tituloPanel">Panel de Control</h1>
-<p style="font-size: 0.95em; margin-top: -10px; margin-bottom: 20px; line-height: 1.4; color: #333;">
-  ⚠️ <strong>INSTRUCCIONES IMPORTANTES PARA LOS ROLES:</strong><br>
-  • Toma en cuenta que al cambiar un estado a <strong>"PAGADO"</strong>, <u>ya no podrás devolverlo a otro estado</u>.<br>
-  • Deberás comunicarte con el <strong>ADMIN</strong> para que realice la corrección si fue un error.<br>
-  • Y recuerda que si el cliente paga por <strong>TRANSFERENCIA a la cuenta del ADMIN</strong>,<br>
-  &nbsp;&nbsp;&nbsp;&nbsp;el cambio de estado <u>debe hacerlo exclusivamente el ADMIN</u>,<br>
-  &nbsp;&nbsp;&nbsp;&nbsp;ya que ese monto no entrará a tu cuenta de ingresos.
-</p>
 
-  <table border="1" id="tablaBoletos">
+  <div class="alerta">
+    ⚠️ <strong>INSTRUCCIONES IMPORTANTES PARA LOS ROLES:</strong><br>
+    - Toma en cuenta que al cambiar un estado a <strong>"PAGADO"</strong>, <u>ya no podrás devolverlo a otro estado</u>.<br>
+    - Deberás comunicarte con el ADMIN para que realice la corrección si fue un error.<br>
+    - Y recuerda que si el cliente paga por <strong>TRANSFERENCIA a la cuenta del ADMIN</strong>,<br>
+    el cambio de estado debe <u>hacerlo exclusivamente el ADMIN</u>,<br>
+    ya que ese monto no entrará a tu cuenta de ingresos.
+  </div>
+
+  <table id="tablaBoletos">
     <thead>
       <tr>
         <th>Boleto</th><th>Nombre</th><th>Teléfono</th><th>Población</th>
-        <th>Estado</th><th>Fecha</th><th>Modificado por</th><th>Forma Pago</th><th>Acción</th>
+        <th>Estado</th><th>Fecha</th><th>Modificado por</th><th>Forma Pago</th><th>Acción</th><th>Comprobante</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
-<button class="solo-admin" onclick="exportarExcel()" style="margin-top: 15px; display: none;">
-  📥 Exportar a Excel
-</button>
-<div class="solo-admin" style="margin-top: 10px; display: none;">
-  <label for="precioUnitario"><strong>💰 Precio unitario por boleto:</strong></label>
-  <input type="number" id="precioUnitario" value="0" min="0" step="1" style="width: 100px;">
-</div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, collection, getDocs, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-    let rolActivo = "";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
@@ -49,6 +101,7 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const storage = getStorage(app);
 
     let datosBoletos = [];
 
@@ -60,179 +113,52 @@
       });
       mostrarBoletos();
     }
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-
-const storage = getStorage(app);
-
-window.subirComprobante = async function(boletoID, input) {
-  const archivo = input.files[0];
-  if (!archivo) return;
-
-  const refStorage = ref(storage, `comprobantes/boletos/${boletoID}`);
-  try {
-    await uploadBytes(refStorage, archivo);
-    const url = await getDownloadURL(refStorage);
-
-    // Guardamos la URL del comprobante en Firestore
-    const refDoc = doc(db, "BoletosRifa", boletoID);
-    await updateDoc(refDoc, {
-      comprobanteUrl: url
-    });
-
-    alert("✅ Comprobante subido correctamente.");
-    input.value = "";
-  } catch (error) {
-    console.error("❌ Error al subir comprobante:", error);
-    alert("Error al subir el comprobante.");
-  }
-};
 
     function mostrarBoletos() {
       const tbody = document.querySelector("#tablaBoletos tbody");
       tbody.innerHTML = "";
       datosBoletos.forEach(b => {
         const fechaFormateada = b.fecha ? (b.fecha.toDate ? b.fecha.toDate().toLocaleString() : new Date(b.fecha).toLocaleString()) : "";
-        const rowColor = b.estado === "pagado" ? "style='background:#e74c3c; color:white'" : (b.estado === "apartado" ? "style='background:#f1c40f;'" : "style='background:#2ecc71; color:white'");
-        tbody.innerHTML += `<tr ${rowColor}>
-          <td>${b.boleto}</td><td>${b.nombre || ""}</td><td>${b.telefono || ""}</td><td>${b.poblacion || ""}</td><td>${b.estado}</td>
-          <td>${fechaFormateada}</td><td>${b.modificadoPor || ""}</td><td>${b.formaPago || ""}</td>
+        const claseFila = b.estado === "pagado" ? "pagado" : b.estado === "apartado" ? "apartado" : "libre";
+        tbody.innerHTML += `
+        <tr class="${claseFila}">
+          <td>${b.boleto}</td><td>${b.nombre || ""}</td><td>${b.telefono || ""}</td><td>${b.poblacion || ""}</td>
+          <td>${b.estado}</td><td>${fechaFormateada}</td><td>${b.modificadoPor || ""}</td><td>${b.formaPago || ""}</td>
           <td>
-  <select onchange="cambiarEstado('${b.id}', this.value)">
-    <option disabled selected>Cambiar</option>
-    <option value="libre">Libre</option>
-    <option value="apartado">Apartado</option>
-    <option value="pagado">Pagado</option>
-  </select>
-  <br>
-  <label class="solo-miriam solo-patty solo-steven" style="font-size: 0.85em; display: none;">
-    📎 Subir comprobante:
-    <input type="file" accept="image/*" onchange="subirComprobante('${b.id}', this)" style="font-size: 0.85em; margin-top: 5px;">
-  </label>
-  <small style="color: #555; font-style: italic; display:block;">
-    ⚠️ El comprobante debe tener escrito el nombre del titular. Si es digital, edítalo antes de subirlo.
-  </small>
-</td>
-
+            <select onchange="cambiarEstado('${b.id}', this.value)">
+              <option disabled selected>Cambiar</option>
+              <option value="libre">Libre</option>
+              <option value="apartado">Apartado</option>
+              <option value="pagado">Pagado</option>
+            </select>
+          </td>
+          <td>
+            <input type="file" accept="image/*" onchange="subirComprobante('${b.id}', this)" />
+            <small>⚠️ El comprobante debe tener escrito el nombre del titular. Si es digital, edítalo antes de subirlo.</small>
+          </td>
         </tr>`;
       });
     }
 
-window.cambiarEstado = async function(id, nuevoEstado) {
-  const boletoOriginal = datosBoletos.find(b => b.id === id);
-  if (!boletoOriginal) return alert("⚠️ No se encontró el boleto.");
+    window.cambiarEstado = async function(id, nuevoEstado) {
+      const ref = doc(db, "BoletosRifa", id);
+      await updateDoc(ref, {
+        estado: nuevoEstado,
+        fecha: serverTimestamp()
+      });
+      Swal.fire('Estado actualizado');
+      cargarBoletos();
+    };
 
-  // 🚫 Si ya está en "pagado" y no es admin, bloquear
-  if (boletoOriginal.estado === "pagado" && rolActivo !== "admin") {
-    return alert("❌ Solo el ADMIN puede cambiar un boleto pagado a otro estado. si cometiste error comunicate con el admnistrador de la rifa ");
-  }
+    window.subirComprobante = async function(id, input) {
+      const file = input.files[0];
+      if (!file) return;
+      const storageRef = ref(storage, `comprobantes/${id}.jpg`);
+      await uploadBytes(storageRef, file);
+      Swal.fire('Comprobante subido');
+    };
 
-  let formaPago = "";
-  if (nuevoEstado === "pagado") {
-    formaPago = prompt("Forma de pago (Efectivo, OXXO, etc):");
-    if (!formaPago) formaPago = "No especificado";
-  }
-
-  try {
-    const ref = doc(db, "BoletosRifa", id);
-
-    await updateDoc(ref, {
-      estado: nuevoEstado,
-      modificadoPor: rolActivo,
-      formaPago: formaPago,
-      fecha: serverTimestamp()
-    });
-
-    alert("✅ Estado actualizado correctamente por: " + rolActivo);
-    await cargarBoletos();
-  } catch (error) {
-    console.error("❌ Error al actualizar el boleto:", error);
-    alert("Error al actualizar el boleto.");
-  }
-};
-
-    // Control de acceso por rol
-    document.addEventListener("DOMContentLoaded", () => {
-      const accesos = {
-        "admin": "admin2024",
-        "miriam": "mc24",
-        "patty": "pt25",
-        "diane": "dn26",
-        "steven": "sv27",
-        "manuel": "admin2024"
-      };
-
-      setTimeout(() => {
-        const clave = prompt("🔒 Ingresa tu clave de acceso:");
-        const usuario = Object.keys(accesos).find(k => accesos[k] === clave);
-
-        if (usuario) {
-          rolActivo = usuario;
-          console.log("🔐 Rol activo definido como:", rolActivo);
-
-          document.title = "Panel - Bienvenido " + usuario.charAt(0).toUpperCase() + usuario.slice(1);
-
-          const encabezado = document.getElementById("tituloPanel");
-          if (encabezado) {
-            encabezado.innerText = "Bienvenido " + usuario.charAt(0).toUpperCase() + usuario.slice(1);
-          }
-
-          document.querySelectorAll(".solo-" + usuario).forEach(el => el.style.display = "inline-block");
-          document.querySelectorAll(".solo-" + usuario).forEach(el => el.classList.remove("oculto"));
-
-          cargarBoletos();
-        } else {
-          alert("🚫 Clave incorrecta. No tienes acceso.");
-          document.body.innerHTML = "<h2 style='color:red;text-align:center;'>ACCESO DENEGADO</h2>";
-        }
-      }, 100);
-    });
-
-import * as XLSX from "https://cdn.sheetjs.com/xlsx-0.20.0/package/xlsx.mjs";
-
-window.exportarExcel = function () {
-  const precio = parseFloat(document.getElementById("precioUnitario").value);
-  if (!precio || precio <= 0) {
-    alert("⚠️ Ingresa un precio válido para calcular los totales.");
-    return;
-  }
-
-  const boletosDetallados = datosBoletos.map(b => ({
-    Boleto: b.boleto,
-    Nombre: b.nombre || "",
-    Teléfono: b.telefono || "",
-    Población: b.poblacion || "",
-    Estado: b.estado || "",
-    Fecha: b.fecha ? (b.fecha.toDate ? b.fecha.toDate().toLocaleString() : new Date(b.fecha).toLocaleString()) : "",
-    "Modificado por": b.modificadoPor || "",
-    "Forma Pago": b.formaPago || ""
-  }));
-
-  // Calcular resumen
-  const resumen = {};
-  datosBoletos.forEach(b => {
-    if (b.estado === "pagado" && b.modificadoPor) {
-      resumen[b.modificadoPor] = (resumen[b.modificadoPor] || 0) + 1;
-    }
-  });
-
-  const resumenFinal = Object.keys(resumen).map(rol => ({
-    Rol: rol,
-    "Boletos Pagados": resumen[rol],
-    "Total a entregar": "$" + (resumen[rol] * precio).toFixed(2)
-  }));
-
-  const libro = XLSX.utils.book_new();
-
-  const hojaDetalle = XLSX.utils.json_to_sheet(boletosDetallados);
-  XLSX.utils.book_append_sheet(libro, hojaDetalle, "Detalle Boletos");
-
-  const hojaResumen = XLSX.utils.json_to_sheet([], { header: ["Rol", "Boletos Pagados", "Total a entregar"] });
-  XLSX.utils.sheet_add_json(hojaResumen, resumenFinal, { skipHeader: true, origin: "A2" });
-  XLSX.utils.book_append_sheet(libro, hojaResumen, "Resumen por Rol");
-
-  XLSX.writeFile(libro, "reporte_boletos.xlsx");
-};
-
+    cargarBoletos();
   </script>
 </body>
 </html>
