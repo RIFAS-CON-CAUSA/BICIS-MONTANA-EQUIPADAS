@@ -86,7 +86,7 @@
   cargarBoletos();
 </script>
 <script>
-  // Accesos por rol
+document.addEventListener("DOMContentLoaded", function () {
   const accesos = {
     "admin": "admin2024",
     "miriam": "mc24",
@@ -96,19 +96,18 @@
     "manuel": "admin2024"
   };
 
-  // Mostrar login
   const clave = prompt("🔒 Ingresa tu clave de acceso:");
   const usuario = Object.keys(accesos).find(k => accesos[k] === clave);
 
   if (usuario) {
     alert("✅ Bienvenido, " + usuario.toUpperCase());
-    // Activar visibilidad de elementos según usuario
     document.querySelectorAll(".solo-" + usuario).forEach(el => el.style.display = "inline-block");
     document.querySelectorAll(".solo-" + usuario).forEach(el => el.classList.remove("oculto"));
   } else {
     alert("🚫 Clave incorrecta. No tienes acceso.");
     document.body.innerHTML = "<h2 style='color:red;text-align:center;'>ACCESO DENEGADO</h2>";
   }
+});
 </script>
 
 </body>
