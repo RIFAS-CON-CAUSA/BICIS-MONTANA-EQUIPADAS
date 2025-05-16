@@ -67,31 +67,38 @@
       });
     }
 
-    window.cambiarEstado = async function(id, nuevoEstado) {
-      let formaPago = "";
+window.cambiarEstado = async function(id, nuevoEstado) {
+  const boletoOriginal = datosBoletos.find(b => b.id === id);
+  if (!boletoOriginal) return alert("⚠️ No se encontró el boleto.");
 
-      if (nuevoEstado === "pagado") {
-        formaPago = prompt("Forma de pago (Efectivo, OXXO, etc):");
-        if (!formaPago) formaPago = "No especificado";
-      }
+  // 🚫 Si ya está en "pagado" y no es admin, bloquear
+  if (boletoOriginal.estado === "pagado" && rolActivo !== "admin") {
+    return alert("❌ Solo el ADMIN puede cambiar un boleto pagado a otro estado.");
+  }
 
-      try {
-        const ref = doc(db, "BoletosRifa", id);
+  let formaPago = "";
+  if (nuevoEstado === "pagado") {
+    formaPago = prompt("Forma de pago (Efectivo, OXXO, etc):");
+    if (!formaPago) formaPago = "No especificado";
+  }
 
-        await updateDoc(ref, {
-          estado: nuevoEstado,
-          modificadoPor: rolActivo,
-          formaPago: formaPago,
-          fecha: serverTimestamp()
-        });
+  try {
+    const ref = doc(db, "BoletosRifa", id);
 
-        alert("✅ Estado actualizado correctamente por: " + rolActivo);
-        await cargarBoletos();
-      } catch (error) {
-        console.error("❌ Error al actualizar el boleto:", error);
-        alert("Error al actualizar el boleto.");
-      }
-    };
+    await updateDoc(ref, {
+      estado: nuevoEstado,
+      modificadoPor: rolActivo,
+      formaPago: formaPago,
+      fecha: serverTimestamp()
+    });
+
+    alert("✅ Estado actualizado correctamente por: " + rolActivo);
+    await cargarBoletos();
+  } catch (error) {
+    console.error("❌ Error al actualizar el boleto:", error);
+    alert("Error al actualizar el boleto.");
+  }
+};
 
     // Control de acceso por rol
     document.addEventListener("DOMContentLoaded", () => {
