@@ -27,6 +27,10 @@
 <button class="solo-admin" onclick="exportarExcel()" style="margin-top: 15px; display: none;">
   📥 Exportar a Excel
 </button>
+<div class="solo-admin" style="margin-top: 10px; display: none;">
+  <label for="precioUnitario"><strong>💰 Precio unitario por boleto:</strong></label>
+  <input type="number" id="precioUnitario" value="0" min="0" step="1" style="width: 100px;">
+</div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
