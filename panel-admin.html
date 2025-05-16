@@ -137,13 +137,25 @@ document.addEventListener("DOMContentLoaded", function () {
       "manuel": "admin2024"
     };
 
+    let rolActivo = "";
+
+document.addEventListener("DOMContentLoaded", () => {
+  const accesos = {
+    "admin": "admin2024",
+    "miriam": "mc24",
+    "patty": "pt25",
+    "diane": "dn26",
+    "steven": "sv27",
+    "manuel": "admin2024"
+  };
+
+  setTimeout(() => {
     const clave = prompt("🔒 Ingresa tu clave de acceso:");
     const usuario = Object.keys(accesos).find(k => accesos[k] === clave);
 
     if (usuario) {
-      rolActivo = usuario; // ✅ Asignado globalmente
+      rolActivo = usuario;
       console.log("🔐 Rol activo definido como:", rolActivo);
-
       alert("✅ Bienvenido, " + usuario.toUpperCase());
 
       document.title = "Panel - Bienvenido " + usuario.charAt(0).toUpperCase() + usuario.slice(1);
@@ -156,13 +168,14 @@ document.addEventListener("DOMContentLoaded", function () {
       document.querySelectorAll(".solo-" + usuario).forEach(el => el.style.display = "inline-block");
       document.querySelectorAll(".solo-" + usuario).forEach(el => el.classList.remove("oculto"));
 
-      cargarBoletos(); // ✅ Ya con rolActivo definido
-
+      cargarBoletos();
     } else {
       alert("🚫 Clave incorrecta. No tienes acceso.");
       document.body.innerHTML = "<h2 style='color:red;text-align:center;'>ACCESO DENEGADO</h2>";
     }
-  });
+  }, 100); // delay para asegurar ejecución visual completa
+});
+
 </script>
 
 </body>
