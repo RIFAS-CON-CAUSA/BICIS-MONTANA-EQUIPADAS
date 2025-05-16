@@ -73,7 +73,7 @@ window.cambiarEstado = async function(id, nuevoEstado) {
 
   // 🚫 Si ya está en "pagado" y no es admin, bloquear
   if (boletoOriginal.estado === "pagado" && rolActivo !== "admin") {
-    return alert("❌ Solo el ADMIN puede cambiar un boleto pagado a otro estado.");
+    return alert("❌ Solo el ADMIN puede cambiar un boleto pagado a otro estado. si cometiste error comunicate con el admnistrador de la rifa ");
   }
 
   let formaPago = "";
