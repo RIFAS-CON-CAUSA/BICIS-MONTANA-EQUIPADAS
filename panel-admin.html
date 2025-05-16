@@ -19,7 +19,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, collection, getDocs, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
+let rolActivo = "";
   const firebaseConfig = {
     apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
     authDomain: "rifas-con-causa.firebaseapp.com",
@@ -66,7 +66,8 @@
     });
   }
 
-  window.cambiarEstado = async function(id, nuevoEstado) {
+window.cambiarEstado = async function(id, nuevoEstado, quienCambio) {
+
     let formaPago = "";
     if (nuevoEstado === "pagado") {
       formaPago = prompt("Forma de pago (Efectivo, OXXO, etc):");
@@ -75,7 +76,8 @@
     const ref = doc(db, "BoletosRifa", id);
     await updateDoc(ref, {
       estado: nuevoEstado,
-      modificadoPor: usuarioNombre,
+     modificadoPor: quienCambio,
+
       formaPago: formaPago,
       fecha: serverTimestamp()
     });
