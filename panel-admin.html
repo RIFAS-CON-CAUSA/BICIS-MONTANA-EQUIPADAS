@@ -134,9 +134,10 @@ window.subirComprobante = subirComprobante;
   </a>
       </td>
       <td>
-        <input type="file" accept="image/*" style="display:none;" id="file-${b.id}" onchange="subirComprobante('${b.id}', this.files[0])">
-        <button onclick="document.getElementById('file-${b.id}').click()" style="font-size: 0.9em;">📎 Subir</button>
-        ${b.comprobanteUrl ? `<a href="${b.comprobanteUrl}" target="_blank">📷 Ver</a>` : ''}
+        <input type="file" accept="image/*" style="display:none;" id="file-${b.id}" onchange="archivoSeleccionado['${b.id}'] = this.files[0]">
+<button onclick="document.getElementById('file-${b.id}').click()" style="font-size: 0.9em;">📁 Seleccionar</button>
+<button onclick="subirComprobante('${b.id}', archivoSeleccionado['${b.id}'])" style="font-size: 0.9em;">⬆️ Subir</button>
+
       </td>
     </tr>`;
   });
