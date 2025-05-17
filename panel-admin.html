@@ -69,53 +69,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstati
     const db = getFirestore(app);
 window.archivoSeleccionado = {};
 
-    let datosBoletos = [];
-    async function cargarBoletos() {
-  const querySnapshot = await getDocs(collection(db, "BoletosRifa"));
-  datosBoletos = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-  const tbody = document.querySelector("#tablaBoletos tbody");
-  tbody.innerHTML = "";
-
-  datosBoletos.forEach(b => {
-    const fechaFormateada = b.fecha
-      ? (b.fecha.toDate ? b.fecha.toDate().toLocaleString() : new Date(b.fecha).toLocaleString())
-      : "";
-
-    const rowColor = b.estado === "pagado"
-      ? "style='background:#e74c3c; color:white'"
-      : (b.estado === "apartado"
-        ? "style='background:#f1c40f;'"
-        : "style='background:#2ecc71; color:white'");
-
-    tbody.innerHTML += `<tr ${rowColor}>
-      <td>${b.boleto}</td>
-      <td>${b.nombre || ""}</td>
-      <td>${b.telefono || ""}</td>
-      <td>${b.poblacion || ""}</td>
-      <td>${b.estado}</td>
-      <td>${fechaFormateada}</td>
-      <td>${b.modificadoPor || ""}</td>
-      <td>${b.formaPago || ""}</td>
-      <td>
-        <select onchange="cambiarEstado('${b.id}', this.value)">
-          <option disabled selected>Cambiar</option>
-          <option value="libre">Libre</option>
-          <option value="apartado">Apartado</option>
-          <option value="pagado">Pagado</option>
-        </select>
-      </td>
-      <td>
-        <input type="file" accept="image/*" style="display:none;" id="file-${b.id}" onchange="window.archivoSeleccionado['${b.id}'] = this.files[0]">
-        <button onclick="document.getElementById('file-${b.id}').click()" style="font-size: 0.9em;">📁 Seleccionar</button>
-        <button onclick="subirComprobante('${b.id}', window.archivoSeleccionado['${b.id}'])" style="font-size: 0.9em;">⬆️ Subir</button>
-        <br>
-        ${b.comprobanteUrl ? '✅ ' : ''}
-        <a href="${b.comprobanteUrl || '#'}" target="_blank" style="font-size: 0.9em;">📎 Ver comprobante</a>
-      </td>
-    </tr>`;
-  });
-}
+   let datosBoletos = [];
 
 async function subirComprobante(id, archivo) {
   if (!archivo) return;
@@ -136,31 +90,10 @@ async function subirComprobante(id, archivo) {
     await cargarBoletos();
   } catch (error) {
     console.error("❌ Error al subir comprobante:", error);
-    alert("Error al subir comprobante.");
+    alert("❌ Hubo un error al subir el comprobante.");
   }
 }
 
-    async function subirComprobante(id, archivo) {
-  if (!archivo) return;
-
-  const storage = getStorage();
-  const extension = archivo.name.split('.').pop();
-  const storageRef = ref(storage, `comprobantes/boletos/${id}.${extension}`);
-
-  try {
-    await uploadBytes(storageRef, archivo);
-    const url = await getDownloadURL(storageRef);
-
-    await updateDoc(doc(db, "BoletosRifa", id), {
-      comprobanteUrl: url
-    });
-
-    alert("✅ Comprobante subido correctamente.");
-    await mostrarBoletos();
-  } catch (error) {
-    console.error("❌ Error al subir comprobante:", error);
-    alert("Error al subir comprobante.");
-  }
 
 window.cambiarEstado = async function(id, nuevoEstado) {
   const boletoOriginal = datosBoletos.find(b => b.id === id);
