@@ -73,18 +73,26 @@ window.archivoSeleccionado = {};
     async function subirComprobante(id, archivo) {
   if (!archivo) return;
 
-  <td>
-  <input type="file" accept="image/*" style="display:none;" id="file-${b.id}" onchange="window.archivoSeleccionado['${b.id}'] = this.files[0]">
-  <button onclick="document.getElementById('file-${b.id}').click()" style="font-size: 0.9em;">📁 Seleccionar</button>
-  <button onclick="subirComprobante('${b.id}', window.archivoSeleccionado['${b.id}'])" style="font-size: 0.9em;">⬆️ Subir</button>
-  <br>
-  ${b.comprobanteUrl ? '✅ ' : ''}
-  <a href="${b.comprobanteUrl || '#'}" target="_blank" style="font-size: 0.9em;">📎 Ver comprobante</a>
-</td>
+  const storage = getStorage();
+  const extension = archivo.name.split('.').pop();
+  const storageRef = ref(storage, `comprobantes/boletos/${id}.${extension}`);
 
-</tr>`;
+  try {
+    await uploadBytes(storageRef, archivo);
+    const url = await getDownloadURL(storageRef);
 
-  });
+    await updateDoc(doc(db, "BoletosRifa", id), {
+      comprobanteUrl: url
+    });
+
+    alert("✅ Comprobante subido correctamente.");
+    await mostrarBoletos();
+  } catch (error) {
+    console.error("❌ Error al subir comprobante:", error);
+    alert("Error al subir comprobante.");
+  }
+}
+
 }
 
 
