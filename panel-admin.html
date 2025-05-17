@@ -71,25 +71,45 @@
     }
 
     function mostrarBoletos() {
-      const tbody = document.querySelector("#tablaBoletos tbody");
-      tbody.innerHTML = "";
-      datosBoletos.forEach(b => {
-        const fechaFormateada = b.fecha ? (b.fecha.toDate ? b.fecha.toDate().toLocaleString() : new Date(b.fecha).toLocaleString()) : "";
-        const rowColor = b.estado === "pagado" ? "style='background:#e74c3c; color:white'" : (b.estado === "apartado" ? "style='background:#f1c40f;'" : "style='background:#2ecc71; color:white'");
-        tbody.innerHTML += `<tr ${rowColor}>
-          <td>${b.boleto}</td><td>${b.nombre || ""}</td><td>${b.telefono || ""}</td><td>${b.poblacion || ""}</td><td>${b.estado}</td>
-          <td>${fechaFormateada}</td><td>${b.modificadoPor || ""}</td><td>${b.formaPago || ""}</td>
-          <td>
-            <select onchange="cambiarEstado('${b.id}', this.value)">
-              <option disabled selected>Cambiar</option>
-              <option value="libre">Libre</option>
-              <option value="apartado">Apartado</option>
-              <option value="pagado">Pagado</option>
-            </select>
-          </td>
-        </tr>`;
-      });
-    }
+  const tbody = document.querySelector("#tablaBoletos tbody");
+  tbody.innerHTML = "";
+
+  datosBoletos.forEach(b => {
+    const fechaFormateada = b.fecha
+      ? (b.fecha.toDate ? b.fecha.toDate().toLocaleString() : new Date(b.fecha).toLocaleString())
+      : "";
+    const rowColor = b.estado === "pagado"
+      ? "style='background:#e74c3c; color:white'"
+      : (b.estado === "apartado"
+        ? "style='background:#f1c40f;'"
+        : "style='background:#2ecc71; color:white'");
+
+    tbody.innerHTML += `<tr ${rowColor}>
+      <td>${b.boleto}</td>
+      <td>${b.nombre || ""}</td>
+      <td>${b.telefono || ""}</td>
+      <td>${b.poblacion || ""}</td>
+      <td>${b.estado}</td>
+      <td>${fechaFormateada}</td>
+      <td>${b.modificadoPor || ""}</td>
+      <td>${b.formaPago || ""}</td>
+      <td>
+        <select onchange="cambiarEstado('${b.id}', this.value)">
+          <option disabled selected>Cambiar</option>
+          <option value="libre">Libre</option>
+          <option value="apartado">Apartado</option>
+          <option value="pagado">Pagado</option>
+        </select>
+      </td>
+      <td>
+        <input type="file" accept="image/*" style="display:none;" id="file-${b.id}" onchange="subirComprobante('${b.id}', this.files[0])">
+        <button onclick="document.getElementById('file-${b.id}').click()" style="font-size: 0.9em;">📎 Subir</button>
+        ${b.comprobanteUrl ? `<a href="${b.comprobanteUrl}" target="_blank">📷 Ver</a>` : ''}
+      </td>
+    </tr>`;
+  });
+}
+
 
 window.cambiarEstado = async function(id, nuevoEstado) {
   const boletoOriginal = datosBoletos.find(b => b.id === id);
