@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>Registro de Boleto</title>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -121,16 +122,23 @@
       Swal.fire({
         title: `✅ ¡Boleto #${numBoleto} registrado correctamente!`,
         html: `
-          <p>GRACIAS... El sistema te da 2 horas para pagar, y lo pone disponible otra vez si no se paga.</p>
-          <p>Envía comprobante de pago al WhatsApp <strong>3311571619</strong>.</p>
-          <p><strong>Cuenta Spin OXXO:</strong> 4217 4701 5601 6160<br>
-          <strong>CLABE:</strong> 7289 6900 0143 3179 21</p>
-          <p><em>Tómale captura de pantalla.</em></p>
-          <p>Este dato también lo encuentras en la página principal en el botón "Bases del sorteo".</p>
+          <div id="swalContent">
+            <p>📌 Todos los comprobantes deben tener escrito con lapicera el <b>nombre del titular</b> del boleto.</p>
+            <p>Si es una imagen digital de transferencia, edita el archivo para que el nombre aparezca visible.</p>
+            <hr>
+            <p>GRACIAS... El sistema te da 2 horas para pagar, y lo pone disponible otra vez si no se paga.</p>
+            <p>Envía comprobante de pago al WhatsApp <strong>3311571619</strong>.</p>
+            <p><strong>Cuenta Spin OXXO:</strong> 4217 4701 5601 6160<br>
+            <strong>CLABE:</strong> 7289 6900 0143 3179 21</p>
+            <p><em>Tómale captura de pantalla.</em></p>
+            <p>Este dato también lo encuentras en la página principal en el botón "Bases del sorteo".</p>
+            <button onclick="guardarCaptura()" style="margin-top:10px;padding:10px 20px;border:none;background:#004aad;color:white;border-radius:5px;cursor:pointer;">📥 Guardar captura aquí</button>
+          </div>
         `,
         icon: 'success',
+        showConfirmButton: true,
         confirmButtonText: 'Aceptar',
-        width: window.innerWidth < 768 ? '80%' : '600px'
+        width: window.innerWidth < 768 ? '90%' : '600px'
       }).then(() => {
         window.location.href = 'panel-boletos-rifa.html';
       });
@@ -140,6 +148,16 @@
       alert("Ocurrió un error al registrar el boleto. Intenta nuevamente.");
     }
   });
+
+  window.guardarCaptura = function () {
+    const target = document.getElementById('swalContent');
+    html2canvas(target).then(canvas => {
+      const link = document.createElement('a');
+      link.download = `comprobante_boleto_${Date.now()}.png`;
+      link.href = canvas.toDataURL();
+      link.click();
+    });
+  };
 </script>
 
 </body>
