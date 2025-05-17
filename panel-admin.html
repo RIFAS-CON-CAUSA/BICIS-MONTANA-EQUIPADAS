@@ -117,12 +117,18 @@ async function subirComprobante(id, archivo) {
       <td>${b.modificadoPor || ""}</td>
       <td>${b.formaPago || ""}</td>
       <td>
-        <select onchange="cambiarEstado('${b.id}', this.value)">
-          <option disabled selected>Cambiar</option>
-          <option value="libre">Libre</option>
-          <option value="apartado">Apartado</option>
-          <option value="pagado">Pagado</option>
-        </select>
+  <select onchange="cambiarEstado('${b.id}', this.value)">
+    <option disabled selected>Cambiar</option>
+    <option value="libre">Libre</option>
+    <option value="apartado">Apartado</option>
+    <option value="pagado">Pagado</option>
+  </select>
+  <br>
+  <input type="file" accept="image/*" onchange="subirComprobante('${b.id}', this.files[0])" style="margin-top:4px;" />
+  <br>
+  <a href="${b.comprobanteUrl || '#'}" target="_blank" style="font-size: 0.9em;">
+    📎 Ver comprobante
+  </a>
       </td>
       <td>
         <input type="file" accept="image/*" style="display:none;" id="file-${b.id}" onchange="subirComprobante('${b.id}', this.files[0])">
