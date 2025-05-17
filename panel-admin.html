@@ -43,6 +43,8 @@
   </div>
 
   <script type="module">
+    let rolActivo = "";
+
     if (!location.origin.includes("https://rifas-con-causa.github.io")) {
       alert("⚠️ Estás abriendo este archivo fuera del entorno web oficial. Algunas funciones como subida de archivos no funcionarán correctamente.\n\nPor favor, accede desde:\nhttps://rifas-con-causa.github.io/BICIS-MONTANA-EQUIPADAS/panel-admin.html");
     }
@@ -64,7 +66,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const storage = getStorage();
-
     window.archivoSeleccionado = {};
     let datosBoletos = [];
 
@@ -72,7 +73,6 @@
       if (!archivo) return alert("⚠️ No has seleccionado un archivo.");
       const extension = archivo.name.split('.').pop();
       const storageRef = ref(storage, `comprobantes/boletos/${id}.${extension}`);
-
       try {
         await uploadBytes(storageRef, archivo);
         const url = await getDownloadURL(storageRef);
