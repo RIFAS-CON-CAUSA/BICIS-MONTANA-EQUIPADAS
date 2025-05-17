@@ -61,6 +61,32 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstati
     const db = getFirestore(app);
 
     let datosBoletos = [];
+    async function subirComprobante(id, archivo) {
+  if (!archivo) return;
+
+  const storage = getStorage();
+  const extension = archivo.name.split('.').pop();
+  const storageRef = ref(storage, `comprobantes/boletos/${id}.${extension}`);
+
+  try {
+    await uploadBytes(storageRef, archivo);
+    const url = await getDownloadURL(storageRef);
+
+    await updateDoc(doc(db, "BoletosRifa", id), {
+      comprobanteUrl: url
+    });
+
+    alert("✅ Comprobante subido correctamente.");
+    await cargarBoletos();
+  } catch (error) {
+    console.error("❌ Error al subir comprobante:", error);
+    alert("Ocurrió un error al subir el comprobante.");
+  }
+}
+
+// Hacerla global para que HTML la encuentre
+window.subirComprobante = subirComprobante;
+
 async function subirComprobante(id, archivo) {
   if (!archivo) return;
 
