@@ -128,12 +128,7 @@ let archivoSeleccionado = {};
     <option value="pagado">Pagado</option>
   </select>
   <br>
-  <input type="file" accept="image/*" onchange="subirComprobante('${b.id}', this.files[0])" style="margin-top:4px;" />
-  <br>
-  <a href="${b.comprobanteUrl || '#'}" target="_blank" style="font-size: 0.9em;">
-    📎 Ver comprobante
-  </a>
-      </td>
+
       <td>
         <input type="file" accept="image/*" style="display:none;" id="file-${b.id}" onchange="archivoSeleccionado['${b.id}'] = this.files[0]">
 <button onclick="document.getElementById('file-${b.id}').click()" style="font-size: 0.9em;">📁 Seleccionar</button>
