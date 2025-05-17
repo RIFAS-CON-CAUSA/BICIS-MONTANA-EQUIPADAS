@@ -59,6 +59,7 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstati
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+window.archivoSeleccionado = {};
 
     let datosBoletos = [];
     async function subirComprobante(id, archivo) {
@@ -129,13 +130,14 @@ let archivoSeleccionado = {};
     </select>
   </td>
   <td>
-    <input type="file" accept="image/*" style="display:none;" id="file-${b.id}" onchange="archivoSeleccionado['${b.id}'] = this.files[0]">
-    <button onclick="document.getElementById('file-${b.id}').click()" style="font-size: 0.9em;">📁 Seleccionar</button>
-    <button onclick="subirComprobante('${b.id}', archivoSeleccionado['${b.id}'])" style="font-size: 0.9em;">⬆️ Subir</button>
-    <br>
-    ${b.comprobanteUrl ? '✅ ' : ''}
-    <a href="${b.comprobanteUrl || '#'}" target="_blank" style="font-size: 0.9em;">📎 Ver comprobante</a>
-  </td>
+  <input type="file" accept="image/*" style="display:none;" id="file-${b.id}" onchange="window.archivoSeleccionado['${b.id}'] = this.files[0]">
+  <button onclick="document.getElementById('file-${b.id}').click()" style="font-size: 0.9em;">📁 Seleccionar</button>
+  <button onclick="subirComprobante('${b.id}', window.archivoSeleccionado['${b.id}'])" style="font-size: 0.9em;">⬆️ Subir</button>
+  <br>
+  ${b.comprobanteUrl ? '✅ ' : ''}
+  <a href="${b.comprobanteUrl || '#'}" target="_blank" style="font-size: 0.9em;">📎 Ver comprobante</a>
+</td>
+
 </tr>`;
 
   });
