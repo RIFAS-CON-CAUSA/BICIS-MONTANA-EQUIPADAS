@@ -93,9 +93,6 @@ window.archivoSeleccionado = {};
   }
 }
 
-}
-
-
 window.cambiarEstado = async function(id, nuevoEstado) {
   const boletoOriginal = datosBoletos.find(b => b.id === id);
   if (!boletoOriginal) return alert("⚠️ No se encontró el boleto.");
