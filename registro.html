@@ -80,7 +80,6 @@
     </form>
   </div>
 
-<!-- Script de Firebase para guardar el registro -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -119,6 +118,7 @@
         fecha: serverTimestamp()
       }, { merge: true });
 
+      // Mostramos Swal con instrucción y botón de captura
       Swal.fire({
         title: `✅ ¡Boleto #${numBoleto} registrado correctamente!`,
         html: `
@@ -133,10 +133,10 @@
             <p><em>Tómale captura de pantalla.</em></p>
             <p>Este dato también lo encuentras en la página principal en el botón "Bases del sorteo".</p>
             <button onclick="guardarCaptura()" style="margin-top:10px;padding:10px 20px;border:none;background:#004aad;color:white;border-radius:5px;cursor:pointer;">📥 Guardar captura aquí</button>
+            <div id="capturaResultado" style="margin-top:10px;"></div>
           </div>
         `,
         icon: 'success',
-        showConfirmButton: true,
         confirmButtonText: 'Aceptar',
         width: window.innerWidth < 768 ? '90%' : '600px'
       }).then(() => {
@@ -149,13 +149,28 @@
     }
   });
 
+  // Captura en móvil + desktop funcional
   window.guardarCaptura = function () {
     const target = document.getElementById('swalContent');
     html2canvas(target).then(canvas => {
-      const link = document.createElement('a');
-      link.download = `comprobante_boleto_${Date.now()}.png`;
-      link.href = canvas.toDataURL();
-      link.click();
+      const resultado = document.getElementById('capturaResultado');
+      resultado.innerHTML = ""; // Limpiar si ya existía
+      resultado.appendChild(canvas);
+
+      const botonDescarga = document.createElement('a');
+      botonDescarga.href = canvas.toDataURL("image/png");
+      botonDescarga.download = `comprobante_boleto_${Date.now()}.png`;
+      botonDescarga.innerText = "⬇️ Descargar imagen";
+      botonDescarga.style.display = "block";
+      botonDescarga.style.marginTop = "10px";
+      botonDescarga.style.textAlign = "center";
+      botonDescarga.style.background = "#28a745";
+      botonDescarga.style.color = "#fff";
+      botonDescarga.style.padding = "10px";
+      botonDescarga.style.borderRadius = "5px";
+      botonDescarga.style.textDecoration = "none";
+
+      resultado.appendChild(botonDescarga);
     });
   };
 </script>
