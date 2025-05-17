@@ -87,14 +87,6 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstati
 // Hacerla global para que HTML la encuentre
 window.subirComprobante = subirComprobante;
 
-    alert("✅ Comprobante subido correctamente.");
-    await cargarBoletos();
-  } catch (error) {
-    console.error("❌ Error al subir comprobante:", error);
-    alert("Ocurrió un error al subir el comprobante.");
-  }
-}
-
     async function cargarBoletos() {
       const querySnapshot = await getDocs(collection(db, "BoletosRifa"));
       datosBoletos = [];
