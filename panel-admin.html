@@ -44,6 +44,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, collection, getDocs, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
     let rolActivo = "";
 
@@ -60,6 +61,28 @@
     const db = getFirestore(app);
 
     let datosBoletos = [];
+async function subirComprobante(id, archivo) {
+  if (!archivo) return;
+
+  const storage = getStorage();
+  const extension = archivo.name.split('.').pop();
+  const storageRef = ref(storage, `comprobantes/boletos/${id}.${extension}`);
+
+  try {
+    await uploadBytes(storageRef, archivo);
+    const url = await getDownloadURL(storageRef);
+
+    await updateDoc(doc(db, "BoletosRifa", id), {
+      comprobanteUrl: url
+    });
+
+    alert("✅ Comprobante subido correctamente.");
+    await cargarBoletos();
+  } catch (error) {
+    console.error("❌ Error al subir comprobante:", error);
+    alert("Ocurrió un error al subir el comprobante.");
+  }
+}
 
     async function cargarBoletos() {
       const querySnapshot = await getDocs(collection(db, "BoletosRifa"));
