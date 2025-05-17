@@ -91,7 +91,6 @@ window.archivoSeleccionado = {};
     console.error("❌ Error al subir comprobante:", error);
     alert("Error al subir comprobante.");
   }
-}
 
 window.cambiarEstado = async function(id, nuevoEstado) {
   const boletoOriginal = datosBoletos.find(b => b.id === id);
