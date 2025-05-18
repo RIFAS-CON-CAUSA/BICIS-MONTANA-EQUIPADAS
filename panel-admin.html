@@ -1,70 +1,98 @@
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
-<meta charset="utf-8"/>
-<title>Panel Admin - Rifas con Causa</title>
-<link href="favicon.ico" rel="icon" type="image/x-icon"/>
+  <meta charset="UTF-8">
+  <title>Panel Admin - Rifas con Causa</title>
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <style>
+    .archivo-seleccionado {
+      background-color: #e0f7fa !important;
+      border: 2px dashed #00796b;
+    }
+  </style>
 </head>
 <body>
-<h1 id="tituloPanel">Panel de Control</h1>
-<p style="font-size: 0.95em; margin-top: -10px; margin-bottom: 20px; line-height: 1.4; color: #333;">
-    ⚠️ <strong>INSTRUCCIONES IMPORTANTES PARA LOS ROLES:</strong><br/>
-    • Toma en cuenta que al cambiar un estado a <strong>"PAGADO"</strong>, <u>ya no podrás devolverlo a otro estado</u>.<br/>
-    • Deberás comunicarte con el <strong>ADMIN</strong> para que realice la corrección si fue un error.<br/>
-    • Y recuerda que si el cliente paga por <strong>TRANSFERENCIA a la cuenta del ADMIN</strong>,<br/>
-        el cambio de estado <u>debe hacerlo exclusivamente el ADMIN</u>,<br/>
-        ya que ese monto no entrará a tu cuenta de ingresos.
+  <h1 id="tituloPanel">Panel de Control</h1>
+  <p style="font-size: 0.95em; margin-top: -10px; margin-bottom: 20px; line-height: 1.4; color: #333;">
+    ⚠️ <strong>INSTRUCCIONES IMPORTANTES PARA LOS ROLES:</strong><br>
+    • Toma en cuenta que al cambiar un estado a <strong>"PAGADO"</strong>, <u>ya no podrás devolverlo a otro estado</u>.<br>
+    • Deberás comunicarte con el <strong>ADMIN</strong> para que realice la corrección si fue un error.<br>
+    • Y recuerda que si el cliente paga por <strong>TRANSFERENCIA a la cuenta del ADMIN</strong>,<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;el cambio de estado <u>debe hacerlo exclusivamente el ADMIN</u>,<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;ya que ese monto no entrará a tu cuenta de ingresos.
   </p>
-<button class="solo-admin" onclick="exportarExcel()" style="margin-top: 15px; display: none;">
-    📥 Exportar a Excel
-  </button><div class="solo-admin" style="margin-top: 10px; display: none;">
-<label for="precioUnitario"><strong>💰 Precio unitario por boleto:</strong></label>
-<input id="precioUnitario" min="0" step="1" style="width: 100px;" type="number" value="0"/>
-</div><table border="1" id="tablaBoletos">
-<thead>
-<tr>
-<th>Boleto</th>
-<th>Nombre</th>
-<th>Teléfono</th>
-<th>Población</th>
-<th>Estado</th>
-<th>Fecha</th>
-<th>Modificado por</th>
-<th>Forma Pago</th>
-<th>Acción</th>
-<th>Comprobante</th>
-</tr>
-</thead>
-<tbody></tbody>
-</table>
 
+  <table border="1" id="tablaBoletos">
+    <thead>
+      <tr>
+        <th>Boleto</th>
+        <th>Nombre</th>
+        <th>Teléfono</th>
+        <th>Población</th>
+        <th>Estado</th>
+        <th>Fecha</th>
+        <th>Modificado por</th>
+        <th>Forma Pago</th>
+        <th>Acción</th>
+        <th>Comprobante</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-<script type="module">
-    if (!location.origin.includes("https://rifas-con-causa.github.io")) {
-      alert("⚠️ Estás abriendo este archivo fuera del entorno web oficial. Algunas funciones como subida de archivos no funcionarán correctamente.\n\nPor favor, accede desde:\nhttps://rifas-con-causa.github.io/BICIS-MONTANA-EQUIPADAS/panel-admin.html");
-    }
-
+  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, collection, getDocs, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-    import * as XLSX from "https://cdn.sheetjs.com/xlsx-0.20.0/package/xlsx.mjs";
 
     const firebaseConfig = {
       apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
       authDomain: "rifas-con-causa.firebaseapp.com",
       projectId: "rifas-con-causa",
-        storageBucket: "rifas-con-causa.firebasestorage.app", 
+      storageBucket: "rifas-con-causa.firebasestorage.app",
       messagingSenderId: "347417635634",
       appId: "1:347417635634:web:3ddab8921d26707910452b"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const storage = getStorage();
-    window.archivoSeleccionado = {};
-    let rolActivo = "";
+    const storage = getStorage(app);
+
     let datosBoletos = [];
+    window.archivoSeleccionadoData = {};
+
+    window.archivoSeleccionado = function(id, archivo) {
+      if (archivo) {
+        archivoSeleccionadoData[id] = archivo;
+        document.getElementById("celda-" + id).classList.add("archivo-seleccionado");
+      }
+    };
+
+    window.subirComprobante = async function(id) {
+      const archivo = archivoSeleccionadoData[id];
+      if (!archivo) return alert("Primero selecciona un archivo.");
+
+      const extension = archivo.name.split('.').pop();
+      const storageRef = ref(storage, `comprobantes/boletos/${id}.${extension}`);
+
+      try {
+        await uploadBytes(storageRef, archivo);
+        const url = await getDownloadURL(storageRef);
+
+        await updateDoc(doc(db, "BoletosRifa", id), {
+          comprobanteUrl: url
+        });
+
+        alert("✅ Comprobante subido correctamente.");
+        await cargarBoletos();
+
+        document.getElementById("celda-" + id).classList.remove("archivo-seleccionado");
+        delete archivoSeleccionadoData[id];
+      } catch (error) {
+        console.error("❌ Error al subir comprobante:", error);
+        alert("Error al subir comprobante.");
+      }
+    };
 
     async function cargarBoletos() {
       const querySnapshot = await getDocs(collection(db, "BoletosRifa"));
@@ -72,16 +100,28 @@
 
       const tbody = document.querySelector("#tablaBoletos tbody");
       tbody.innerHTML = "";
-              <option disabled selected>Cambiar</option>
-              <option value="libre">Libre</option>
-              <option value="apartado">Apartado</option>
-              <option value="pagado">Pagado</option>
+
+      datosBoletos.forEach(b => {
+        const fechaFormateada = b.fecha
+          ? (b.fecha.toDate ? b.fecha.toDate().toLocaleString() : new Date(b.fecha).toLocaleString())
+          : "";
+
+        const rowColor = b.estado === "pagado"
+          ? "style='background:#e74c3c; color:white'"
+          : (b.estado === "apartado"
+            ? "style='background:#f1c40f;'"
+            : "style='background:#2ecc71; color:white'");
+
+        tbody.innerHTML += `<tr ${rowColor}>
+          <td>${b.boleto}</td>
+          <td>${b.nombre || ""}</td>
+          <td>${b.telefono || ""}</td>
             </select>
           </td>
-          <td>
-            <input type="file" accept="image/*" style="display:none;" id="file-${b.id}" onchange="window.archivoSeleccionado['${b.id}'] = this.files[0]">
+          <td id="celda-${b.id}">
+            <input type="file" accept="image/*" style="display:none;" id="file-${b.id}" onchange="archivoSeleccionado('${b.id}', this.files[0])">
             <button onclick="document.getElementById('file-${b.id}').click()" style="font-size: 0.9em;">📁 Seleccionar</button>
-            <button onclick="subirComprobante('${b.id}', window.archivoSeleccionado['${b.id}'])" style="font-size: 0.9em;">⬆️ Subir</button>
+            <button onclick="subirComprobante('${b.id}')" style="font-size: 0.9em;">⬆️ Subir</button>
             <br>
             ${b.comprobanteUrl ? '✅ ' : ''}
             <a href="${b.comprobanteUrl || '#'}" target="_blank" style="font-size: 0.9em;">📎 Ver comprobante</a>
@@ -90,25 +130,7 @@
       });
     }
 
-    async function subirComprobante(id, archivo) {
-      if (!archivo) return;
-      const extension = archivo.name.split('.').pop();
-      const storageRef = ref(storage, `comprobantes/boletos/${id}.${extension}`);
-
-      try {
-        await uploadBytes(storageRef, archivo);
-        const url = await getDownloadURL(storageRef);
-        await updateDoc(doc(db, "BoletosRifa", id), { comprobanteUrl: url });
-        alert("✅ Comprobante subido correctamente.");
-        await cargarBoletos();
-      } catch (error) {
-        console.error("❌ Error al subir comprobante:", error);
-        alert("Error al subir comprobante.");
-      }
-    }
-window.subirComprobante = subirComprobante;
-
-    window.cambiarEstado = async function (id, nuevoEstado) {
+    window.cambiarEstado = async function(id, nuevoEstado) {
       const boletoOriginal = datosBoletos.find(b => b.id === id);
       if (!boletoOriginal) return alert("⚠️ No se encontró el boleto.");
 
@@ -123,12 +145,14 @@ window.subirComprobante = subirComprobante;
       }
 
       try {
-        await updateDoc(doc(db, "BoletosRifa", id), {
+        const ref = doc(db, "BoletosRifa", id);
+        await updateDoc(ref, {
           estado: nuevoEstado,
           modificadoPor: rolActivo,
           formaPago: formaPago,
           fecha: serverTimestamp()
         });
+
         alert("✅ Estado actualizado correctamente por: " + rolActivo);
         await cargarBoletos();
       } catch (error) {
@@ -154,8 +178,8 @@ window.subirComprobante = subirComprobante;
         if (usuario) {
           rolActivo = usuario;
           document.title = "Panel - Bienvenido " + usuario.charAt(0).toUpperCase() + usuario.slice(1);
-          document.getElementById("tituloPanel").innerText = "Bienvenido " + usuario.charAt(0).toUpperCase() + usuario.slice(1);
-          document.querySelectorAll(".solo-" + usuario).forEach(el => el.style.display = "inline-block");
+          const encabezado = document.getElementById("tituloPanel");
+          if (encabezado) encabezado.innerText = "Bienvenido " + usuario.charAt(0).toUpperCase() + usuario.slice(1);
           cargarBoletos();
         } else {
           alert("🚫 Clave incorrecta. No tienes acceso.");
@@ -163,42 +187,6 @@ window.subirComprobante = subirComprobante;
         }
       }, 100);
     });
-
-    window.exportarExcel = function () {
-      const precio = parseFloat(document.getElementById("precioUnitario").value);
-      if (!precio || precio <= 0) return alert("⚠️ Ingresa un precio válido para calcular los totales.");
-
-      const boletosDetallados = datosBoletos.map(b => ({
-        Boleto: b.boleto,
-        Nombre: b.nombre || "",
-        Teléfono: b.telefono || "",
-        Población: b.poblacion || "",
-        Estado: b.estado || "",
-        Fecha: b.fecha ? (b.fecha.toDate ? b.fecha.toDate().toLocaleString() : new Date(b.fecha).toLocaleString()) : "",
-        "Modificado por": b.modificadoPor || "",
-        "Forma Pago": b.formaPago || ""
-      }));
-
-      const resumen = {};
-      datosBoletos.forEach(b => {
-        if (b.estado === "pagado" && b.modificadoPor) {
-          resumen[b.modificadoPor] = (resumen[b.modificadoPor] || 0) + 1;
-        }
-      });
-
-      const resumenFinal = Object.keys(resumen).map(rol => ({
-        Rol: rol,
-        "Boletos Pagados": resumen[rol],
-        "Total a entregar": "$" + (resumen[rol] * precio).toFixed(2)
-      }));
-
-      const libro = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(libro, XLSX.utils.json_to_sheet(boletosDetallados), "Detalle Boletos");
-      const hojaResumen = XLSX.utils.json_to_sheet([], { header: ["Rol", "Boletos Pagados", "Total a entregar"] });
-      XLSX.utils.sheet_add_json(hojaResumen, resumenFinal, { skipHeader: true, origin: "A2" });
-      XLSX.utils.book_append_sheet(libro, hojaResumen, "Resumen por Rol");
-      XLSX.writeFile(libro, "reporte_boletos.xlsx");
-    };
   </script>
 </body>
 </html>
