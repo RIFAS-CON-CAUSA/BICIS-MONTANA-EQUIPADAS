@@ -101,15 +101,15 @@ datosBoletos.forEach(b => {
           <option value="pagado">Pagado</option>
         </select>
       </td>
-      <td id="celda-${b.id}">
-        <input type="file" accept="image/*" style="display:none;" id="file-${b.id}" 
-               onchange="document.getElementById('celda-${b.id}').style.backgroundColor = '#ffeaa7'; 
-                          window.archivoSeleccionado['${b.id}'] = this.files[0]">
-        <button onclick="document.getElementById('file-${b.id}').click()" style="font-size: 0.9em;">📁 Seleccionar</button>
-        <button onclick="subirComprobante('${b.id}', window.archivoSeleccionado['${b.id}'])" style="font-size: 0.9em;">⬆️ Subir</button><br>
-        ${b.comprobanteUrl ? '✅ ' : ''}
-        <a href="${b.comprobanteUrl || '#'}" target="_blank" style="font-size: 0.9em;">📎 Ver comprobante</a>
-      </td>
+     <td id="celda-${b.id}">
+  <label for="file-${b.id}" style="cursor:pointer; background:#2980b9; color:white; padding:4px 8px; border-radius:4px; display:inline-block; font-size:0.85em;">📎 Subir comprobante</label>
+  <input type="file" accept="image/*" id="file-${b.id}" style="display:none;"
+         onchange="document.getElementById('celda-${b.id}').style.backgroundColor = '#ffeaa7'; 
+                    window.archivoSeleccionado['${b.id}'] = this.files[0]; 
+                    subirComprobante('${b.id}', this.files[0]);">
+  ${b.comprobanteUrl ? '<br>✅ <a href="' + b.comprobanteUrl + '" target="_blank" style="font-size:0.85em;">📄 Ver</a>' : ''}
+</td>
+
     </tr>
   `;
 });
