@@ -5,6 +5,9 @@
 <title>Panel Admin - Rifas con Causa</title>
 <link href="favicon.ico" rel="icon" type="image/x-icon"/>
 </head>
+ <h3>🔧 Prueba directa de subida</h3>
+<input type="file" onchange="probarSubida(this.files[0])" />
+
 <body>
 <h1 id="tituloPanel">Panel de Control</h1>
 <p style="font-size: 0.95em; margin-top: -10px; margin-bottom: 20px; line-height: 1.4; color: #333;">
@@ -53,9 +56,26 @@ projectId: "rifas-con-causa",
 messagingSenderId: "347417635634",
 appId: "1:347417635634:web:3ddab8921d26707910452b"
 };
+ 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage();
+window.probarSubida = async function (archivo) {
+  if (!archivo) return alert("Selecciona un archivo válido.");
+  const extension = archivo.name.split('.').pop();
+  const storageRef = ref(storage, `test/prueba.${extension}`);
+  try {
+    await uploadBytes(storageRef, archivo);
+    const url = await getDownloadURL(storageRef);
+    alert("✅ Subida de prueba exitosa. URL:\n" + url);
+    console.log("📁 Archivo subido a:", url);
+  } catch (error) {
+    console.error("❌ Error al subir archivo de prueba:", error);
+    alert("Error en la subida de prueba.");
+  }
+};
+
+ 
 window.archivoSeleccionado = {};
 let rolActivo = "";
 let datosBoletos = [];
