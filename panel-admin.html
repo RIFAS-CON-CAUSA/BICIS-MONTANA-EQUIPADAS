@@ -71,13 +71,13 @@ async function cargarBoletos() {
   const querySnapshot = await getDocs(collection(db, "BoletosRifa"));
   datosBoletos = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   const tbody = document.querySelector("#tablaBoletos tbody");
-  tbody.innerHTML = "";
-  datosBoletos.forEach(b => {
+tbody.innerHTML = "";
+datosBoletos.forEach(b => {
   const rowColor = b.estado === "pagado"
     ? "style='background:#e74c3c; color:white'"
-    : b.estado === "apartado"
-    ? "style='background:#f1c40f;'"
-    : "style='background:#2ecc71; color:white'";
+    : (b.estado === "apartado"
+      ? "style='background:#f1c40f;'"
+      : "style='background:#2ecc71; color:white'");
 
   tbody.innerHTML += `
     <tr ${rowColor}>
@@ -91,21 +91,20 @@ async function cargarBoletos() {
       <td>${b.formaPago || ""}</td>
       <td>
         <select id="forma-${b.id}" style="margin-bottom:5px;">
-          <option disabled selected>📑 Elige forma de pago...</option>
+          <option disabled selected>🧾 Elige forma de pago...</option>
           ${opcionesFormaPago.map(op => `<option value="${op}">${op}</option>`).join("")}
         </select><br>
         <select id="estado-${b.id}" onchange="cambiarEstado('${b.id}', this.value)">
-          <option disabled selected>📄 Cambiar status del boleto...</option>
+          <option disabled selected>🔄 Cambiar status del boleto...</option>
           <option value="libre">Libre</option>
           <option value="apartado">Apartado</option>
           <option value="pagado">Pagado</option>
         </select>
       </td>
       <td id="celda-${b.id}">
-        <input type="file" accept="image/*" style="display:none;" id="file-${b.id}" onchange="
-          document.getElementById('celda-${b.id}').style.backgroundColor = '#fffea7';
-          window.archivoSeleccionado['${b.id}'] = this.files[0]
-        ">
+        <input type="file" accept="image/*" style="display:none;" id="file-${b.id}" 
+               onchange="document.getElementById('celda-${b.id}').style.backgroundColor = '#ffeaa7'; 
+                          window.archivoSeleccionado['${b.id}'] = this.files[0]">
         <button onclick="document.getElementById('file-${b.id}').click()" style="font-size: 0.9em;">📁 Seleccionar</button>
         <button onclick="subirComprobante('${b.id}', window.archivoSeleccionado['${b.id}'])" style="font-size: 0.9em;">⬆️ Subir</button><br>
         ${b.comprobanteUrl ? '✅ ' : ''}
@@ -114,6 +113,7 @@ async function cargarBoletos() {
     </tr>
   `;
 });
+
 
 const rowColor = b.estado === "pagado"
   ? "style='background:#e74c3c; color:white'"
