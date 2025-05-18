@@ -186,7 +186,8 @@ alert("🚫 Clave incorrecta. No tienes acceso.");
 document.body.innerHTML = "<h2 style='color:red;text-align:center;'>ACCESO DENEGADO</h2>";
 }
 }, 100);
-});
+});   
+}; 
 window.exportarExcel = function () {
 const precio = parseFloat(document.getElementById("precioUnitario").value);
 if (!precio || precio <= 0) return alert("⚠️ Ingresa un precio válido para calcular los totales.");
