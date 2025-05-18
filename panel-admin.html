@@ -72,9 +72,15 @@ async function cargarBoletos() {
   datosBoletos = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   const tbody = document.querySelector("#tablaBoletos tbody");
   tbody.innerHTML = "";
+const rowColor = b.estado === "pagado"
+  ? "style='background:#e74c3c; color:white'"
+  : (b.estado === "apartado"
+    ? "style='background:#f1c40f;'"
+    : "style='background:#2ecc71; color:white'");
 
+  
   datosBoletos.forEach(b => {
-    tbody.innerHTML += `
+   tbody.innerHTML += `
       <tr>
         <td>${b.boleto}</td>
         <td>${b.nombre}</td>
