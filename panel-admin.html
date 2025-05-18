@@ -106,8 +106,6 @@ const rowColor = b.estado === "pagado"
     `;
   });
 }
-
-}
 async function subirComprobante(id, archivo) {
 if (!archivo) return;
 const extension = archivo.name.split('.').pop();
