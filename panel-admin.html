@@ -160,7 +160,7 @@ window.cambiarEstado = async function (id, nuevoEstado) {
     }
 
     if (cuentasOficiales.includes(formaPagoSeleccionada) && rolActivo !== "admin") {
-      return alert("🚫 No puedes marcar como PAGADO si el pago fue a una cuenta oficial. Solo el ADMIN puede hacerlo.");
+      return alert("🚫 No puedes marcar como PAGADO si el pago fue a una cuenta oficial. ⚠️Solo el ADMIN puede hacerlo, contactalo y dejale mensaje... solo sube porfavor el comprobante de pago y el lo comprobará.");
     }
   }
 
