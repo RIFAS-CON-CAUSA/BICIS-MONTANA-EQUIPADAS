@@ -152,37 +152,25 @@ alert("Error al subir comprobante.");
 window.cambiarEstado = async function (id, nuevoEstado) {
   const boletoOriginal = datosBoletos.find(b => b.id === id);
   if (!boletoOriginal) return alert("⚠️ No se encontró el boleto.");
-    
-// 🔒 Protege los boletos ya pagados contra cambios si no eres admin
-if (boletoOriginal.estado === "pagado" && nuevoEstado !== "pagado" && rolActivo !== "admin") {
-  return alert("❌ Solo el ADMIN puede cambiar un boleto pagado a otro estado.");
-}
 
-  const formaPagoSeleccionada = document.getElementById(`forma-${id}`)?.value || "";
-  const selectForma = document.getElementById(`forma-${id}`);
-  const selectEstado = document.getElementById(`estado-${id}`);
-
-  // Solo ADMIN puede cambiar a LIBRE
-  if (nuevoEstado === "libre" && rolActivo !== "admin") {
-    if (selectEstado) selectEstado.value = "";
-    return alert("🚫 Solo el ADMIN puede cambiar un boleto a LIBRE.");
+  // ❌ Impedir que un rol no admin cambie un boleto ya pagado
+  if (boletoOriginal.estado === "pagado" && nuevoEstado !== "pagado" && rolActivo !== "admin") {
+    return alert("❌ Solo el ADMIN puede cambiar un boleto pagado a otro estado.");
   }
 
+  const formaPagoSeleccionada = document.getElementById(`forma-${id}`)?.value || "";
+
   if (nuevoEstado === "pagado") {
-    if (!formaPagoSeleccionada || formaPagoSeleccionada === "❗ Elige forma de pago...") {
-      if (selectEstado) selectEstado.value = "";
-      if (selectForma) selectForma.value = "";
+    if (!formaPagoSeleccionada || formaPagoSeleccionada === "Elige forma de pago...") {
       return alert("⚠️ Selecciona primero una forma de pago antes de marcar como pagado.");
     }
 
     if (cuentasOficiales.includes(formaPagoSeleccionada) && rolActivo !== "admin") {
-      if (selectEstado) selectEstado.value = "";
-      if (selectForma) selectForma.value = "";
-      return alert("🚫 No puedes marcar como PAGADO si el pago fue a una cuenta oficial. Solo el ADMIN puede hacerlo.");
+      return alert("⚠️ No puedes marcar como PAGADO si el pago fue a una cuenta oficial. 🛑 Solo el ADMIN puede hacerlo. Contacta al admin y deja mensaje.");
     }
   }
 
-  const formaPago = formaPagoSeleccionada || "No especificado";
+  const formaPago = formaPagoSeleccionada || prompt("Forma de pago (Efectivo, OXXO, etc):") || "No especificado";
 
   try {
     await updateDoc(doc(db, "BoletosRifa", id), {
