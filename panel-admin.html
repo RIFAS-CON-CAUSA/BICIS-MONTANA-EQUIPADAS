@@ -134,45 +134,44 @@ alert("Error al subir comprobante.");
 }
 // 🔁 Parche: Control de roles y reseteo visual al fallar
 window.cambiarEstado = async function (id, nuevoEstado) {
-const boletoOriginal = datosBoletos.find(b => b.id === id);
-if (!boletoOriginal) return alert("⚠️ No se encontró el boleto.");
-// ❌ Impedir que un rol no admin cambie un boleto ya pagado
-if (boletoOriginal.estado === "pagado" && nuevoEstado !== "pagado" && rolActivo !== "admin") {
-return alert("❌ Solo el ADMIN puede cambiar un boleto pagado a otro estado.");
-}
-const formaPagoSeleccionada = document.getElementById(`forma-${id}`)?.value || "";
-if (nuevoEstado === "pagado") {
-if (!formaPagoSeleccionada || formaPagoSeleccionada === "Elige forma de pago...") {
-return alert("⚠️ Selecciona primero una forma de pago antes de marcar como pagado.");
-}
-if (cuentasOficiales.includes(formaPagoSeleccionada) && rolActivo !== "admin") {
-return alert("⚠️ No puedes marcar como PAGADO si el pago fue a una cuenta oficial. 🛑 Solo el ADMIN puede hacerlo. Si alguien pagö Contacta al admin y mandale comprobante.");
-}
-}
-const formaPago = formaPagoSeleccionada || prompt("Forma de pago (Efectivo, OXXO, etc):") || "No especificado";
-try {
-await updateDoc(doc(db, "BoletosRifa", id), {
-estado: nuevoEstado,
-modificadoPor: rolActivo,
-formaPago: formaPago,
-fecha: serverTimestamp()
-});
-alert("✅ Estado actualizado correctamente por: " + rolActivo);
-await cargarBoletos();
-} catch (error) {
-console.error("❌ Error al actualizar el boleto:", error);
-alert("Error al actualizar el boleto.");
-}
+  const boletoOriginal = datosBoletos.find(b => b.id === id);
+  if (!boletoOriginal) return alert("⚠️ No se encontró el boleto.");
+
+  // ❌ Bloquear cambio si ya estaba pagado y no es admin
+  if (boletoOriginal.estado === "pagado" && rolActivo !== "admin") {
+    return alert("🚫 Solo el ADMIN puede cambiar un boleto pagado a otro estado.");
+  }
+
+  // 🧾 Validar forma de pago seleccionada
+  const formaPagoSeleccionada = document.getElementById(`forma-${id}`)?.value || "";
+
+  if (nuevoEstado === "pagado") {
+    if (!formaPagoSeleccionada || formaPagoSeleccionada.includes("forma de pago")) {
+      return alert("⚠️ Selecciona primero una forma de pago antes de marcar como pagado.");
+    }
+
+    if (cuentasOficiales.includes(formaPagoSeleccionada) && rolActivo !== "admin") {
+      return alert("🚫 No puedes marcar como PAGADO si el pago fue a una cuenta oficial. Solo el ADMIN puede hacerlo.");
+    }
+  }
+
+  const formaPago = formaPagoSeleccionada || prompt("Forma de pago (Efectivo, etc):") || "No especificado";
+
+  try {
+    await updateDoc(doc(db, "BoletosRifa", id), {
+      estado: nuevoEstado,
+      modificadoPor: rolActivo,
+      formaPago: formaPago,
+      fecha: serverTimestamp()
+    });
+    alert("✅ Estado actualizado correctamente por: " + rolActivo);
+    await cargarBoletos();
+  } catch (error) {
+    console.error("❌ Error al actualizar el boleto:", error);
+    alert("Error al actualizar el boleto.");
+  }
 };
-document.addEventListener("DOMContentLoaded", () => {
-const accesos = {
-"admin": "admin2024",
-"miriam": "mc24",
-"patty": "pt25",
-"diane": "dn26",
-"steven": "sv27",
-"manuel": "admin2024"
-};
+
 setTimeout(() => {
 const clave = prompt("🔒 Ingresa tu clave de acceso:");
 const usuario = Object.keys(accesos).find(k => accesos[k] === clave);
