@@ -147,43 +147,40 @@ console.error("❌ Error al subir comprobante:", error);
 alert("Error al subir comprobante.");
 }
 }
-window.subirComprobante = subirComprobante;
 window.cambiarEstado = async function (id, nuevoEstado) {
-const boletoOriginal = datosBoletos.find(b => b.id === id);
-if (!boletoOriginal) return alert("⚠️ No se encontró el boleto.");
-if (boletoOriginal.estado === "pagado" && rolActivo !== "admin") {
-return alert("❌ Solo el ADMIN puede cambiar un boleto pagado a otro estado. si cometiste error comunicate con el admnistrador de la rifa ");
-}
-let formaPago = "";
+  const boletoOriginal = datosBoletos.find(b => b.id === id);
+  if (!boletoOriginal) return alert("⚠️ No se encontró el boleto.");
 
-if (nuevoEstado === "pagado") {
   const formaPagoSeleccionada = document.getElementById(`forma-${id}`)?.value || "";
 
-  if (!formaPagoSeleccionada || formaPagoSeleccionada === "Elige forma de pago...") {
-    return alert("⚠️ Selecciona primero una forma de pago antes de marcar como pagado.");
+  if (nuevoEstado === "pagado") {
+    if (!formaPagoSeleccionada || formaPagoSeleccionada === "Elige forma de pago...") {
+      return alert("⚠️ Selecciona primero una forma de pago antes de marcar como pagado.");
+    }
+
+    if (cuentasOficiales.includes(formaPagoSeleccionada) && rolActivo !== "admin") {
+      return alert("🚫 No puedes marcar como PAGADO si el pago fue a una cuenta oficial. Solo el ADMIN puede hacerlo.");
+    }
   }
 
-  if (cuentasOficiales.includes(formaPagoSeleccionada) && rolActivo !== "admin") {
-    return alert("🚫 No puedes marcar como PAGADO si el pago fue a una cuenta oficial. Solo el ADMIN puede hacerlo.");
+  let formaPago = formaPagoSeleccionada || prompt("Forma de pago (Efectivo, OXXO, etc):");
+  if (!formaPago) formaPago = "No especificado";
+
+  try {
+    await updateDoc(doc(db, "BoletosRifa", id), {
+      estado: nuevoEstado,
+      modificadoPor: rolActivo,
+      formaPago: formaPago,
+      fecha: serverTimestamp()
+    });
+    alert("✅ Estado actualizado correctamente por: " + rolActivo);
+    await cargarBoletos();
+  } catch (error) {
+    console.error("❌ Error al actualizar el boleto:", error);
+    alert("Error al actualizar el boleto.");
   }
-
-  formaPago = formaPagoSeleccionada;
-}
-
-try {
-await updateDoc(doc(db, "BoletosRifa", id), {
-estado: nuevoEstado,
-modificadoPor: rolActivo,
-formaPago: formaPago,
-fecha: serverTimestamp()
-});
-alert("✅ Estado actualizado correctamente por: " + rolActivo);
-await cargarBoletos();
-} catch (error) {
-console.error("❌ Error al actualizar el boleto:", error);
-alert("Error al actualizar el boleto.");
-}
 };
+
 document.addEventListener("DOMContentLoaded", () => {
 const accesos = {
 "admin": "admin2024",
