@@ -171,6 +171,15 @@ window.cambiarEstado = async function (id, nuevoEstado) {
     alert("Error al actualizar el boleto.");
      }
 };
+  const accesos = {
+  "admin": "admin2024",
+  "miriam": "mc24",
+  "patty": "pt25",
+  "diane": "dn26",
+  "steven": "sv27",
+  "manuel": "admin2024"
+};
+
 setTimeout(() => {
 const clave = prompt("🔒 Ingresa tu clave de acceso:");
 const usuario = Object.keys(accesos).find(k => accesos[k] === clave);
