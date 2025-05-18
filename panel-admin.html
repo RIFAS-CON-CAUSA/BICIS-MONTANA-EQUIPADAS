@@ -134,55 +134,25 @@ const rowColor = b.estado === "pagado"
 }
 async function subirComprobante(id, archivo) {
   if (!archivo) return;
-
-  const boleto = datosBoletos.find(b => b.id === id);
-
-  // 🔒 Si ya hay comprobante y no es admin, bloquear
-  if (boleto?.comprobanteUrl) {
-    if (rolActivo !== "admin") {
-      return Swal.fire({
-        icon: "error",
-        title: `Boleto #${boleto.boleto}`,
-        html: `🚫 Este comprobante ya fue subido.<br><br>
-               Solo el <strong>ADMIN</strong> puede reemplazarlo.`,
-        confirmButtonText: "Entendido"
-      });
-    }
-
-    // 🟡 Si es admin, mostrar confirmación para reemplazar
-    const confirmado = await Swal.fire({
-      title: `Boleto #${boleto.boleto}`,
-      html: `⚠️ Ya existe un comprobante.<br>¿Deseas reemplazarlo?<br><br>
-             📝 Se guardará también tu rol como responsable de esta actualización.`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Sí, reemplazar",
-      cancelButtonText: "Cancelar"
-    });
-
-    if (!confirmado.isConfirmed) return;
-  }
-
   const extension = archivo.name.split('.').pop();
   const storageRef = ref(storage, `comprobantes/boletos/${id}.${extension}`);
-
   try {
     await uploadBytes(storageRef, archivo);
     const url = await getDownloadURL(storageRef);
-
     await updateDoc(doc(db, "BoletosRifa", id), {
       comprobanteUrl: url,
       modificadoPor: rolActivo,
       fecha: serverTimestamp()
     });
-
     alert("✅ Comprobante subido correctamente.");
     await cargarBoletos();
+    document.getElementById("celda-" + id).style.backgroundColor = "";
   } catch (error) {
     console.error("❌ Error al subir comprobante:", error);
     alert("Error al subir comprobante.");
   }
 }
+
 
 document.addEventListener("DOMContentLoaded", () => {
 const accesos = {
