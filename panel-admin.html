@@ -152,6 +152,11 @@ alert("Error al subir comprobante.");
 window.cambiarEstado = async function (id, nuevoEstado) {
   const boletoOriginal = datosBoletos.find(b => b.id === id);
   if (!boletoOriginal) return alert("⚠️ No se encontró el boleto.");
+    
+// 🔒 Protege los boletos ya pagados contra cambios si no eres admin
+if (boletoOriginal.estado === "pagado" && nuevoEstado !== "pagado" && rolActivo !== "admin") {
+  return alert("❌ Solo el ADMIN puede cambiar un boleto pagado a otro estado.");
+}
 
   const formaPagoSeleccionada = document.getElementById(`forma-${id}`)?.value || "";
   const selectForma = document.getElementById(`forma-${id}`);
