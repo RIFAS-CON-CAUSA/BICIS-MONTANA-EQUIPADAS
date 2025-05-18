@@ -99,10 +99,11 @@ const rowColor = b.estado === "pagado"
         <td>${b.modificadoPor || ""}</td>
         <td>${b.formaPago || ""}</td>
         <td>
-       <select id="formaPago-${b.id}" style="margin-bottom:5px;">
-  <option disabled selected>⏳ Elige forma de pago...</option>
-  ${opcionesFormaPago.map(op => `<option value="${op}">${op}</option>`).join('')}
+     <select id="forma-${b.id}" style="margin-bottom:5px;">
+  <option disabled selected>❗ Elige forma de pago...</option>
+  ${opcionesFormaPago.map(op => `<option value="${op}">${op}</option>`).join("")}
 </select>
+
 <br/>
 <select id="estado-${b.id}" onchange="cambiarEstado('${b.id}', this.value)">
   <option disabled selected>⏬ Cambiar status del boleto...</option>
