@@ -169,9 +169,8 @@ window.cambiarEstado = async function (id, nuevoEstado) {
   } catch (error) {
     console.error("❌ Error al actualizar el boleto:", error);
     alert("Error al actualizar el boleto.");
-  }
+     }
 };
-
 setTimeout(() => {
 const clave = prompt("🔒 Ingresa tu clave de acceso:");
 const usuario = Object.keys(accesos).find(k => accesos[k] === clave);
