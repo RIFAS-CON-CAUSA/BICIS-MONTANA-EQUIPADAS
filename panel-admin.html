@@ -114,35 +114,6 @@ datosBoletos.forEach(b => {
   `;
 });
 
-
-datosBoletos.forEach(b => {
-  const rowColor = b.estado === "pagado"
-    ? "style='background:#e74c3c; color:white'"
-    : (b.estado === "apartado"
-      ? "style='background:#f1c40f;'"
-      : "style='background:#2ecc71; color:white'");
-
-  tbody.innerHTML += `
-    <tr ${rowColor}>
-      <td>${b.boleto}</td>
-      <td>${b.nombre}</td>
-      <td>${b.telefono}</td>
-      <td>${b.poblacion}</td>
-      <td>${b.estado}</td>
-      <td>${b.fecha ? new Date(b.fecha.seconds * 1000).toLocaleString().slice(0, 16) : ''}</td>
-      <td>${b.modificadoPor || ""}</td>
-      <td>${b.formaPago || ""}</td>
-      <td>
-        <select id="estado-${b.id}" onchange="cambiarEstado('${b.id}', this.value)">
-          <option disabled selected>⚙️ Cambiar status del boleto...</option>
-          <option value="libre">Libre</option>
-          <option value="apartado">Apartado</option>
-          <option value="pagado">Pagado</option>
-        </select>
-      </td>
-    </tr>`;
-});
-
 }
 
 async function subirComprobante(id, archivo) {
