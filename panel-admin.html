@@ -60,6 +60,16 @@ window.archivoSeleccionado = {};
     
 let rolActivo = "";
 let datosBoletos = [];
+    const cuentasOficiales = [
+  "Transferencia oficial Spin OXXO 6160"
+];
+
+const opcionesFormaPago = [
+  "Efectivo",
+  ...cuentasOficiales,
+  "Otro"
+];
+
     
 async function cargarBoletos() {
   const querySnapshot = await getDocs(collection(db, "BoletosRifa"));
