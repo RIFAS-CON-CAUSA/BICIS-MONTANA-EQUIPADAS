@@ -12,8 +12,8 @@
 • Toma en cuenta que al cambiar un estado a <strong>"PAGADO"</strong>, <u>ya no podrás devolverlo a otro estado</u>.<br/>
 • Deberás comunicarte con el <strong>ADMIN</strong> para que realice la corrección si fue un error.<br/>
 • Y recuerda que si el cliente paga por <strong>TRANSFERENCIA a la cuenta del ADMIN</strong>,<br/>
-    el cambio de estado <u>debe hacerlo exclusivamente el ADMIN</u>,<br/>
-    ya que ese monto no entrará a tu cuenta de ingresos.
+el cambio de estado <u>debe hacerlo exclusivamente el ADMIN</u>,<br/>
+ya que ese monto no entrará a tu cuenta de ingresos.
 </p>
 <button class="solo-admin" onclick="exportarExcel()" style="margin-top: 15px; display: none;">
 📥 Exportar a Excel
@@ -57,37 +57,35 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage();
 window.archivoSeleccionado = {};
-    
 let rolActivo = "";
 let datosBoletos = [];
-    const cuentasOficiales = [
-  "Transferencia oficial Spin OXXO 6160"
+const cuentasOficiales = [
+"Transferencia oficial Spin OXXO 6160"
 ];
-
 const opcionesFormaPago = [
-  "Efectivo",
-  ...cuentasOficiales,
-  "Otro"
+"Efectivo",
+...cuentasOficiales,
+"Otro"
 ];
-
-    
 async function cargarBoletos() {
-  const querySnapshot = await getDocs(collection(db, "BoletosRifa"));
-    document.getElementById('celda-${b.id}').style.backgroundColor = '#ffeaa7';
-    window.archivoSeleccionado['${b.id}'] = this.files[0]
-  ">
-  <button onclick="document.getElementById('file-${b.id}').click()" style="font-size: 0.9em;">📁 Seleccionar</button>
-  <button onclick="subirComprobante('${b.id}', window.archivoSeleccionado['${b.id}'])" style="font-size: 0.9em;">⬆️ Subir</button><br>
-  ${b.comprobanteUrl ? '✅ ' : ''}
-  <a href="${b.comprobanteUrl || '#'}" target="_blank" style="font-size: 0.9em;">📎 Ver comprobante</a>
+const querySnapshot = await getDocs(collection(db, "BoletosRifa"));
+<option value="apartado">Apartado</option>
+<option value="pagado">Pagado</option>
+</select>
 </td>
-
-      </tr>
-
-
-      
-    `;
-  });
+<td id="celda-${b.id}">
+<input type="file" accept="image/*" style="display:none;" id="file-${b.id}" onchange="
+document.getElementById('celda-${b.id}').style.backgroundColor = '#ffeaa7';
+window.archivoSeleccionado['${b.id}'] = this.files[0]
+">
+<button onclick="document.getElementById('file-${b.id}').click()" style="font-size: 0.9em;">📁 Seleccionar</button>
+<button onclick="subirComprobante('${b.id}', window.archivoSeleccionado['${b.id}'])" style="font-size: 0.9em;">⬆️ Subir</button><br>
+${b.comprobanteUrl ? '✅ ' : ''}
+<a href="${b.comprobanteUrl || '#'}" target="_blank" style="font-size: 0.9em;">📎 Ver comprobante</a>
+</td>
+</tr>
+`;
+});
 }
 async function subirComprobante(id, archivo) {
 if (!archivo) return;
@@ -99,7 +97,7 @@ const url = await getDownloadURL(storageRef);
 await updateDoc(doc(db, "BoletosRifa", id), { comprobanteUrl: url });
 alert("✅ Comprobante subido correctamente.");
 await cargarBoletos();
-   document.getElementById("celda-" + id).style.backgroundColor = ""; 
+document.getElementById("celda-" + id).style.backgroundColor = ""; 
 } catch (error) {
 console.error("❌ Error al subir comprobante:", error);
 alert("Error al subir comprobante.");
@@ -107,44 +105,36 @@ alert("Error al subir comprobante.");
 }
 // 🔁 Parche: Control de roles y reseteo visual al fallar
 window.cambiarEstado = async function (id, nuevoEstado) {
-  const boletoOriginal = datosBoletos.find(b => b.id === id);
-  if (!boletoOriginal) return alert("⚠️ No se encontró el boleto.");
-
-  // ❌ Impedir que un rol no admin cambie un boleto ya pagado
-  if (boletoOriginal.estado === "pagado" && nuevoEstado !== "pagado" && rolActivo !== "admin") {
-    return alert("❌ Solo el ADMIN puede cambiar un boleto pagado a otro estado.");
-  }
-
-  const formaPagoSeleccionada = document.getElementById(`forma-${id}`)?.value || "";
-
-  if (nuevoEstado === "pagado") {
-    if (!formaPagoSeleccionada || formaPagoSeleccionada === "Elige forma de pago...") {
-      return alert("⚠️ Selecciona primero una forma de pago antes de marcar como pagado.");
-    }
-
-    if (cuentasOficiales.includes(formaPagoSeleccionada) && rolActivo !== "admin") {
-      return alert("⚠️ No puedes marcar como PAGADO si el pago fue a una cuenta oficial. 🛑 Solo el ADMIN puede hacerlo. Contacta al admin y deja mensaje.");
-    }
-  }
-
-  const formaPago = formaPagoSeleccionada || prompt("Forma de pago (Efectivo, OXXO, etc):") || "No especificado";
-
-  try {
-    await updateDoc(doc(db, "BoletosRifa", id), {
-      estado: nuevoEstado,
-      modificadoPor: rolActivo,
-      formaPago: formaPago,
-      fecha: serverTimestamp()
-    });
-    alert("✅ Estado actualizado correctamente por: " + rolActivo);
-    await cargarBoletos();
-  } catch (error) {
-    console.error("❌ Error al actualizar el boleto:", error);
-    alert("Error al actualizar el boleto.");
-  }
+const boletoOriginal = datosBoletos.find(b => b.id === id);
+if (!boletoOriginal) return alert("⚠️ No se encontró el boleto.");
+// ❌ Impedir que un rol no admin cambie un boleto ya pagado
+if (boletoOriginal.estado === "pagado" && nuevoEstado !== "pagado" && rolActivo !== "admin") {
+return alert("❌ Solo el ADMIN puede cambiar un boleto pagado a otro estado.");
+}
+const formaPagoSeleccionada = document.getElementById(`forma-${id}`)?.value || "";
+if (nuevoEstado === "pagado") {
+if (!formaPagoSeleccionada || formaPagoSeleccionada === "Elige forma de pago...") {
+return alert("⚠️ Selecciona primero una forma de pago antes de marcar como pagado.");
+}
+if (cuentasOficiales.includes(formaPagoSeleccionada) && rolActivo !== "admin") {
+return alert("⚠️ No puedes marcar como PAGADO si el pago fue a una cuenta oficial. 🛑 Solo el ADMIN puede hacerlo. Si alguien pagö Contacta al admin y mandale comprobante.");
+}
+}
+const formaPago = formaPagoSeleccionada || prompt("Forma de pago (Efectivo, OXXO, etc):") || "No especificado";
+try {
+await updateDoc(doc(db, "BoletosRifa", id), {
+estado: nuevoEstado,
+modificadoPor: rolActivo,
+formaPago: formaPago,
+fecha: serverTimestamp()
+});
+alert("✅ Estado actualizado correctamente por: " + rolActivo);
+await cargarBoletos();
+} catch (error) {
+console.error("❌ Error al actualizar el boleto:", error);
+alert("Error al actualizar el boleto.");
+}
 };
-
-
 document.addEventListener("DOMContentLoaded", () => {
 const accesos = {
 "admin": "admin2024",
@@ -203,3 +193,4 @@ XLSX.writeFile(libro, "reporte_boletos.xlsx");
 </script>
 </body>
 </html>
+
