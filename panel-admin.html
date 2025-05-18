@@ -115,50 +115,34 @@ datosBoletos.forEach(b => {
 });
 
 
-const rowColor = b.estado === "pagado"
-  ? "style='background:#e74c3c; color:white'"
-  : (b.estado === "apartado"
-    ? "style='background:#f1c40f;'"
-    : "style='background:#2ecc71; color:white'");
+datosBoletos.forEach(b => {
+  const rowColor = b.estado === "pagado"
+    ? "style='background:#e74c3c; color:white'"
+    : (b.estado === "apartado"
+      ? "style='background:#f1c40f;'"
+      : "style='background:#2ecc71; color:white'");
 
-  
-  datosBoletos.forEach(b => {
-   tbody.innerHTML += `
-      <tr>
-        <td>${b.boleto}</td>
-        <td>${b.nombre}</td>
-        <td>${b.telefono}</td>
-        <td>${b.poblacion}</td>
-        <td>${b.estado}</td>
-        <td>${b.fecha ? new Date(b.fecha.seconds * 1000).toLocaleString() : ''}</td>
-        <td>${b.modificadoPor || ''}</td>
-        <td>${b.formaPago || ''}</td>
-        <td>
-          <select id="estado-${b.id}" onchange="cambiarEstado('${b.id}', this.value)">
-            <option disabled selected>🔁 Cambiar status del boleto...</option>
-            <option value="libre">Libre</option>
-            <option value="apartado">Apartado</option>
-            <option value="pagado">Pagado</option>
-          </select>
-          <br/>
-          <select id="forma-${b.id}" style="margin-top:5px;">
-            <option disabled selected>🪪 Elige forma de pago...</option>
-            ${opcionesFormaPago.map(op => `<option value="${op}">${op}</option>`).join('')}
-          </select>
-        </td>
-        <td id="celda-${b.id}">
-          <input type="file" accept="image/*" style="display:none;" id="file-${b.id}" onchange="
-            document.getElementById('celda-${b.id}').style.backgroundColor = '#ffea7';
-            window.archivoSeleccionado['${b.id}'] = this.files[0]
-          ">
-          <button onclick="document.getElementById('file-${b.id}').click()">📁 Seleccionar</button>
-          <button onclick="subirComprobante('${b.id}', window.archivoSeleccionado['${b.id}'])">📤 Subir</button><br>
-          ${b.comprobanteUrl ? '✅' : ''}
-          <a href="${b.comprobanteUrl || '#'}" target="_blank">📎 Ver comprobante</a>
-        </td>
-      </tr>
-    `;
-  });
+  tbody.innerHTML += `
+    <tr ${rowColor}>
+      <td>${b.boleto}</td>
+      <td>${b.nombre}</td>
+      <td>${b.telefono}</td>
+      <td>${b.poblacion}</td>
+      <td>${b.estado}</td>
+      <td>${b.fecha ? new Date(b.fecha.seconds * 1000).toLocaleString().slice(0, 16) : ''}</td>
+      <td>${b.modificadoPor || ""}</td>
+      <td>${b.formaPago || ""}</td>
+      <td>
+        <select id="estado-${b.id}" onchange="cambiarEstado('${b.id}', this.value)">
+          <option disabled selected>⚙️ Cambiar status del boleto...</option>
+          <option value="libre">Libre</option>
+          <option value="apartado">Apartado</option>
+          <option value="pagado">Pagado</option>
+        </select>
+      </td>
+    </tr>`;
+});
+
 }
 
 async function subirComprobante(id, archivo) {
