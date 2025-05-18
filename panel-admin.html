@@ -133,57 +133,57 @@ const rowColor = b.estado === "pagado"
   });
 }
 async function subirComprobante(id, archivo) {
-if (!archivo) return;
-const extension = archivo.name.split('.').pop();
-const storageRef = ref(storage, `comprobantes/boletos/${id}.${extension}`);
-try {
-await uploadBytes(storageRef, archivo);
-const url = await getDownloadURL(storageRef);
-await updateDoc(doc(db, "BoletosRifa", id), { comprobanteUrl: url });
-alert("✅ Comprobante subido correctamente.");
-await cargarBoletos();
-   document.getElementById("celda-" + id).style.backgroundColor = ""; 
-} catch (error) {
-console.error("❌ Error al subir comprobante:", error);
-alert("Error al subir comprobante.");
-}
-}
-// 🔁 Parche: Control de roles y reseteo visual al fallar
-window.cambiarEstado = async function (id, nuevoEstado) {
-  const boletoOriginal = datosBoletos.find(b => b.id === id);
-  if (!boletoOriginal) return alert("⚠️ No se encontró el boleto.");
+  if (!archivo) return;
 
-  // ❌ Impedir que un rol no admin cambie un boleto ya pagado
-  if (boletoOriginal.estado === "pagado" && nuevoEstado !== "pagado" && rolActivo !== "admin") {
-    return alert("❌ Solo el ADMIN puede cambiar un boleto pagado a otro estado.");
-  }
+  const boleto = datosBoletos.find(b => b.id === id);
 
-  const formaPagoSeleccionada = document.getElementById(`forma-${id}`)?.value || "";
-
-  if (nuevoEstado === "pagado") {
-    if (!formaPagoSeleccionada || formaPagoSeleccionada === "Elige forma de pago...") {
-      return alert("⚠️ Selecciona primero una forma de pago antes de marcar como pagado.");
+  // 🔒 Si ya hay comprobante y no es admin, bloquear
+  if (boleto?.comprobanteUrl) {
+    if (rolActivo !== "admin") {
+      return Swal.fire({
+        icon: "error",
+        title: `Boleto #${boleto.boleto}`,
+        html: `🚫 Este comprobante ya fue subido.<br><br>
+               Solo el <strong>ADMIN</strong> puede reemplazarlo.`,
+        confirmButtonText: "Entendido"
+      });
     }
 
-    if (cuentasOficiales.includes(formaPagoSeleccionada) && rolActivo !== "admin") {
-      return alert("⚠️ No puedes marcar como PAGADO si el pago fue a una cuenta oficial. 🛑 Solo el ADMIN puede hacerlo. Si alguien pagö Contacta al admin y mandale comprobante.");
-    }
+    // 🟡 Si es admin, mostrar confirmación para reemplazar
+    const confirmado = await Swal.fire({
+      title: `Boleto #${boleto.boleto}`,
+      html: `⚠️ Ya existe un comprobante.<br>¿Deseas reemplazarlo?<br><br>
+             📝 Se guardará también tu rol como responsable de esta actualización.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, reemplazar",
+      cancelButtonText: "Cancelar"
+    });
+
+    if (!confirmado.isConfirmed) return;
   }
 
-  const formaPago = formaPagoSeleccionada || prompt("Forma de pago (Efectivo, OXXO, etc):") || "No especificado";
+  const extension = archivo.name.split('.').pop();
+  const storageRef = ref(storage, `comprobantes/boletos/${id}.${extension}`);
 
   try {
+    await uploadBytes(storageRef, archivo);
+    const url = await getDownloadURL(storageRef);
+
     await updateDoc(doc(db, "BoletosRifa", id), {
-      estado: nuevoEstado,
+      comprobanteUrl: url,
       modificadoPor: rolActivo,
-      formaPago: formaPago,
       fecha: serverTimestamp()
     });
-    alert("✅ Estado actualizado correctamente por: " + rolActivo);
+
+    alert("✅ Comprobante subido correctamente.");
     await cargarBoletos();
   } catch (error) {
-    console.error("❌ Error al actualizar el boleto:", error);
-    alert("Error al actualizar el boleto.");
+    console.error("❌ Error al subir comprobante:", error);
+    alert("Error al subir comprobante.");
+  }
+}
+
   }
 };
 
