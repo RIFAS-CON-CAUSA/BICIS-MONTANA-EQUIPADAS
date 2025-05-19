@@ -172,7 +172,8 @@ window.cambiarEstado = async function (id, nuevoEstado) {
     await cargarBoletos();
    const b = datosBoletos.find(b => b.id === id);
 if (nuevoEstado === "pagado" && b) {
-  const oportunidades = (b.oportunidades || []).slice(0, 10);
+ const oportunidades = Array.isArray(b.oportunidades) ? b.oportunidades.slice(0, 10) : [];
+
   generarBoleto(b.nombre || "Participante", b.poblacion || "", b.boleto || "000", oportunidades);
 }
 
