@@ -129,6 +129,7 @@ const url = await getDownloadURL(storageRef);
 await updateDoc(doc(db, "BoletosRifa", id), { comprobanteUrl: url });
 alert("✅ Comprobante subido correctamente.");
 await cargarBoletos();
+ document.getElementById("btnWhatsapp").style.display = "none";
 document.getElementById("celda-" + id).style.backgroundColor = ""; 
 } catch (error) {
 console.error("❌ Error al subir comprobante:", error);
