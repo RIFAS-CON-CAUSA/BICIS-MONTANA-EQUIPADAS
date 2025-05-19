@@ -169,6 +169,12 @@ window.cambiarEstado = async function (id, nuevoEstado) {
     });
     alert("✅ Estado actualizado correctamente por: " + rolActivo);
     await cargarBoletos();
+   const b = datosBoletos.find(b => b.id === id);
+if (nuevoEstado === "pagado" && b) {
+  const oportunidades = (b.oportunidades || []).slice(0, 10);
+  generarBoleto(b.nombre || "Participante", b.poblacion || "", b.boleto || "000", oportunidades);
+}
+
   } catch (error) {
     console.error("❌ Error al actualizar el boleto:", error);
     alert("Error al actualizar el boleto.");
