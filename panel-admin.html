@@ -291,7 +291,7 @@ function generarBoleto(nombre, poblacion, folio, oportunidades) {
   const boleto = document.getElementById("boletoPreview");
   boleto.style.display = "block";
 
-  html2canvas(boleto).then(canvas => {
+  html2canvas(boleto, { useCORS: true }).then(canvas => {
     const link = document.createElement("a");
     link.download = `BOLETO-${folio}.png`;
     link.href = canvas.toDataURL();
