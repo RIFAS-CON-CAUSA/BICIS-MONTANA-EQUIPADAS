@@ -232,6 +232,74 @@ XLSX.utils.book_append_sheet(libro, hojaResumen, "Resumen por Rol");
 XLSX.writeFile(libro, "reporte_boletos.xlsx");
 };
 </script>
+ <!-- 🎟️ Plantilla oculta para generar boleto -->
+<div id="boletoPreview" style="position:relative; width:720px; height:1280px; display:none; font-family:sans-serif;">
+  <img src="https://raw.githubusercontent.com/RIFAS-CON-CAUSA/BICIS-MONTANA-EQUIPADAS/main/BOLETO-RIFA-BICIS-BASE.png" style="width:100%; height:100%; position:absolute; top:0; left:0; z-index:0;">
+  <!-- Texto institucional superior -->
+  <div style="position:absolute; top:165px; width:100%; text-align:center; font-size:13px;">
+    <div>TU APOYO A ESTA CAUSA</div>
+    <div>IMPULSA LA CULTURA DEL DEPORTE</div>
+    <div>Y FORTALECE A NUESTRA COMUNIDAD.</div>
+    <div style="font-weight:bold; font-size:12px;">POR MÁS JUVENTUD INDUCIDA AL DEPORTE</div>
+  </div>
+  <!-- Datos dinámicos -->
+  <div id="nombreBoleto" style="position:absolute; top:830px; left:90px; font-size:22px; font-weight:bold;"></div>
+  <div id="poblacionBoleto" style="position:absolute; top:880px; left:90px; font-size:22px;"></div>
+  <div id="folioBoleto" style="position:absolute; top:950px; left:90px; font-size:28px; color:#002F6C; font-weight:bold;"></div>
+  <div style="position:absolute; top:1000px; left:90px; font-size:22px; color:#002F6C;">10 oportunidades</div>
+  <div id="lineaOport1" style="position:absolute; top:1040px; left:90px; font-size:18px;"></div>
+  <div id="lineaOport2" style="position:absolute; top:1070px; left:90px; font-size:18px;"></div>
+  <!-- Mensaje VIP -->
+  <div style="position:absolute; top:1110px; left:90px; font-size:14px; width:580px; line-height:1.3;">
+    <div>🎁 3.er Premio adicional: ES UN REGALO PARA NUESTROS COLABORADORES VIP. Bicicleta Mercurio 26</div>
+    <div>📢 Este premio para quien compre 3 boletos o mas. y comparta en Facebook, SI RESULTA GANADOR (TODO PARA UN SOLO GANADOR)</div>
+    <div>📦 ademas se gana Envío GRATIS a todo México.</div>
+    <div>📌 Recuerda poner tu número participante de tu serie participante en la publicación. Es minimo una por serie al dia. guarda captura para reclamar el regalo</div>
+  </div>
+  <!-- Frase final -->
+  <div style="position:absolute; top:1240px; left:120px; font-size:26px; font-style:italic; font-weight:bold;">¡Gracias por tu apoyo y buena suerte!</div>
+  <!-- Enlace inferior -->
+  <div style="position:absolute; bottom:20px; left:110px; font-size:12px;">
+    Bases del sorteo, detalles y actualizaciones: <span style="color:#002F6C; font-weight:bold;">AQUÍ</span>
+  </div>
+</div>
+
+<!-- 📤 Botón de WhatsApp -->
+<div id="btnWhatsapp" style="display:none; margin-top:20px;">
+  <a id="waLink" href="#" target="_blank" style="background-color:#25D366; padding:10px 20px; color:white; text-decoration:none; font-weight:bold; border-radius:5px;">
+    📤 Enviar por WhatsApp
+  </a>
+</div>
+
+<!-- Script para generar imagen -->
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script>
+function generarBoleto(nombre, poblacion, folio, oportunidades) {
+  document.getElementById("nombreBoleto").innerText = nombre;
+  document.getElementById("poblacionBoleto").innerText = poblacion;
+  document.getElementById("folioBoleto").innerText = "BOLETO # " + folio;
+  document.getElementById("lineaOport1").innerText = oportunidades.slice(0, 5).join("   ");
+  document.getElementById("lineaOport2").innerText = oportunidades.slice(5, 10).join("   ");
+
+  const boleto = document.getElementById("boletoPreview");
+  boleto.style.display = "block";
+
+  html2canvas(boleto).then(canvas => {
+    const link = document.createElement("a");
+    link.download = `BOLETO-${folio}.png`;
+    link.href = canvas.toDataURL();
+    link.click();
+    boleto.style.display = "none";
+
+    // WhatsApp link
+    const mensaje = `🎉 ¡Gracias por apoyar la causa! Aquí tienes tu boleto #${folio} de la rifa de bicicletas.\n\n✅ Participas con 10 oportunidades.\n\nMás información en: https://rifas-con-causa.github.io/BICIS-MONTANA-EQUIPADAS/index.html`;
+    const waUrl = "https://wa.me/?text=" + encodeURIComponent(mensaje);
+    document.getElementById("waLink").href = waUrl;
+    document.getElementById("btnWhatsapp").style.display = "block";
+  });
+}
+</script>
+
 </body>
 </html>
 
