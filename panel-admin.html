@@ -174,7 +174,7 @@ window.cambiarEstado = async function (id, nuevoEstado) {
    
 if (nuevoEstado === "pagado" && b) {
  const oportunidades = Array.isArray(b.series) ? b.series.slice(0, 10) : [];
-  generarBoleto(b.nombre || "Participante", b.poblacion || "", b.boleto || "000", oportunidades);
+generarBoleto(b.nombre || "Participante", b.poblacion || "", b.boleto || "000", oportunidades, b.telefono || "");
    // WhatsApp link directo al número del participante
   const mensaje = "📩 ¡Gracias por apoyar la causa! Aquí tienes tu boleto #" + b.boleto + " de la rifa de bicicletas.\n\n✅ Participas con 10 oportunidades.\n\nMás información en: https://rifas-con-causa.github.io/BICIS-MONTANA-EQUIPADAS/index.html";
   const numeroLimpio = (b.telefono || "").replace(/\D/g, "");
@@ -297,7 +297,8 @@ XLSX.writeFile(libro, "reporte_boletos.xlsx");
 <!-- Script para generar imagen -->
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <script>
-function generarBoleto(nombre, poblacion, folio, oportunidades) {
+function generarBoleto(nombre, poblacion, folio, oportunidades, telefono) {
+
   document.getElementById("nombreBoleto").innerText = nombre;
   document.getElementById("poblacionBoleto").innerText = poblacion;
   document.getElementById("folioBoleto").innerText = "BOLETO # " + folio;
@@ -316,7 +317,8 @@ function generarBoleto(nombre, poblacion, folio, oportunidades) {
 
     // WhatsApp link
     const mensaje = `🎉 ¡Gracias por apoyar la causa! Aquí tienes tu boleto #${folio} de la rifa de bicicletas.\n\n✅ Participas con 10 oportunidades.\n\nMás información en: https://rifas-con-causa.github.io/BICIS-MONTANA-EQUIPADAS/index.html`;
-    const numeroLimpio = b.telefono.replace(/\D/g, ""); // Solo números
+    const numeroLimpio = telefono.replace(/\D/g, ""); // Solo números
+
 const waUrl = `https://wa.me/52${numeroLimpio}?text=${encodeURIComponent(mensaje)}`;
 
     document.getElementById("waLink").href = waUrl;
