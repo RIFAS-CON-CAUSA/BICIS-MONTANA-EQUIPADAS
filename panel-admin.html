@@ -306,9 +306,13 @@ function generarBoleto(nombre, poblacion, folio, oportunidades) {
 
     // WhatsApp link
     const mensaje = `🎉 ¡Gracias por apoyar la causa! Aquí tienes tu boleto #${folio} de la rifa de bicicletas.\n\n✅ Participas con 10 oportunidades.\n\nMás información en: https://rifas-con-causa.github.io/BICIS-MONTANA-EQUIPADAS/index.html`;
-    const waUrl = "https://wa.me/?text=" + encodeURIComponent(mensaje);
+    const numeroLimpio = b.telefono.replace(/\D/g, ""); // Solo números
+const waUrl = `https://wa.me/52${numeroLimpio}?text=${encodeURIComponent(mensaje)}`;
+
     document.getElementById("waLink").href = waUrl;
     document.getElementById("btnWhatsapp").style.display = "block";
+   window.open(waUrl, "_blank");  // Esto abre automáticamente el WhatsApp web
+
   });
 }
 </script>
