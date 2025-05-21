@@ -326,6 +326,34 @@ const waUrl = `https://wa.me/52${numeroLimpio}?text=${encodeURIComponent(mensaje
   });
 }
 </script>
+<script>
+// 🎨 Resalta la fila activa en rosa mientras se edita
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll("#tablaBoletos select").forEach(sel => {
+    sel.addEventListener("focus", () => {
+      const tr = sel.closest("tr");
+      if (tr) tr.style.background = "#ffe6f0";
+    });
+
+    sel.addEventListener("blur", () => {
+      const tr = sel.closest("tr");
+      const estado = tr?.querySelector("td:nth-child(5)")?.textContent?.toLowerCase();
+      if (tr && estado) {
+        switch (estado) {
+          case "pagado":
+            tr.style.background = "#e74c3c"; tr.style.color = "white";
+            break;
+          case "apartado":
+            tr.style.background = "#f1c40f"; tr.style.color = "black";
+            break;
+          default:
+            tr.style.background = "#2ecc71"; tr.style.color = "white";
+        }
+      }
+    });
+  });
+});
+</script>
 
 </body>
 </html>
