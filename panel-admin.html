@@ -3,9 +3,27 @@
 <head>
 <meta charset="utf-8"/>
 <title>Panel Admin - Rifas con Causa</title>
+ <style>
+#contadorActualizacion {
+  position: fixed;
+  top: 10px;
+  right: 20px;
+  background: #e0f7fa;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #00796b;
+  z-index: 9999;
+  display: none;
+}
+</style>
+
 <link href="favicon.ico" rel="icon" type="image/x-icon"/>
 </head>
 <body>
+ <div id="contadorActualizacion">Actualización en: 40s</div>
+
 <h1 id="tituloPanel">Panel de Control</h1>
 <p style="font-size: 0.95em; margin-top: -10px; margin-bottom: 20px; line-height: 1.4; color: #333;">
 ⚠️ <strong>INSTRUCCIONES IMPORTANTES PARA LOS ROLES:</strong><br/>
@@ -362,6 +380,35 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 
+<script type="module">
+let tiempoRestante = 180;
+const contador = document.getElementById("contadorActualizacion");
+
+setInterval(() => {
+  const activo = document.activeElement;
+  const esEditable = activo && (activo.tagName === 'INPUT' || activo.tagName === 'SELECT' || activo.tagName === 'TEXTAREA');
+
+  tiempoRestante--;
+
+  if (tiempoRestante <= 40) {
+    contador.style.display = "block";
+    contador.textContent = esEditable
+      ? "⏸️ Editando..."
+      : `Actualización en: ${tiempoRestante}s`;
+  }
+
+  if (tiempoRestante <= 0) {
+    if (!esEditable) {
+      cargarBoletos();
+      console.log("🔁 Tabla actualizada automáticamente");
+    } else {
+      console.log("⏸️ Pausa: el usuario está interactuando");
+    }
+    tiempoRestante = 180;
+    contador.style.display = "none";
+  }
+}, 1000);
+</script>
 
 </body>
 </html>
