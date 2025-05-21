@@ -20,6 +20,27 @@
 </style>
 
 <link href="favicon.ico" rel="icon" type="image/x-icon"/>
+ <style>
+#contadorActualizacion {
+  position: fixed;
+  top: 10px;
+  right: 20px;
+  background: #def7fa;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #08796b;
+  z-index: 9999;
+  display: none;
+  transition: background 0.3s, color 0.3s;
+}
+#contadorActualizacion.alarma {
+  background: #ff4d4d;
+  color: white;
+}
+</style>
+
 </head>
 <body>
  <div id="contadorActualizacion">Actualización en: 40s</div>
@@ -407,6 +428,56 @@ setInterval(() => {
     tiempoRestante = 180;
     contador.style.display = "none";
   }
+}, 1000);
+</script>
+<script type="module">
+let tiempoRestante = 180;
+let segundosSinMover = 0;
+const contador = document.getElementById("contadorActualizacion");
+let alarmaReproducida = false;
+
+const audio = new Audio("https://notificationsounds.com/storage/sounds/file-sounds-1157-pristine.mp3");
+
+setInterval(() => {
+  const activo = document.activeElement;
+  const editable = activo && (activo.tagName === 'INPUT' || activo.tagName === 'SELECT' || activo.tagName === 'TEXTAREA');
+  const cursorSobreContador = contador.matches(':hover');
+
+  if (tiempoRestante <= 40 || segundosSinMover > 240) {
+    contador.style.display = "block";
+    contador.textContent = editable ? 
+      (segundosSinMover > 240 ? "⚠️ Inactividad prolongada" : `✏️ Editando...`) : 
+      `Actualización en: ${tiempoRestante}s`;
+  }
+
+  if (editable) {
+    segundosSinMover++;
+    if (segundosSinMover >= 240) {
+      contador.classList.add("alarma");
+      if (!alarmaReproducida) {
+        audio.play();
+        alarmaReproducida = true;
+      }
+    }
+  } else {
+    segundosSinMover = 0;
+    contador.classList.remove("alarma");
+    alarmaReproducida = false;
+  }
+
+  if (tiempoRestante <= 0) {
+    if (!editable && !cursorSobreContador) {
+      cargarBoletos();
+      console.log("🔁 Tabla actualizada automáticamente");
+      tiempoRestante = 180;
+      contador.style.display = "none";
+    } else {
+      console.log("⏸️ Pausa: el usuario está interactuando o revisando");
+      tiempoRestante = 20;
+    }
+  }
+
+  tiempoRestante--;
 }, 1000);
 </script>
 
