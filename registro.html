@@ -100,9 +100,7 @@ body {
 
   const params = new URLSearchParams(window.location.search);
   const numBoleto = params.get("boleto") || "???";
-
   document.getElementById("boletoTitulo").innerText = `Boleto #${numBoleto}`;
-
   document.getElementById("formRegistro").addEventListener("submit", async function(e){
     e.preventDefault();
 
@@ -157,29 +155,6 @@ body {
     }
   });
 
-  // Captura en móvil + desktop funcional
-  window.guardarCaptura = function () {
-    const target = document.getElementById('swalContent');
-    html2canvas(target).then(canvas => {
-      const resultado = document.getElementById('capturaResultado');
-      resultado.innerHTML = ""; // Limpiar si ya existía
-      resultado.appendChild(canvas);
-
-      const botonDescarga = document.createElement('a');
-      botonDescarga.href = canvas.toDataURL("image/png");
-      botonDescarga.download = `comprobante_boleto_${Date.now()}.png`;
-      botonDescarga.innerText = "⬇️ Descargar imagen";
-      botonDescarga.style.display = "block";
-      botonDescarga.style.marginTop = "10px";
-      botonDescarga.style.textAlign = "center";
-      botonDescarga.style.background = "#28a745";
-      botonDescarga.style.color = "#fff";
-      botonDescarga.style.padding = "10px";
-      botonDescarga.style.borderRadius = "5px";
-      botonDescarga.style.textDecoration = "none";
-
-      resultado.appendChild(botonDescarga);
-    });
   };
 </script>
 
