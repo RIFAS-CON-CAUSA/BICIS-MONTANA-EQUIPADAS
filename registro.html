@@ -6,29 +6,31 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      margin: 0; padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .form-container {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      width: 95%;
-      max-width: 500px;
-    }
-    .form-container h1 {
-      text-align: center;
-      color: #004aad;
-      font-size: 1.5em;
-      margin-bottom: 10px;
-    }
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+  margin: 0; padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* antes decía height: 100vh */
+}
+
+.form-container {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  width: 95%;
+  max-width: 500px;
+  margin-bottom: 50px; /* nueva línea añadida */
+}
+
+
+
+
+
+    
     .form-container h2 {
       text-align: center;
       color: #333;
@@ -123,7 +125,7 @@
         title: `✅ ¡Boleto #${numBoleto} registrado correctamente!`,
         html: `
   <div id="swalContent" style="max-width:100%; font-size:1em;">
-    <p>GRACIAS... El sistema te da 4 horas para pagar, y lo pone disponible otra vez si no se paga.</p>
+    <p>GRACIAS... El sistema te da 4 horas para pagar, y lo pone disponible otra vez, si no se paga.</p>
     <p>Envía comprobante de pago al WhatsApp <strong>3311571619</strong>.</p>
     <p><strong>Cuenta Spin OXXO:</strong> 4217 4701 5601 6160<br>
        <strong>CLABE:</strong> 7289 6900 0143 3179 21</p>
@@ -150,7 +152,8 @@
         `,
         icon: 'success',
         confirmButtonText: 'Aceptar',
-        width: window.innerWidth < 768 ? '90%' : '600px'
+       width: window.innerWidth < 500 ? '90%' : '600px'
+
       }).then(() => {
         window.location.href = 'panel-boletos-rifa.html';
       });
