@@ -1,87 +1,3 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Registro de Boleto</title>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-  <style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f5f5f5;
-  margin: 0; padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh; /* antes decía height: 100vh */
-}
-
-.form-container {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-  width: 95%;
-  max-width: 500px;
-  margin-bottom: 50px; /* nueva línea añadida */
-}
-
-
-
-
-
-    
-    .form-container h2 {
-      text-align: center;
-      color: #333;
-      font-size: 1.2em;
-      margin-top: 0;
-    }
-    .form-container label {
-      display: block;
-      margin-bottom: 10px;
-      font-weight: bold;
-    }
-    .form-container input,
-    .form-container button {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 15px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      font-size: 1em;
-    }
-    .form-container button {
-      background: #004aad;
-      color: white;
-      font-weight: bold;
-      border: none;
-      cursor: pointer;
-    }
-    .form-container button:hover {
-      background: #003080;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="form-container">
-    <h1>Registro de Boleto</h1>
-    <h2 id="boletoTitulo">Boleto #???</h2>
-    <form id="formRegistro">
-      <label>Nombre:
-        <input type="text" name="nombre" id="nombre" required>
-      </label>
-      <label>Teléfono:
-        <input type="text" name="telefono" id="telefono" required>
-      </label>
-      <label>Población:
-        <input type="text" name="poblacion" id="poblacion" placeholder="Población y Estado" required>
-      </label>
-      <button type="submit">Registrar Boleto</button>
-    </form>
-  </div>
-
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -101,6 +17,7 @@ body {
   const params = new URLSearchParams(window.location.search);
   const numBoleto = params.get("boleto") || "???";
   document.getElementById("boletoTitulo").innerText = `Boleto #${numBoleto}`;
+
   document.getElementById("formRegistro").addEventListener("submit", async function(e){
     e.preventDefault();
 
@@ -118,33 +35,30 @@ body {
         fecha: serverTimestamp()
       }, { merge: true });
 
-      <script>
-  document.getElementById("btnGuardar").addEventListener("click", () => {
-    try {
       Swal.fire({
         title: `✅ ¡Boleto #${numBoleto} registrado correctamente!`,
         html: `
-  <div id="swalContent" style="max-width:100%; font-size:1em;">
-    <p>GRACIAS... El sistema te da 4 horas para pagar, y lo pone disponible otra vez, si no se paga.</p>
-    <p>Envía comprobante de pago al WhatsApp <strong>3311571619</strong>.</p>
-    <p><strong>Cuenta Spin OXXO:</strong> 4217 4701 5601 6160<br>
-       <strong>CLABE:</strong> 7289 6900 0143 3179 21</p>
-    <p><em>Tómale captura de pantalla si es necesario.</em></p>
-    <p>Este dato también lo encuentras en la página principal en el botón "Bases del sorteo".</p>
-    <hr>
-    <p>📌 Si pagaste por OXXO, favor de anotar tu nombre con lapicera en el ticket antes de tomarle foto. <br>
-    <b>Si pagaste por transferencia, en concepto solo pon tu nombre</b> o contacta a tu promotor y acuerda si le pagas en efectivo.</p>
-    <p>GRACIAS... Estamos al pendiente de tu respuesta. Acciones nobles como la tuya merecen una recompensa... SUERTE.</p>
-    <div style="text-align:center; margin-top:20px;">
-      <p style="margin-bottom:8px; font-size:1em; color:#28a745; font-weight:bold;">
-        ✅ Avisar que ya aparté mi boleto
-      </p>
-      <a href="https://wa.me/523311571619?text=Hola,%20me%20comunico%20desde%20la%20rifa.%20En%20cuanto%20pueda%20te%20env%C3%ADo%20el%20comprobante%20de%20pago%20de%20mi%20boleto%20n%C3%BAmero%20${numBoleto}.%20%C2%A1Gracias!"
-         target="_blank"
-         style="display:inline-block; background:#25D366; color:white; padding:12px 24px; border-radius:8px; text-decoration:none; font-size:1.1em; font-weight:bold;">
-        📩 GRACIAS
-      </a>
-    </div>`
+<div id="swalContent" style="max-width:100%; font-size:1em;">
+  <p>GRACIAS... El sistema te da 4 horas para pagar, y lo pone disponible otra vez, si no se paga.</p>
+  <p>Envía comprobante de pago al WhatsApp <strong>3311571619</strong>.</p>
+  <p><strong>Cuenta Spin OXXO:</strong> 4217 4701 5601 6160<br>
+     <strong>CLABE:</strong> 7289 6900 0143 3179 21</p>
+  <p><em>Tómale captura de pantalla si es necesario.</em></p>
+  <p>Este dato también lo encuentras en la página principal en el botón "Bases del sorteo".</p>
+  <hr>
+  <p>📌 Si pagaste por OXXO, favor de anotar tu nombre con lapicera en el ticket antes de tomarle foto. <br>
+  <b>Si pagaste por transferencia, en concepto solo pon tu nombre</b> o contacta a tu promotor y acuerda si le pagas en efectivo.</p>
+  <p>GRACIAS... Estamos al pendiente de tu respuesta. Acciones nobles como la tuya merecen una recompensa... SUERTE.</p>
+  <div style="text-align:center; margin-top:20px;">
+    <p style="margin-bottom:8px; font-size:1em; color:#28a745; font-weight:bold;">
+      ✅ Avisar que ya aparté mi boleto
+    </p>
+    <a href="https://wa.me/523311571619?text=Hola,%20me%20comunico%20desde%20la%20rifa.%20En%20cuanto%20pueda%20te%20env%C3%ADo%20el%20comprobante%20de%20pago%20de%20mi%20boleto%20n%C3%BAmero%20${numBoleto}.%20%C2%A1Gracias!"
+       target="_blank"
+       style="display:inline-block; background:#25D366; color:white; padding:12px 24px; border-radius:8px; text-decoration:none; font-size:1.1em; font-weight:bold;">
+      📩 GRACIAS
+    </a>
+  </div>`
       }).then(() => {
         window.location.href = 'panel-boletos-rifa.html';
       });
@@ -153,10 +67,5 @@ body {
       console.error("❌ Error al registrar el boleto:", error);
       alert("Ocurrió un error al registrar el boleto. Intenta nuevamente.");
     }
-  }); <!-- ESTA LÍNEA ES CLAVE ✅ -->
+  });
 </script>
-
-</body>
-</html>
-
-
