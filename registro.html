@@ -122,19 +122,31 @@
       Swal.fire({
         title: `✅ ¡Boleto #${numBoleto} registrado correctamente!`,
         html: `
-          <div id="swalContent">
-          <p>GRACIAS... El sistema te da 4 horas para pagar, y lo pone disponible otra vez si no se paga.</p>
-            <p>Envía comprobante de pago al WhatsApp <strong>3311571619</strong>.</p>
-            <p><strong>Cuenta Spin OXXO:</strong> 4217 4701 5601 6160<br>
-            <strong>CLABE:</strong> 7289 6900 0143 3179 21</p>
-            <p><em>Tómale captura de pantalla.</em></p>
-            <p>Este dato también lo encuentras en la página principal en el botón "Bases del sorteo".</p
-            <hr>
-             <p>📌 si pagaste por oxxo, Favor de anotar tu nombre con lapicera en el ticket antes de tomarle foto <b> Si pagaste por transferencia en concepto solo ponle tu nombre</b> o contacta tu promotor y acuerda si le pagas en efectivo.</p>
-            <p>GRACIAS... Estamos al pendiente de tu respuesta Acciones nobles como la tuya merecen una recompensa ...   SUERTE.</p>
-            <button onclick="guardarCaptura()" style="margin-top:10px;padding:10px 20px;border:none;background:#004aad;color:white;border-radius:5px;cursor:pointer;">📥 Guardar captura aquí</button>
-            <div id="capturaResultado" style="margin-top:10px;"></div>
-          </div>
+  <div id="swalContent" style="max-width:100%; font-size:1em;">
+    <p>GRACIAS... El sistema te da 4 horas para pagar, y lo pone disponible otra vez si no se paga.</p>
+    <p>Envía comprobante de pago al WhatsApp <strong>3311571619</strong>.</p>
+    <p><strong>Cuenta Spin OXXO:</strong> 4217 4701 5601 6160<br>
+       <strong>CLABE:</strong> 7289 6900 0143 3179 21</p>
+    <p><em>Tómale captura de pantalla.</em></p>
+    <p>Este dato también lo encuentras en la página principal en el botón "Bases del sorteo".</p>
+    <hr>
+    <p>📌 si pagaste por oxxo, Favor de anotar tu nombre con lapicera en el ticket antes de tomarle foto 
+    <b>Si pagaste por transferencia en concepto solo ponle tu nombre</b> o contacta tu promotor y acuerda si le pagas en efectivo.</p>
+    <p>GRACIAS... Estamos al pendiente de tu respuesta. Acciones nobles como la tuya merecen una recompensa ... SUERTE.</p>
+
+    <button onclick="guardarCaptura()" style="margin-top:10px;padding:10px 20px;border:none;background:#004aad;color:white;border-radius:5px;cursor:pointer;">
+      📥 Guardar captura aquí
+    </button>
+    <div id="capturaResultado" style="margin-top:10px;"></div>
+
+    <!-- COMERCIAL -->
+    <p style="margin-top:20px; font-size: 1em; color:#004aad; font-weight:bold;">
+      🔵 ¿Quieres organizar tu propia rifa?
+      <a href="https://www.facebook.com/share/p/1Aab5eZNMF/" target="_blank" style="color:#004aad; text-decoration:underline;">
+        Visítanos aquí en Facebook
+      </a>
+    </p>
+  </div>
         `,
         icon: 'success',
         confirmButtonText: 'Aceptar',
