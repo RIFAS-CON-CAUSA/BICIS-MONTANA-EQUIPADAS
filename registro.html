@@ -118,7 +118,9 @@ body {
         fecha: serverTimestamp()
       }, { merge: true });
 
-      // Mostramos Swal con instrucción y botón de captura
+      <script>
+  document.getElementById("btnGuardar").addEventListener("click", () => {
+    try {
       Swal.fire({
         title: `✅ ¡Boleto #${numBoleto} registrado correctamente!`,
         html: `
@@ -127,32 +129,33 @@ body {
     <p>Envía comprobante de pago al WhatsApp <strong>3311571619</strong>.</p>
     <p><strong>Cuenta Spin OXXO:</strong> 4217 4701 5601 6160<br>
        <strong>CLABE:</strong> 7289 6900 0143 3179 21</p>
-    <p><em>Tómale captura de pantalla.</em></p>
+    <p><em>Tómale captura de pantalla si es necesario.</em></p>
     <p>Este dato también lo encuentras en la página principal en el botón "Bases del sorteo".</p>
     <hr>
-    <p>📌 si pagaste por oxxo, Favor de anotar tu nombre con lapicera en el ticket antes de tomarle foto 
-    <b>Si pagaste por transferencia en concepto solo ponle tu nombre</b> o contacta tu promotor y acuerda si le pagas en efectivo.</p>
-    <p>GRACIAS... Estamos al pendiente de tu respuesta. Acciones nobles como la tuya merecen una recompensa ... SUERTE.</p>
-<!-- Botón WhatsApp para móviles -->
-<div style="text-align:center; margin-top:20px;">
-  <p style="margin-bottom:8px; font-size:1em; color:#28a745; font-weight:bold;">
-    ✅ Avisar que ya aparté mi boleto
-  </p>
-  <a href="https://wa.me/523311571619?text=Hola,%20me%20comunico%20desde%20la%20rifa.%20En%20cuanto%20pueda%20te%20env%C3%ADo%20el%20comprobante%20de%20pago%20de%20mi%20boleto%20n%C3%BAmero%20${numBoleto}.%20%C2%A1Gracias!"
-     target="_blank"
-     style="display:inline-block; background:#25D366; color:white; padding:12px 24px; border-radius:8px; text-decoration:none; font-size:1.1em; font-weight:bold;">
-    📩 GRACIAS
-  </a>
-</div> 
+    <p>📌 Si pagaste por OXXO, favor de anotar tu nombre con lapicera en el ticket antes de tomarle foto. <br>
+    <b>Si pagaste por transferencia, en concepto solo pon tu nombre</b> o contacta a tu promotor y acuerda si le pagas en efectivo.</p>
+    <p>GRACIAS... Estamos al pendiente de tu respuesta. Acciones nobles como la tuya merecen una recompensa... SUERTE.</p>
+    <div style="text-align:center; margin-top:20px;">
+      <p style="margin-bottom:8px; font-size:1em; color:#28a745; font-weight:bold;">
+        ✅ Avisar que ya aparté mi boleto
+      </p>
+      <a href="https://wa.me/523311571619?text=Hola,%20me%20comunico%20desde%20la%20rifa.%20En%20cuanto%20pueda%20te%20env%C3%ADo%20el%20comprobante%20de%20pago%20de%20mi%20boleto%20n%C3%BAmero%20${numBoleto}.%20%C2%A1Gracias!"
+         target="_blank"
+         style="display:inline-block; background:#25D366; color:white; padding:12px 24px; border-radius:8px; text-decoration:none; font-size:1.1em; font-weight:bold;">
+        📩 GRACIAS
+      </a>
+    </div>`
       }).then(() => {
         window.location.href = 'panel-boletos-rifa.html';
       });
 
     } catch (error) {
-  console.error("❌ Error al registrar el boleto:", error);
-  alert("Ocurrió un error al registrar el boleto. Intenta nuevamente.");
-}
+      console.error("❌ Error al registrar el boleto:", error);
+      alert("Ocurrió un error al registrar el boleto. Intenta nuevamente.");
+    }
   });
 </script>
+
 </body>
 </html>
+
