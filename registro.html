@@ -6,31 +6,29 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
   <style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f5f5f5;
-  margin: 0; padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh; /* antes decía height: 100vh */
-}
-
-.form-container {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-  width: 95%;
-  max-width: 500px;
-  margin-bottom: 50px; /* nueva línea añadida */
-}
-
-
-
-
-
-    
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0; padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .form-container {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      width: 95%;
+      max-width: 500px;
+    }
+    .form-container h1 {
+      text-align: center;
+      color: #004aad;
+      font-size: 1.5em;
+      margin-bottom: 10px;
+    }
     .form-container h2 {
       text-align: center;
       color: #333;
@@ -125,7 +123,7 @@ body {
         title: `✅ ¡Boleto #${numBoleto} registrado correctamente!`,
         html: `
   <div id="swalContent" style="max-width:100%; font-size:1em;">
-    <p>GRACIAS... El sistema te da 4 horas para pagar, y lo pone disponible otra vez, si no se paga.</p>
+    <p>GRACIAS... El sistema te da 4 horas para pagar, y lo pone disponible otra vez si no se paga.</p>
     <p>Envía comprobante de pago al WhatsApp <strong>3311571619</strong>.</p>
     <p><strong>Cuenta Spin OXXO:</strong> 4217 4701 5601 6160<br>
        <strong>CLABE:</strong> 7289 6900 0143 3179 21</p>
@@ -135,18 +133,24 @@ body {
     <p>📌 si pagaste por oxxo, Favor de anotar tu nombre con lapicera en el ticket antes de tomarle foto 
     <b>Si pagaste por transferencia en concepto solo ponle tu nombre</b> o contacta tu promotor y acuerda si le pagas en efectivo.</p>
     <p>GRACIAS... Estamos al pendiente de tu respuesta. Acciones nobles como la tuya merecen una recompensa ... SUERTE.</p>
-<!-- Botón WhatsApp para móviles -->
-<div style="text-align:center; margin-top:20px;">
-  <p style="margin-bottom:8px; font-size:1em; color:#28a745; font-weight:bold;">
-    ✅ Avisar que ya aparté mi boleto
-  </p>
-  <a href="https://wa.me/523311571619?text=Hola,%20me%20comunico%20desde%20la%20rifa.%20En%20cuanto%20pueda%20te%20env%C3%ADo%20el%20comprobante%20de%20pago%20de%20mi%20boleto%20n%C3%BAmero%20${numBoleto}.%20%C2%A1Gracias!"
-     target="_blank"
-     style="display:inline-block; background:#25D366; color:white; padding:12px 24px; border-radius:8px; text-decoration:none; font-size:1.1em; font-weight:bold;">
-    📩 GRACIAS
-  </a>
-</div>
-        
+
+    <button onclick="guardarCaptura()" style="margin-top:10px;padding:10px 20px;border:none;background:#004aad;color:white;border-radius:5px;cursor:pointer;">
+      📥 Guardar captura aquí
+    </button>
+    <div id="capturaResultado" style="margin-top:10px;"></div>
+
+    <!-- COMERCIAL -->
+    <p style="margin-top:20px; font-size: 1em; color:#004aad; font-weight:bold;">
+      🔵 ¿Quieres organizar tu propia rifa? Te hacemos tu panel a nivel profesional muy seguro, accesible, facil y economico.
+      <a href="https://www.facebook.com/share/p/1Aab5eZNMF/" target="_blank" style="color:#004aad; text-decoration:underline;">
+        Visítanos aquí en Facebook
+      </a>
+    </p>
+  </div>
+        `,
+        icon: 'success',
+        confirmButtonText: 'Aceptar',
+        width: window.innerWidth < 768 ? '90%' : '600px'
       }).then(() => {
         window.location.href = 'panel-boletos-rifa.html';
       });
