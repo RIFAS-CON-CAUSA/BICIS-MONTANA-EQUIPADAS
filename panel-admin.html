@@ -172,7 +172,14 @@ try {
 await uploadBytes(storageRef, archivo);
 const url = await getDownloadURL(storageRef);
 await updateDoc(doc(db, "BoletosRifa", id), { comprobanteUrl: url });
-alert("✅ Comprobante subido correctamente.");
+Swal.fire({
+  icon: 'success',
+  title: '¡Comprobante subido!',
+  text: 'El archivo fue guardado y vinculado correctamente.',
+  timer: 1800,
+  showConfirmButton: false
+});
+
 await cargarBoletos();
  document.getElementById("btnWhatsapp").style.display = "none";
 document.getElementById("celda-" + id).style.backgroundColor = ""; 
