@@ -128,7 +128,8 @@ datosBoletos.forEach(b => {
     <select id="forma-${b.id}" style="margin-bottom:5px;" onchange="cambiarFormaPago('${b.id}', this.value)">
       <option disabled>🧾 Elige forma de pago...</option>
       ${opcionesFormaPago.map(op => `
-        <option value="${op}" ${b.formaPago === op ? "selected" : ""}>${op}</option>
+      <option value="${op}" ${b.formaPago?.toLowerCase() === op.toLowerCase() ? "selected" : ""}>${op}</option>
+
       `).join("")}
     </select>
   `;
