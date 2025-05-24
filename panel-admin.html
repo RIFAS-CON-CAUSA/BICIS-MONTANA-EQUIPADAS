@@ -123,6 +123,30 @@
   }
 };
 
+    function generarBoleto(nombre, poblacion, folio, oportunidades = [], telefono = "") {
+  const boletoDiv = document.createElement("div");
+  boletoDiv.style = "width: 300px; padding: 15px; border: 2px dashed #333; font-family: Arial; text-align: center; background: #fefefe;";
+  boletoDiv.innerHTML = `
+    <h3>🎟️ Boleto Digital</h3>
+    <p><strong>Nombre:</strong> ${nombre}</p>
+    <p><strong>Población:</strong> ${poblacion}</p>
+    <p><strong>Folio:</strong> ${folio}</p>
+    <p><strong>Oportunidades:</strong><br>${oportunidades.join(" | ")}</p>
+    <small style="font-size: 0.75em;">Gracias por apoyar la causa 🙌</small>
+  `;
+
+  document.body.appendChild(boletoDiv);
+
+  html2canvas(boletoDiv).then(canvas => {
+    const link = document.createElement("a");
+    link.href = canvas.toDataURL();
+    link.download = `boleto-${folio}.png`;
+    link.click();
+    boletoDiv.remove();
+  });
+}
+
+
   </script>
 </body>
 </html>
