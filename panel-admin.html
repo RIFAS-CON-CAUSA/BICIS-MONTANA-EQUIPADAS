@@ -66,20 +66,60 @@
       const tbody = document.querySelector("#tablaBoletos tbody");
       tbody.innerHTML = "";
 
-      datosBoletos.forEach(b => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${b.boleto || ""}</td>
-          <td>${b.nombre || ""}</td>
-          <td>${b.telefono || ""}</td>
-          <td>${b.estado || ""}</td>
-          <td>${b.fecha ? new Date(b.fecha.seconds * 1000).toLocaleString().slice(0,16) : ""}</td>
-        `;
+     datosBoletos.forEach(b => {
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td>${b.boleto || ""}</td>
+    <td>${b.nombre || ""}</td>
+    <td>${b.telefono || ""}</td>
+    <td>
+      <select id="estado-${b.id}">
+        <option value="">🔄 Estado...</option>
+        <option value="libre" ${b.estado === "libre" ? "selected" : ""}>Libre</option>
+        <option value="apartado" ${b.estado === "apartado" ? "selected" : ""}>Apartado</option>
+        <option value="pagado" ${b.estado === "pagado" ? "selected" : ""}>Pagado</option>
+      </select>
+    </td>
+    <td>
+      <select id="forma-${b.id}">
+        <option value="">🧾 Forma pago...</option>
+        <option value="Efectivo" ${b.formaPago === "Efectivo" ? "selected" : ""}>Efectivo</option>
+        <option value="Transferencia o deposito Spin OXXO 6160" ${b.formaPago === "Transferencia o deposito Spin OXXO 6160" ? "selected" : ""}>Transferencia SPIN OXXO</option>
+        <option value="Otro" ${b.formaPago === "Otro" ? "selected" : ""}>Otro</option>
+      </select>
+    </td>
+    <td><button onclick="guardarAccion('${b.id}')">💾 Guardar</button></td>
+  `;
+  tbody.appendChild(row);
+});
+
         tbody.appendChild(row);
       });
     }
 
     cargarBoletos();
+    window.guardarAccion = async function(id) {
+  const forma = document.getElementById(`forma-${id}`).value;
+  const estado = document.getElementById(`estado-${id}`).value;
+
+  if (!forma || !estado) {
+    alert("⚠️ Selecciona forma de pago y estado antes de guardar.");
+    return;
+  }
+
+  try {
+    await updateDoc(doc(db, "BoletosRifa", id), {
+      formaPago: forma,
+      estado: estado
+    });
+    alert("✅ Guardado correctamente.");
+    cargarBoletos();
+  } catch (error) {
+    console.error("Error al guardar:", error);
+    alert("❌ Ocurrió un error al guardar.");
+  }
+};
+
   </script>
 </body>
 </html>
