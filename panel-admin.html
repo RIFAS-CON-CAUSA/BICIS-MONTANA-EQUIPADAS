@@ -124,24 +124,21 @@ datosBoletos.forEach(b => {
       ? "style='background:#f1c40f;'"
       : "style='background:#2ecc71; color:white'");
 
-  const selectForma = `
-    <select id="forma-${b.id}" style="margin-bottom:5px;" onchange="cambiarFormaPago('${b.id}', this.value)">
-      <option disabled>🧾 Elige forma de pago...</option>
-      ${opcionesFormaPago.map(op => `
+ <td>
+  <select id="forma-${b.id}" style="margin-bottom:5px;" onchange="guardarAccion('${b.id}')">
+    <option disabled ${!b.formaPago ? "selected" : ""} style="color:#888;">🧾 Elige forma de pago...</option>
+    ${opcionesFormaPago.map(op => `
       <option value="${op}" ${b.formaPago?.toLowerCase() === op.toLowerCase() ? "selected" : ""}>${op}</option>
+    `).join("")}
+  </select><br>
+  <select id="estado-${b.id}" onchange="guardarAccion('${b.id}')">
+    <option disabled ${!b.estado ? "selected" : ""} style="color:#888;">🔄 Cambiar el status del boleto...</option>
+    <option value="libre" ${b.estado === "libre" ? "selected" : ""}>Libre</option>
+    <option value="apartado" ${b.estado === "apartado" ? "selected" : ""}>Apartado</option>
+    <option value="pagado" ${b.estado === "pagado" ? "selected" : ""}>Pagado</option>
+  </select>
+</td>
 
-      `).join("")}
-    </select>
-  `;
-
-  const selectEstado = `
-    <select id="estado-${b.id}" onchange="cambiarEstado('${b.id}', this.value)">
-      <option disabled>🔄 Cambiar status del boleto...</option>
-      <option value="libre" ${b.estado === "libre" ? "selected" : ""}>Libre</option>
-      <option value="apartado" ${b.estado === "apartado" ? "selected" : ""}>Apartado</option>
-      <option value="pagado" ${b.estado === "pagado" ? "selected" : ""}>Pagado</option>
-    </select>
-  `;
 
   tbody.innerHTML += `
     <tr ${rowColor}>
@@ -459,6 +456,43 @@ const contador = document.getElementById("contadorActualizacion");
 let alarmaReproducida = false;
 
 const audio = new Audio("https://notificationsounds.com/storage/sounds/file-sounds-1157-pristine.mp3");
+
+ async function guardarAccion(id) {
+  const forma = document.getElementById(`forma-${id}`).value;
+  const estado = document.getElementById(`estado-${id}`).value;
+
+  if (!forma || !estado || forma === "🧾 Elige forma de pago..." || estado === "🔄 Cambiar el status del boleto...") {
+    Swal.fire({
+      icon: 'warning',
+      text: 'Debes seleccionar tanto forma de pago como estado.',
+      timer: 2000,
+      showConfirmButton: false
+    });
+    return;
+  }
+
+  try {
+   await setDoc(doc(db, "BoletosRifa", id), {
+  formaPago: forma,
+  estado: estado,
+  modificadoPor: rolActivo
+}, { merge: true });
+
+
+    Swal.fire({
+      icon: 'success',
+      title: '¡Actualizado!',
+      text: 'Forma de pago y estado guardados correctamente.',
+      timer: 1800,
+      showConfirmButton: false
+    });
+
+    cargarBoletos();
+  } catch (error) {
+    console.error("❌ Error al guardar acción combinada:", error);
+    alert("Error al guardar los cambios. Intenta de nuevo.");
+  }
+}
 
 </script>
 
