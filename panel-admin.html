@@ -117,6 +117,8 @@ async function cargarBoletos() {
   datosBoletos = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   const tbody = document.querySelector("#tablaBoletos tbody");
 
+
+ 
 const rowColor =
   b.estado === "pagado"
     ? "style='background:#e74c3c; color:white'"
