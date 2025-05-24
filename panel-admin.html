@@ -108,116 +108,80 @@
       return;
     }
 
-  try {
-  await updateDoc(doc(db, "BoletosRifa", id), {
-    formaPago: forma,
-    estado: estado,
-    modificadoPor: rolActivo,
-    fecha: serverTimestamp()
-  });
+ <script>
+  async function actualizarEstado(id, forma, estado, rolActivo, datosBoletos) {
+    try {
+      await updateDoc(doc(db, "BoletosRifa", id), {
+        formaPago: forma,
+        estado: estado,
+        modificadoPor: rolActivo,
+        fecha: serverTimestamp()
+      });
 
-  const b = datosBoletos.find(b => b.id === id);
-  if (estado === "pagado" && b) {
-    const oportunidades = Array.isArray(b.series) ? b.series.slice(0, 10) : [];
-    generarBoleto(
-      b.nombre || "Participante",
-      b.poblacion || "",
-      b.boleto || "000",
-      oportunidades,
-      b.telefono || ""
-    );
+      const b = datosBoletos.find(b => b.id === id);
+      if (estado === "pagado" && b) {
+        const oportunidades = Array.isArray(b.series) ? b.series.slice(0, 10) : [];
+        generarBoleto(
+          b.nombre || "Participante",
+          b.poblacion || "",
+          b.boleto || "000",
+          oportunidades,
+          b.telefono || ""
+        );
 
-    const mensaje = "📩 ¡Gracias por apoyar la causa! Aquí tienes tu boleto #" + b.boleto +
-      " de la rifa de bicicletas.\n\n✅ Participas con 10 oportunidades.\n\nMás información en: https://rifas-con-causa.github.io/BICIS-MONTANA-EQUIPADAS/index.html";
+        const mensaje = "📩 ¡Gracias por apoyar la causa! Aquí tienes tu boleto #" + b.boleto +
+          " de la rifa de bicicletas.\n\n✅ Participas con 10 oportunidades.\n\nMás información en: https://rifas-con-causa.github.io/BICIS-MONTANA-EQUIPADAS/index.html";
 
-    const numeroLimpio = (b.telefono || "").replace(/\D/g, "");
-    if (numeroLimpio.length >= 10) {
-      const waURL = `https://wa.me/52${numeroLimpio}?text=${encodeURIComponent(mensaje)}`;
-      window.open(waURL, "_blank");
-    } else {
-      console.warn("📵 Teléfono no válido para WhatsApp:", b.telefono);
+        const numeroLimpio = (b.telefono || "").replace(/\D/g, "");
+        if (numeroLimpio.length >= 10) {
+          const waURL = `https://wa.me/52${numeroLimpio}?text=${encodeURIComponent(mensaje)}`;
+          window.open(waURL, "_blank");
+        } else {
+          console.warn("📵 Teléfono no válido para WhatsApp:", b.telefono);
+        }
+      }
+
+      alert("✅ Guardado correctamente.");
+      cargarBoletos();
+    } catch (error) {
+      console.error("❌ Error al guardar:", error);
+      alert("❌ Ocurrió un error al guardar.");
     }
   }
 
-  alert("✅ Guardado correctamente.");
-  cargarBoletos();
-} catch (error) {
-  console.error("❌ Error al guardar:", error);
-  alert("❌ Ocurrió un error al guardar.");
-}
+  function generarBoleto(nombre, poblacion, folio, oportunidades, telefono) {
+    const div = document.createElement("div");
+    div.id = "boletoRecibo";
+    div.style = `
+      width: 300px;
+      padding: 20px;
+      border: 2px solid #000;
+      border-radius: 10px;
+      background: #f8f9fa;
+      font-family: Arial;
+      color: #333;
+      text-align: center;
+    `;
 
+    div.innerHTML = `
+      <h2 style="margin-bottom: 10px;">🎟️ Boleto de Rifa</h2>
+      <p><strong>Nombre:</strong> ${nombre}</p>
+      <p><strong>Población:</strong> ${poblacion}</p>
+      <p><strong>Folio:</strong> ${folio}</p>
+      <p><strong>Oportunidades:</strong><br>${oportunidades.join(", ")}</p>
+      <p style="margin-top:15px; font-weight: bold;">¡Gracias por apoyar la causa!</p>
+    `;
 
-  cargarBoletos();
+    document.body.appendChild(div);
 
-
-function generarBoleto(nombre, poblacion, folio, oportunidades, telefono) {
-  // Crear elemento temporal
-  const div = document.createElement("div");
-  div.id = "boletoRecibo";
-  div.style = `
-    width: 300px;
-    padding: 20px;
-    border: 2px solid #000;
-    text-align: center;
-    font-family: Arial;
-    background: #f8f9fa;
-  `;
-  div.innerHTML = `
-    <h3>🎟️ Boleto de Rifa</h3>
-    <p><strong>Nombre:</strong> ${nombre}</p>
-    <p><strong>Población:</strong> ${poblacion}</p>
-    <p><strong>Folio:</strong> ${folio}</p>
-    <p><strong>Oportunidades:</strong><br>${oportunidades.join(", ")}</p>
-    <p style="margin-top:15px;">¡Gracias por apoyar la causa!</p>
-  `;
-  document.body.appendChild(div);
-
-  html2canvas(div).then(canvas => {
-    const link = document.createElement("a");
-    link.download = `BOLETO-${folio}.png`;
-    link.href = canvas.toDataURL();
-    link.click();
-    document.body.removeChild(div);
-  });
-}
-
-
-function generarBoleto(nombre, poblacion, folio, oportunidades, telefono) {
-  // Crear div temporal del recibo
-  const div = document.createElement("div");
-  div.id = "boletoRecibo";
-  div.style = `
-    width: 300px;
-    padding: 20px;
-    border: 2px solid #000;
-    border-radius: 10px;
-    background: #f8f9fa;
-    font-family: Arial;
-    color: #333;
-    text-align: center;
-  `;
-
-  div.innerHTML = `
-    <h2 style="margin-bottom: 10px;">🎟️ Boleto de Rifa</h2>
-    <p><strong>Nombre:</strong> ${nombre}</p>
-    <p><strong>Población:</strong> ${poblacion}</p>
-    <p><strong>Folio:</strong> ${folio}</p>
-    <p><strong>Oportunidades:</strong><br>${oportunidades.join(", ")}</p>
-    <p style="margin-top:15px; font-weight: bold;">¡Gracias por apoyar la causa!</p>
-  `;
-
-  document.body.appendChild(div);
-
-  html2canvas(div).then(canvas => {
-    const link = document.createElement("a");
-    link.download = `BOLETO-${folio}.png`;
-    link.href = canvas.toDataURL();
-    link.click();
-    document.body.removeChild(div);
-  });
+    html2canvas(div).then(canvas => {
+      const link = document.createElement("a");
+      link.download = `BOLETO-${folio}.png`;
+      link.href = canvas.toDataURL();
+      link.click();
+      document.body.removeChild(div);
+    });
   }
 </script>
 </body>
 </html>
-
-
