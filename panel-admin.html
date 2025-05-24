@@ -452,6 +452,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
+// Configuración Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
   authDomain: "rifas-con-causa.firebaseapp.com",
@@ -465,6 +466,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
+// Variables globales
 window.archivoSeleccionado = {};
 let rolActivo = "";
 let datosBoletos = [];
@@ -481,7 +483,8 @@ const opcionesFormaPago = [
 
 const audio = new Audio("https://notificationsounds.com/storage/sounds/file-sounds-1157-pristine.mp3");
 
-async function guardarAccion(id) {
+// ✅ FUNCION PARA GUARDAR FORMA Y ESTADO
+window.guardarAccion = async function(id) {
   const formaSelect = document.getElementById(`forma-${id}`);
   const estadoSelect = document.getElementById(`estado-${id}`);
   const nuevaForma = formaSelect?.value || "";
@@ -503,6 +506,7 @@ async function guardarAccion(id) {
       estado: nuevoEstado,
       modificadoPor: rolActivo || "admin"
     });
+
     Swal.fire({
       icon: "success",
       title: "✅ Actualizado",
@@ -510,12 +514,13 @@ async function guardarAccion(id) {
       timer: 1500,
       showConfirmButton: false
     });
-    cargarBoletos();
+
+    cargarBoletos(); // para refrescar visual
   } catch (error) {
     console.error("❌ Error al guardar acción:", error);
     alert("Ocurrió un error al guardar los cambios.");
   }
-}
+};
 </script>
 </body>
 </html>
