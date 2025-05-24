@@ -66,36 +66,37 @@
       const tbody = document.querySelector("#tablaBoletos tbody");
       tbody.innerHTML = "";
 
-     datosBoletos.forEach(b => {
+    datosBoletos.forEach(b => {
   const row = document.createElement("tr");
   row.innerHTML = `
-    <td>${b.boleto || ""}</td>
+    <td>${b.boleto}</td>
     <td>${b.nombre || ""}</td>
     <td>${b.telefono || ""}</td>
+    <td>${b.estado || ""}</td>
+    <td>${b.fecha ? new Date(b.fecha.seconds * 1000).toLocaleString().slice(0, 16) : ""}</td>
+    <td>
+      <select id="forma-${b.id}">
+        <option disabled ${!b.formaPago ? "selected" : ""}>🧾 Elige forma de pago...</option>
+        <option value="Efectivo" ${b.formaPago === "Efectivo" ? "selected" : ""}>Efectivo</option>
+        <option value="Transferencia o deposito Spin OXXO 6160" ${b.formaPago === "Transferencia o deposito Spin OXXO 6160" ? "selected" : ""}>Transferencia o deposito Spin OXXO 6160</option>
+        <option value="Otro" ${b.formaPago === "Otro" ? "selected" : ""}>Otro</option>
+      </select>
+    </td>
     <td>
       <select id="estado-${b.id}">
-        <option value="">🔄 Estado...</option>
+        <option disabled ${!b.estado ? "selected" : ""}>🔄 Cambiar el status del boleto...</option>
         <option value="libre" ${b.estado === "libre" ? "selected" : ""}>Libre</option>
         <option value="apartado" ${b.estado === "apartado" ? "selected" : ""}>Apartado</option>
         <option value="pagado" ${b.estado === "pagado" ? "selected" : ""}>Pagado</option>
       </select>
     </td>
     <td>
-      <select id="forma-${b.id}">
-        <option value="">🧾 Forma pago...</option>
-        <option value="Efectivo" ${b.formaPago === "Efectivo" ? "selected" : ""}>Efectivo</option>
-        <option value="Transferencia o deposito Spin OXXO 6160" ${b.formaPago === "Transferencia o deposito Spin OXXO 6160" ? "selected" : ""}>Transferencia SPIN OXXO</option>
-        <option value="Otro" ${b.formaPago === "Otro" ? "selected" : ""}>Otro</option>
-      </select>
+      <button onclick="guardarAccion('${b.id}')">💾 Guardar</button>
     </td>
-    <td><button onclick="guardarAccion('${b.id}')">💾 Guardar</button></td>
   `;
   tbody.appendChild(row);
 });
 
-        tbody.appendChild(row);
-      });
-    }
 
     cargarBoletos();
     window.guardarAccion = async function(id) {
