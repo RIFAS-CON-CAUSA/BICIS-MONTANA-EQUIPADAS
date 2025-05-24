@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<title>Panel Admin - Rifas con Causa</title>
+ <style>
+#contadorActualizacion {
+  position: fixed;
+  top: 10px;
+  right: 20px;
+  background: #e0f7fa;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #00796b;
+  z-index: 9999;
+  display: none;
+}
+</style>
+
+<link href="favicon.ico" rel="icon" type="image/x-icon"/>
+ <style>
+#contadorActualizacion {
+  position: fixed;
+  top: 10px;
+  right: 20px;
+  background: #def7fa;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #08796b;
+  z-index: 9999;
+  display: none;
+  transition: background 0.3s, color 0.3s;
+}
+#contadorActualizacion.alarma {
+  background: #ff4d4d;
+  color: white;
+}
+</style>
+
+</head>
+<body>
+ <div id="contadorActualizacion">Actualización en: 40s</div>
+
+<h1 id="tituloPanel">Panel de Control</h1>
+<p style="font-size: 0.95em; margin-top: -10px; margin-bottom: 20px; line-height: 1.4; color: #333;">
+⚠️ <strong>INSTRUCCIONES IMPORTANTES PARA LOS ROLES:</strong><br/>
+• Toma en cuenta que al cambiar un estado a <strong>"PAGADO"</strong>, <u>ya no podrás devolverlo a otro estado</u>.<br/>
+• Deberás comunicarte con el <strong>ADMIN</strong> para que realice la corrección si fue un error.<br/>
+• Y recuerda que si el cliente paga por <strong>transf. o deposito a la cuenta del admin</strong>,<br/>
+el cambio de estado <u>debe hacerlo el ADMIN</u>,<br/>
+ya que ese monto no entrará a tu cuenta de ingresos.
+</p>
+<button class="solo-admin" onclick="exportarExcel()" style="margin-top: 15px; display: none;">
+📥 Exportar a Excel
+</button><div class="solo-admin" style="margin-top: 10px; display: none;">
+<label for="precioUnitario"><strong>💰 Precio unitario por boleto:</strong></label>
+<input id="precioUnitario" min="0" step="1" style="width: 100px;" type="number" value="0"/>
+</div><table border="1" id="tablaBoletos">
+<thead>
+<tr>
+<th>Boleto</th>
+<th>Nombre</th>
+<th>Teléfono</th>
+<th>Población</th>
+<th>Estado</th>
+<th>Fecha</th>
+<th>Modificado por</th>
+<th>Forma Pago</th>
+<th>Acción</th>
+<th>Comprobante</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+ <!-- Espacio extra para margen inferior -->
+<div style="height: 60px;"></div>
+
+<script type="module">
+if (!location.origin.includes("https://rifas-con-causa.github.io")) {
+alert("⚠️ Estás abriendo este archivo fuera del entorno web oficial. Algunas funciones como subida de archivos no funcionarán correctamente.\n\nPor favor, accede desde:\nhttps://rifas-con-causa.github.io/BICIS-MONTANA-EQUIPADAS/panel-admin.html");
+}
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import * as XLSX from "https://cdn.sheetjs.com/xlsx-0.20.0/package/xlsx.mjs";
+const firebaseConfig = {
+apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
+authDomain: "rifas-con-causa.firebaseapp.com",
+projectId: "rifas-con-causa",
+storageBucket: "rifas-con-causa.firebasestorage.app",
+
+messagingSenderId: "347417635634",
+appId: "1:347417635634:web:3ddab8921d26707910452b"
+};
+ 
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage();
+ 
+window.archivoSeleccionado = {};
+let rolActivo = "";
+let datosBoletos = [];
+const cuentasOficiales = [
+"Transferencia o deposito Spin OXXO 6160"
+];
+const opcionesFormaPago = [
+"Efectivo",
+...cuentasOficiales,
+"Otro"
+];
+async function cargarBoletos() {
+  const querySnapshot = await getDocs(collection(db, "BoletosRifa"));
+  datosBoletos = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  const tbody = document.querySelector("#tablaBoletos tbody");
+tbody.innerHTML = "";
+datosBoletos.forEach(b => {
+  const rowColor = b.estado === "pagado"
+    ? "style='background:#e74c3c; color:white'"
+    : (b.estado === "apartado"
+      ? "style='background:#f1c40f;'"
+      : "style='background:#2ecc71; color:white'");
+
+  tbody.innerHTML += `
+    <tr ${rowColor}>
+      <td>${b.boleto}</td>
+      <td>${b.nombre}</td>
+      <td>${b.telefono}</td>
+      <td>${b.poblacion}</td>
+      <td>${b.estado}</td>
+      <td>${b.fecha ? new Date(b.fecha.seconds * 1000).toLocaleString().slice(0, 16) : ""}</td>
+      <td>${b.modificadoPor || ""}</td>
+      <td>${b.formaPago || ""}</td>
+      <td>
+        <select id="forma-${b.id}" style="margin-bottom:5px;">
+          <option disabled selected>🧾 Elige forma de pago...</option>
+          ${opcionesFormaPago.map(op => `<option value="${op}">${op}</option>`).join("")}
+        </select><br>
+        <select id="estado-${b.id}" onchange="cambiarEstado('${b.id}', this.value)">
+          <option disabled selected>🔄 Cambiar status del boleto...</option>
+          <option value="libre">Libre</option>
+          <option value="apartado">Apartado</option>
+          <option value="pagado">Pagado</option>
+        </select>
+      </td>
+     <td id="celda-${b.id}">
+  <label for="file-${b.id}" style="cursor:pointer; background:#2980b9; color:white; padding:4px 8px; border-radius:4px; display:inline-block; font-size:0.85em;">📎 Subir comprobante</label>
+  console.error("❌ Error al subir comprobante:", error);
+alert("Error al subir comprobante.");
+}
+}
+// 🔁 Parche: Control de roles y reseteo visual al fallar
+window.cambiarEstado = async function (id, nuevoEstado) {
+  const boletoOriginal = datosBoletos.find(b => b.id === id);
+  if (!boletoOriginal) return alert("⚠️ No se encontró el boleto.");
+
+  // ❌ Bloquear cambio si ya estaba pagado y no es admin
+  if (boletoOriginal.estado === "pagado" && rolActivo !== "admin") {
+    return alert("🚫 Solo el ADMIN puede cambiar un boleto pagado a otro estado.");
+  }
+
+  // 🧾 Validar forma de pago seleccionada
+  const formaPagoSeleccionada = document.getElementById(`forma-${id}`)?.value || "";
+
+  if (nuevoEstado === "pagado") {
+    if (!formaPagoSeleccionada || formaPagoSeleccionada.includes("forma de pago")) {
+      return alert("⚠️ Selecciona primero una forma de pago antes de marcar como pagado.");
+    }
+
+    if (cuentasOficiales.includes(formaPagoSeleccionada) && rolActivo !== "admin") {
+      return alert("🚫 No puedes marcar como PAGADO si el pago fue a una cuenta oficial. Solo el ADMIN puede hacerlo.");
+    }
+  }
+
+  const formaPago = formaPagoSeleccionada || prompt("Forma de pago (Efectivo, etc):") || "No especificado";
+
+  try {
+    await updateDoc(doc(db, "BoletosRifa", id), {
+      estado: nuevoEstado,
+      modificadoPor: rolActivo,
+      formaPago: formaPago,
+      fecha: serverTimestamp()
+    });
+    alert("✅ Estado actualizado correctamente por: " + rolActivo);
+    await cargarBoletos();
+   const b = datosBoletos.find(b => b.id === id);
+   
+if (nuevoEstado === "pagado" && b) {
+ const oportunidades = Array.isArray(b.series) ? b.series.slice(0, 10) : [];
+generarBoleto(b.nombre || "Participante", b.poblacion || "", b.boleto || "000", oportunidades, b.telefono || "");
+   // WhatsApp link directo al número del participante
+  const mensaje = "📩 ¡Gracias por apoyar la causa! Aquí tienes tu boleto #" + b.boleto + " de la rifa de bicicletas.\n\n✅ Participas con 10 oportunidades.\n\nMás información en: https://rifas-con-causa.github.io/BICIS-MONTANA-EQUIPADAS/index.html";
+  const numeroLimpio = (b.telefono || "").replace(/\D/g, "");
+  if (numeroLimpio.length >= 10) {
+    const waURL = `https://wa.me/52${numeroLimpio}?text=${encodeURIComponent(mensaje)}`;
+  
+   
+  } else {
+    console.warn("📵 Teléfono no válido para WhatsApp:", b.telefono);
+  }
+
+}
+
+  } catch (error) {
+    console.error("❌ Error al actualizar el boleto:", error);
+    alert("Error al actualizar el boleto.");
+     }
+};
+window.subirComprobante = subirComprobante;
+
+  const accesos = {
+  "admin": "admin2024",
+  "miriam": "mc24",
+  "patty": "pt25",
+  "diane": "dn26",
+  "steven": "sv27",
+  "manuel": "admin2024"
+};
+
+setTimeout(() => {
+const clave = prompt("🔒 Ingresa tu clave de acceso:");
+const usuario = Object.keys(accesos).find(k => accesos[k] === clave);
+if (usuario) {
+rolActivo = usuario;
+document.title = "Panel - Bienvenido " + usuario.charAt(0).toUpperCase() + usuario.slice(1);
+document.getElementById("tituloPanel").innerText = "Bienvenido " + usuario.charAt(0).toUpperCase() + usuario.slice(1);
+document.querySelectorAll(".solo-" + usuario).forEach(el => el.style.display = "inline-block");
+cargarBoletos();
+} else {
+alert("🚫 Clave incorrecta. No tienes acceso.");
+document.body.innerHTML = "<h2 style='color:red;text-align:center;'>ACCESO DENEGADO</h2>";
+}
+}, 100);  
+  
+window.exportarExcel = function () {
+const precio = parseFloat(document.getElementById("precioUnitario").value);
+if (!precio || precio <= 0) return alert("⚠️ Ingresa un precio válido para calcular los totales.");
+const boletosDetallados = datosBoletos.map(b => ({
+Boleto: b.boleto,
+Nombre: b.nombre || "",
+Teléfono: b.telefono || "",
+Población: b.poblacion || "",
+Estado: b.estado || "",
+Fecha: b.fecha ? (b.fecha.toDate ? b.fecha.toDate().toLocaleString() : new Date(b.fecha).toLocaleString()) : "",
+"Modificado por": b.modificadoPor || "",
+"Forma Pago": b.formaPago || ""
+}));
+const resumen = {};
+datosBoletos.forEach(b => {
+if (b.estado === "pagado" && b.modificadoPor) {
+resumen[b.modificadoPor] = (resumen[b.modificadoPor] || 0) + 1;
+}
+});
+const resumenFinal = Object.keys(resumen).map(rol => ({
+Rol: rol,
+"Boletos Pagados": resumen[rol],
+"Total a entregar": "$" + (resumen[rol] * precio).toFixed(2)
+}));
+const libro = XLSX.utils.book_new();
+XLSX.utils.book_append_sheet(libro, XLSX.utils.json_to_sheet(boletosDetallados), "Detalle Boletos");
+const hojaResumen = XLSX.utils.json_to_sheet([], { header: ["Rol", "Boletos Pagados", "Total a entregar"] });
+XLSX.utils.sheet_add_json(hojaResumen, resumenFinal, { skipHeader: true, origin: "A2" });
+XLSX.utils.book_append_sheet(libro, hojaResumen, "Resumen por Rol");
+XLSX.writeFile(libro, "reporte_boletos.xlsx");
+};
+</script>
+ <!-- 🎟️ Plantilla oculta para generar boleto -->
+<div id="boletoPreview" style="position:relative; width:720px; height:1280px; display:none; font-family:sans-serif;">
+ <img src="https://raw.githubusercontent.com/RIFAS-CON-CAUSA/BICIS-MONTANA-EQUIPADAS/main/BOLETO-RIFA-BICIS-BASE.png" crossorigin="anonymous" style="width:100%; height:100%; position:absolute; top:0; left:0; z-index:0;">
+  <!-- Texto institucional superior -->
+  <div style="position:absolute; top:145px; width:100%; text-align:center; font-size:20px;">
+        <div style="font-weight:bold; font-size:22px;">POR MÁS JUVENTUD INDUCIDA AL DEPORTE</div>
+  </div>
+  <!-- Datos dinámicos -->
+  <div id="nombreBoleto" style="position:absolute; top:710px; left:90px; font-size:28px; font-weight:bold;"></div>
+  <div id="poblacionBoleto" style="position:absolute; top:760px; left:90px; font-size:26px;"></div>
+  <div id="folioBoleto" style="position:absolute; top:810px; left:90px; font-size:40px; color:#002F6C; font-weight:bold;"></div>
+  <div style="position:absolute; top:850px; left:90px; font-size:24px; color:#002F6C;"> Tus 10 oportunidades</div>
+  <div id="lineaOport1" style="position:absolute; top:890px; left:90px; font-size:22px;"></div>
+  <div id="lineaOport2" style="position:absolute; top:925px; left:90px; font-size:22px;"></div>
+  <!-- Mensaje VIP -->
+  <div style="position:absolute; top:980px; left:90px; font-size:16px; width:580px; line-height:1.3;">
+
+    <div>🎁 3.er Premio adicional: ES UN REGALO PARA NUESTROS COLABORADORES VIP. Bicicleta Mercurio 26</div>
+    <div>📢 Este premio para quien compre 3 boletos o mas. y comparta en Facebook, SI RESULTA GANADOR (TODO PARA UN SOLO GANADOR)</div>
+    <div>📦 ademas se gana Envío GRATIS a todo México.</div>
+    <div>📌 Recuerda poner tu número participante de tu serie participante en la publicación. Es minimo una por serie al dia. guarda captura para reclamar el regalo</div>
+  </div>
+  <!-- Frase final -->
+<div style="position:absolute; top:1160px; left:140px; font-size:28px; font-style:italic; font-weight:bold;">
+  ¡Gracias por tu apoyo y buena suerte!
+</div>
+
+<div style="position:absolute; top:1200px; left:140px; font-size:24px;">
+  Bases del sorteo y actualizaciones disponibles en la pagina.
+</div>
+
+<!-- 📤 Botón de WhatsApp -->
+<div id="btnWhatsapp" style="display:none; margin-top:20px;">
+  <a id="waLink" href="#" target="_blank" style="background-color:#25D366; padding:10px 20px; color:white; text-decoration:none; font-weight:bold; border-radius:5px;">
+    📤 Enviar por WhatsApp
+  </a>
+</div>
+
+<!-- Script para generar imagen -->
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script>
+function generarBoleto(nombre, poblacion, folio, oportunidades, telefono) {
+
+  document.getElementById("nombreBoleto").innerText = nombre;
+  document.getElementById("poblacionBoleto").innerText = poblacion;
+  document.getElementById("folioBoleto").innerText = "BOLETO # " + folio;
+  document.getElementById("lineaOport1").innerText = oportunidades.slice(0, 5).join("   ");
+  document.getElementById("lineaOport2").innerText = oportunidades.slice(5, 10).join("   ");
+
+  const boleto = document.getElementById("boletoPreview");
+  boleto.style.display = "block";
+
+  html2canvas(boleto, { useCORS: true }).then(canvas => {
+    const link = document.createElement("a");
+    link.download = `BOLETO-${folio}.png`;
+    link.href = canvas.toDataURL();
+    link.click();
+    boleto.style.display = "none";
+
+    // WhatsApp link
+    const mensaje = `🎉 ¡Gracias por apoyar la causa! Aquí tienes tu boleto #${folio} de la rifa de bicicletas.\n\n✅ Participas con 10 oportunidades.\n\nMás información en: https://rifas-con-causa.github.io/BICIS-MONTANA-EQUIPADAS/index.html`;
+    const numeroLimpio = telefono.replace(/\D/g, ""); // Solo números
+
+const waUrl = `https://wa.me/52${numeroLimpio}?text=${encodeURIComponent(mensaje)}`;
+
+    document.getElementById("waLink").href = waUrl;
+    document.getElementById("btnWhatsapp").style.display = "block";
+   window.open(waUrl, "_blank");  // Esto abre automáticamente el WhatsApp web
+
+  });
+}
+</script>
+<script>
+// 🎨 Activar color rosa al editar y restaurar según estado al salir
+document.addEventListener("DOMContentLoaded", () => {
+  const tabla = document.getElementById("tablaBoletos");
+
+  tabla.addEventListener("focusin", (e) => {
+    const tr = e.target.closest("tr");
+    if (tr) {
+      tr.setAttribute("data-original-color", tr.style.backgroundColor); // opcional
+      tr.style.background = "#ffe6f0"; // color rosa claro
+      tr.style.color = "black";
+    }
+  });
+
+  tabla.addEventListener("focusout", (e) => {
+    const tr = e.target.closest("tr");
+    const estado = tr?.querySelector("td:nth-child(5)")?.textContent?.toLowerCase();
+    if (tr && estado) {
+      switch (estado) {
+        case "pagado":
+          tr.style.background = "#e74c3c"; tr.style.color = "white";
+          break;
+        case "apartado":
+          tr.style.background = "#f1c40f"; tr.style.color = "black";
+          break;
+        default:
+          tr.style.background = "#2ecc71"; tr.style.color = "white";
+      }
+    }
+  });
+});
+</script>
+
+<script type="module">
+let tiempoRestante = 180;
+const contador = document.getElementById("contadorActualizacion");
+
+setInterval(() => {
+  const activo = document.activeElement;
+  const esEditable = activo && (activo.tagName === 'INPUT' || activo.tagName === 'SELECT' || activo.tagName === 'TEXTAREA');
+
+  tiempoRestante--;
+
+  if (tiempoRestante <= 40) {
+    contador.style.display = "block";
+    contador.textContent = esEditable
+      ? "⏸️ Editando..."
+      : `Actualización en: ${tiempoRestante}s`;
+  }
+
+  if (tiempoRestante <= 0) {
+    if (!esEditable) {
+      cargarBoletos();
+      console.log("🔁 Tabla actualizada automáticamente");
+    } else {
+      console.log("⏸️ Pausa: el usuario está interactuando");
+    }
+    tiempoRestante = 180;
+    contador.style.display = "none";
+  }
+}, 1000);
+</script>
+<script type="module">
+let tiempoRestante = 180;
+let segundosSinMover = 0;
+const contador = document.getElementById("contadorActualizacion");
+let alarmaReproducida = false;
+
+const audio = new Audio("https://notificationsounds.com/storage/sounds/file-sounds-1157-pristine.mp3");
+
+</script>
+
+</body>
+</html>
