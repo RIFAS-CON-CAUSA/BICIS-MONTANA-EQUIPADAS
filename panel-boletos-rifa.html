@@ -78,19 +78,18 @@
       setTimeout(() => {
         const mensaje = document.createElement("div");
         mensaje.id = "bienvenidaPanel";
-        mensaje.textContent = "✅ BIENVENIDO. LOS BOLETOS VERDES SON LOS DISPONIBLES. TÓCALO Y SE ACTIVARÁ PARA TI.";
+        mensaje.innerHTML = "<strong>✅ BIENVENIDO.</strong> LOS BOLETOS VERDES SON LOS DISPONIBLES. <br><br><strong>TÓCALO Y SE ACTIVARÁ PARA TI.</strong>";
         mensaje.style = `
-          position: fixed;
-          top: 90px;
-          left: 50%;
-          transform: translateX(-50%);
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
           background-color: #2ecc71;
           color: white;
-          padding: 14px 24px;
-          border-radius: 10px;
+          padding: 50px 20px;
+          font-size: 1.6em;
+          text-align: center;
           font-weight: bold;
-          font-size: 1.2em;
-          box-shadow: 0 4px 6px rgba(0,0,0,0.2);
           z-index: 9999;
           animation: desaparecer 1s ease-in-out 6s forwards;
         `;
@@ -112,6 +111,7 @@
       to {
         opacity: 0;
         visibility: hidden;
+        pointer-events: none;
       }
     }
   </style>
@@ -145,7 +145,7 @@
   z-index: 9999;
   box-shadow: 0 0 5px rgba(0,0,0,0.2);
 ">
-  🔵 <span style="font-size: 2em;">Te apoyamos a hacer tus rifas a nivel profesional  a un precio muy cómodo.</span><br>
+  🔵 <span style="font-size: 2.1em;">Te apoyamos a hacer tus rifas a nivel profesional  a un precio muy cómodo.</span><br>
 👉<a href="https://www.facebook.com/share/p/1Aab5eZNMF/" target="_blank" style="color:#004aad; font-weight:bold; font-size: 1.6em;">
   👉Visítanos aquí... en Facebook
 </a>
