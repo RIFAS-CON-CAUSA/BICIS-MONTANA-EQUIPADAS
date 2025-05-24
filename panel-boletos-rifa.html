@@ -1,8 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>  
-  
   <meta charset="UTF-8">
   <title>Rifa Bicis Montaña - Boletos</title>
   <script type="module">
@@ -74,18 +72,46 @@
       });
     }
 
-    document.addEventListener("DOMContentLoaded", cargarBoletos);
+    document.addEventListener("DOMContentLoaded", () => {
+      cargarBoletos();
+
+      const mensaje = document.createElement("div");
+      mensaje.id = "bienvenidaPanel";
+      mensaje.textContent = "✅ BIENVENIDO. LOS BOLETOS VERDES SON LOS DISPONIBLES. TÓCALO Y SE ACTIVARÁ PARA TI.";
+      mensaje.style = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #004aad;
+        color: white;
+        padding: 12px 18px;
+        border-radius: 10px;
+        font-weight: bold;
+        font-size: 0.95em;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        z-index: 9999;
+        animation: desaparecer 1s ease-in-out 6s forwards;
+      `;
+      document.body.appendChild(mensaje);
+    });
   </script>
   <style>
     body { font-family: Arial, sans-serif; margin: 0; padding: 0 0 100px 0; background: #f5f5f5; display: flex; flex-direction: column; align-items: center; }
     .navbar, .footer { width: 100%; text-align: center; background: #004aad; color: white; padding: 10px; font-weight: bold; }
-    .instrucciones { text-align: center; padding: 10px; font-size: 0.95em; max-width: 600px; }
+    .instrucciones { text-align: center; padding: 10px; font-size: 1.15em; max-width: 600px; }
     #boletosGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; padding: 10px; width: 100%; max-width: 600px; }
     .boletoCard { border: 2px solid #004aad; border-radius: 8px; padding: 5px; color: white; text-align: center; font-weight: bold; }
     .seriesGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; margin-bottom: 5px; }
     .seriesGrid span { background: rgba(255,255,255,0.2); padding: 2px; border-radius: 4px; font-size: 0.7em; }
     .button-link { background: white; color: #004aad; border: 2px solid white; border-radius: 5px; padding: 5px 10px; text-decoration: none; font-weight: bold; }
     .footer p { font-size: 1.2em; margin: 10px 0 0 0; padding: 0 10px; }
+    @keyframes desaparecer {
+      to {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
   </style>
 </head>
 <body>
@@ -102,7 +128,7 @@
   <a href="index.html" class="button-link">Volver a Inicio</a>
   <p>Gracias por apoyar esta causa. Tu donativo impulsa la cultura del deporte y fortalece a nuestra comunidad.</p>
 </div>
-  <!-- 📢 Anuncio de servicio -->
+<!-- 📢 Anuncio de servicio -->
 <div style="
   position: fixed;
   bottom: 15px;
@@ -117,11 +143,11 @@
   z-index: 9999;
   box-shadow: 0 0 5px rgba(0,0,0,0.2);
 ">
-  🔵 <span style="font-size: 1.6em;">Te apoyamos a hacer tus rifas a nivel profesional  a un precio muy cómodo.</span><br>
+  🔵 <span style="font-size: 2.0em;">Te apoyamos a hacer tus rifas a nivel profesional  a un precio muy cómodo.</span><br>
 👉<a href="https://www.facebook.com/share/p/1Aab5eZNMF/" target="_blank" style="color:#004aad; font-weight:bold; font-size: 1.6em;">
   👉Visítanos aquí... en Facebook
 </a>
 </div>
-
 </body>
 </html>
+
