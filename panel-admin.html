@@ -491,6 +491,36 @@ const audio = new Audio("https://notificationsounds.com/storage/sounds/file-soun
     alert("Error al guardar los cambios. Intenta de nuevo.");
   }
 }
+async function guardarAccion(id) {
+  const formaSelect = document.getElementById(`forma-${id}`);
+  const estadoSelect = document.getElementById(`estado-${id}`);
+  const nuevaForma = formaSelect?.value || "";
+  const nuevoEstado = estadoSelect?.value || "";
+
+  if (!nuevaForma || !nuevoEstado) {
+    alert("⚠️ Debes elegir tanto forma de pago como estado.");
+    return;
+  }
+
+  try {
+    await updateDoc(doc(db, "BoletosRifa", id), {
+      formaPago: nuevaForma,
+      estado: nuevoEstado,
+      modificadoPor: rolActivo || "admin"
+    });
+    Swal.fire({
+      icon: "success",
+      title: "✅ Actualizado",
+      text: "Forma de pago y estado guardados correctamente.",
+      timer: 1500,
+      showConfirmButton: false
+    });
+    cargarBoletos(); // para refrescar visual
+  } catch (error) {
+    console.error("❌ Error al guardar acción:", error);
+    alert("Ocurrió un error al guardar los cambios.");
+  }
+}
 
 </script>
 
