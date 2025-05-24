@@ -71,65 +71,44 @@
   <div style="height: 60px;"></div>
 
 
- <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, getDocs, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+  import * as XLSX from "https://cdn.sheetjs.com/xlsx-0.20.0/package/xlsx.mjs";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
-  authDomain: "rifas-con-causa.firebaseapp.com",
-  projectId: "rifas-con-causa",
-  storageBucket: "rifas-con-causa.appspot.com",
-  messagingSenderId: "347417635634",
-  appId: "1:347417635634:web:3ddab8921d26707910452b"
-};
+  const firebaseConfig = {
+    apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
+    authDomain: "rifas-con-causa.firebaseapp.com",
+    projectId: "rifas-con-causa",
+    storageBucket: "rifas-con-causa.appspot.com",
+    messagingSenderId: "347417635634",
+    appId: "1:347417635634:web:3ddab8921d26707910452b"
+  };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage(app);
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
 
-// Variables globales
-window.archivoSeleccionado = {};
-let rolActivo = "";
-let datosBoletos = [];
+  window.archivoSeleccionado = {};
+  let rolActivo = "";
+  let datosBoletos = [];
 
-const cuentasOficiales = [
-  "Transferencia o deposito Spin OXXO 6160"
-];
+  const cuentasOficiales = [
+    "Transferencia o deposito Spin OXXO 6160"
+  ];
 
-const opcionesFormaPago = [
-  "Efectivo",
-  ...cuentasOficiales,
-  "Otro"
-];
+  const opcionesFormaPago = [
+    "Efectivo",
+    ...cuentasOficiales,
+    "Otro"
+  ];
 
-// Accesos por clave
-const accesos = {
-  "admin": "admin2024",
-  "miriam": "mc24",
-  "patty": "pt25",
-  "diane": "dn26",
-  "steven": "sv27",
-  "manuel": "admin2024"
-};
+  const audio = new Audio("https://notificationsounds.com/storage/sounds/file-sounds-1157-pristine.mp3");
 
-// Validación de acceso por clave
-setTimeout(() => {
-  const clave = prompt("🔒 Ingresa tu clave de acceso:");
-  const usuario = Object.keys(accesos).find(k => accesos[k] === clave);
-  if (usuario) {
-    rolActivo = usuario;
-    document.title = "Panel - Bienvenido " + usuario.charAt(0).toUpperCase() + usuario.slice(1);
-    document.getElementById("tituloPanel").innerText = "Bienvenido " + usuario.charAt(0).toUpperCase() + usuario.slice(1);
-    document.querySelectorAll(".solo-" + usuario).forEach(el => el.style.display = "inline-block");
-    cargarBoletos();
-  } else {
-    alert("🚫 Clave incorrecta. No tienes acceso.");
-    document.body.innerHTML = "<h2 style='color:red;text-align:center;'>ACCESO DENEGADO</h2>";
-  }
-}, 100);
+  // Aquí puedes continuar con las funciones como cargarBoletos, subirComprobante, etc.
 </script>
+
 
 
  <script type="module">
