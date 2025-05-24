@@ -116,31 +116,8 @@ async function cargarBoletos() {
   const querySnapshot = await getDocs(collection(db, "BoletosRifa"));
   datosBoletos = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   const tbody = document.querySelector("#tablaBoletos tbody");
-tbody.innerHTML = "";
-datosBoletos.forEach(b => {
-  const rowColor = b.estado === "pagado"
-    ? "style='background:#e74c3c; color:white'"
-    : (b.estado === "apartado"
-      ? "style='background:#f1c40f;'"
-      : "style='background:#2ecc71; color:white'");
 
- <td>
-  <select id="forma-${b.id}" style="margin-bottom:5px;" onchange="guardarAccion('${b.id}')">
-    <option disabled ${!b.formaPago ? "selected" : ""} style="color:#888;">🧾 Elige forma de pago...</option>
-    ${opcionesFormaPago.map(op => `
-      <option value="${op}" ${b.formaPago?.toLowerCase() === op.toLowerCase() ? "selected" : ""}>${op}</option>
-    `).join("")}
-  </select><br>
-  <select id="estado-${b.id}" onchange="guardarAccion('${b.id}')">
-    <option disabled ${!b.estado ? "selected" : ""} style="color:#888;">🔄 Cambiar el status del boleto...</option>
-    <option value="libre" ${b.estado === "libre" ? "selected" : ""}>Libre</option>
-    <option value="apartado" ${b.estado === "apartado" ? "selected" : ""}>Apartado</option>
-    <option value="pagado" ${b.estado === "pagado" ? "selected" : ""}>Pagado</option>
-  </select>
-</td>
-
-
- tbody.innerHTML += `
+tbody.innerHTML += `
   <tr ${rowColor}>
     <td>${b.boleto}</td>
     <td>${b.nombre}</td>
@@ -151,7 +128,7 @@ datosBoletos.forEach(b => {
     <td>${b.modificadoPor || ""}</td>
     <td>${b.formaPago || ""}</td>
     <td>
-      <select id="forma-${b.id}" style="margin-bottom:5px;" onchange="guardarAccion('${b.id}')">
+      <select id="forma-${b.id}" onchange="guardarAccion('${b.id}')" style="margin-bottom:5px;">
         <option disabled ${!b.formaPago ? "selected" : ""} style="color:#888;">🧾 Elige forma de pago...</option>
         ${opcionesFormaPago.map(op => `
           <option value="${op}" ${b.formaPago?.toLowerCase() === op.toLowerCase() ? "selected" : ""}>${op}</option>
@@ -169,9 +146,9 @@ datosBoletos.forEach(b => {
         📎 Subir comprobante
       </label>
       <input type="file" accept="image/*" id="file-${b.id}" style="display:none;"
-        onchange="document.getElementById('celda-${b.id}').style.backgroundColor = '#ffeaa7';
-                  window.archivoSeleccionado['${b.id}'] = this.files[0];
-                  subirComprobante('${b.id}', this.files[0]);">
+             onchange="document.getElementById('celda-${b.id}').style.backgroundColor = '#ffeaa7'; 
+                        window.archivoSeleccionado['${b.id}'] = this.files[0]; 
+                        subirComprobante('${b.id}', this.files[0]);">
       ${b.comprobanteUrl
         ? '<br>✅ <a href="' + b.comprobanteUrl + '" target="_blank" style="font-size:0.85em;">📄 Ver</a>'
         : ''}
