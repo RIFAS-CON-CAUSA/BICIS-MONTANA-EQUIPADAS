@@ -152,7 +152,7 @@ datosBoletos.forEach(b => {
 alert("Error al subir comprobante.");
 }
 }
-// 🔁 Parche: Control de roles y reseteo visual al fallar
+
 // 🔁 Parche: Control de roles y reseteo visual al fallar
 window.cambiarEstado = async function (id, nuevoEstado) {
   const boletoOriginal = datosBoletos.find(b => b.id === id);
@@ -192,8 +192,8 @@ window.cambiarEstado = async function (id, nuevoEstado) {
   if (nuevoEstado === "pagado" && b) {
   const oportunidades = Array.isArray(b.series) ? b.series.slice(0, 10) : [];
   generarBoleto(b.nombre || "Participante", b.poblacion || "", b.boleto || "000", oportunidades, b.telefono || "");
+const mensaje = `📩 ¡Gracias por apoyar la causa! Aquí tienes tu boleto #${b.boleto} de la rifa de bicicletas.\n\n✅ Participas con 10 oportunidades.\n\nMás información en: https://rifas-con-causa.github.io/BICIS-MONTANA-EQUIPADAS/index.html`;
 
- const mensaje = `📩 ¡Gracias por apoyar la causa! Aquí tienes tu boleto #${b.boleto} de la rifa de bicicletas.\n\n✅ Participas con 10 oportunidades.\n\nMás información en: https://rifas-con-causa.github.io/BICIS-MONTANA-EQUIPADAS/index.html`;
 
   const numeroLimpio = (b.telefono || "").replace(/\D/g, "");
 
