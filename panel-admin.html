@@ -153,6 +153,7 @@ alert("Error al subir comprobante.");
 }
 }
 // 🔁 Parche: Control de roles y reseteo visual al fallar
+// 🔁 Parche: Control de roles y reseteo visual al fallar
 window.cambiarEstado = async function (id, nuevoEstado) {
   const boletoOriginal = datosBoletos.find(b => b.id === id);
   if (!boletoOriginal) return alert("⚠️ No se encontró el boleto.");
@@ -162,8 +163,7 @@ window.cambiarEstado = async function (id, nuevoEstado) {
     return alert("🚫 Solo el ADMIN puede cambiar un boleto pagado a otro estado.");
   }
 
-  // 🧾 Validar forma de pago seleccionada
-  const formaPagoSeleccionada = document.getElementById(`forma-${id}`)?.value || "";
+  const formaPagoSeleccionada = document.getElementById("forma-" + id)?.value || "";
 
   if (nuevoEstado === "pagado") {
     if (!formaPagoSeleccionada || formaPagoSeleccionada.includes("forma de pago")) {
@@ -184,6 +184,30 @@ window.cambiarEstado = async function (id, nuevoEstado) {
       formaPago: formaPago,
       fecha: serverTimestamp()
     });
+
+    alert("✅ Estado actualizado correctamente por: " + rolActivo);
+    await cargarBoletos();
+
+    const b = datosBoletos.find(b => b.id === id);
+    if (nuevoEstado === "pagado" && b) {
+      const oportunidades = Array.isArray(b.series) ? b.series.slice(0, 10) : [];
+      generarBoleto(b.nombre || "Participante", b.poblacion || "", b.boleto || "000", oportunidades, b.telefono || "");
+
+      const mensaje = "📩 ¡Gracias por apoyar la causa! Aquí tienes tu boleto #" + b.boleto + " de la rifa de bicicletas.\n\n✅ Participas con 10 oportunidades.\n\nMás información en: https://rifas-con-causa.github.io/BICIS-MONTANA-EQUIPADAS/index.html";
+      const numeroLimpio = (b.telefono || "").replace(/\D/g, "");
+      if (numeroLimpio.length >= 10) {
+        const waURL = `https://wa.me/52${numeroLimpio}?text=${encodeURIComponent(mensaje)}`;
+        window.open(waURL, "_blank");
+      } else {
+        console.warn("📵 Teléfono no válido para WhatsApp:", b.telefono);
+      }
+    }
+  } catch (error) {
+    console.error("❌ Error al actualizar el boleto:", error);
+    alert("Error al actualizar el boleto.");
+  }
+};
+
     alert("✅ Estado actualizado correctamente por: " + rolActivo);
     await cargarBoletos();
    const b = datosBoletos.find(b => b.id === id);
