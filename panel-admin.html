@@ -72,106 +72,34 @@
 
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, getDocs, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-  import * as XLSX from "https://cdn.sheetjs.com/xlsx-0.20.0/package/xlsx.mjs";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import * as XLSX from "https://cdn.sheetjs.com/xlsx-0.20.0/package/xlsx.mjs";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
-    authDomain: "rifas-con-causa.firebaseapp.com",
-    projectId: "rifas-con-causa",
-    storageBucket: "rifas-con-causa.appspot.com",
-    messagingSenderId: "347417635634",
-    appId: "1:347417635634:web:3ddab8921d26707910452b"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const storage = getStorage(app);
-
-  window.archivoSeleccionado = {};
-  let rolActivo = "";
-  let datosBoletos = [];
-
-  const cuentasOficiales = [
-    "Transferencia o deposito Spin OXXO 6160"
-  ];
-
-  const opcionesFormaPago = [
-    "Efectivo",
-    ...cuentasOficiales,
-    "Otro"
-  ];
-
-  const audio = new Audio("https://notificationsounds.com/storage/sounds/file-sounds-1157-pristine.mp3");
-
-  // Aquí puedes continuar con las funciones como cargarBoletos, subirComprobante, etc.
-</script>
-
-
-
- <script type="module">
-window.cargarBoletos = async function () {
-  const querySnapshot = await getDocs(collection(db, "BoletosRifa"));
-  datosBoletos = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-  const tbody = document.querySelector("#tablaBoletos tbody");
-  tbody.innerHTML = "";
-
-  datosBoletos.forEach(b => {
-    const rowColor =
-      b.estado === "pagado"
-        ? "style='background:#e74c3c; color:white'"
-        : b.estado === "apartado"
-        ? "style='background:#f1c40f;'"
-        : "style='background:#2ecc71; color:white'";
-
-    const selectForma = `
-      <select id="forma-${b.id}" onchange="guardarAccion('${b.id}')" style="margin-bottom:5px;">
-        <option disabled ${!b.formaPago ? "selected" : ""} style="color:#888;">🧾 Elige forma de pago...</option>
-        ${opcionesFormaPago.map(op => `
-          <option value="${op}" ${b.formaPago?.toLowerCase() === op.toLowerCase() ? "selected" : ""}>${op}</option>
-        `).join("")}
-      </select>`;
-
-    const selectEstado = `
-      <select id="estado-${b.id}" onchange="guardarAccion('${b.id}')">
-        <option disabled ${!b.estado ? "selected" : ""} style="color:#888;">🔄 Cambiar el status del boleto...</option>
-        <option value="libre" ${b.estado === "libre" ? "selected" : ""}>Libre</option>
-        <option value="apartado" ${b.estado === "apartado" ? "selected" : ""}>Apartado</option>
-        <option value="pagado" ${b.estado === "pagado" ? "selected" : ""}>Pagado</option>
-      </select>`;
-
-    const comprobanteHTML = `
-      <label for="file-${b.id}" style="cursor:pointer; background:#2980b9; color:white; padding:4px 8px; border-radius:4px; display:inline-block; font-size:0.85em;">
-        📎 Subir comprobante
-      </label>
-      <input type="file" accept="image/*" id="file-${b.id}" style="display:none;"
-        onchange="document.getElementById('celda-${b.id}').style.backgroundColor = '#ffeaa7'; 
-          window.archivoSeleccionado['${b.id}'] = this.files[0]; 
-          subirComprobante('${b.id}', this.files[0]);">
-      ${b.comprobanteUrl ? `<br>✅ <a href="${b.comprobanteUrl}" target="_blank" style="font-size:0.85em;">📄 Ver</a>` : ''}`;
-
-    tbody.innerHTML += `
-      <tr ${rowColor}>
-        <td>${b.boleto}</td>
-        <td>${b.nombre}</td>
-        <td>${b.telefono}</td>
-        <td>${b.poblacion}</td>
-        <td>${b.estado}</td>
-        <td>${b.fecha ? new Date(b.fecha.seconds * 1000).toLocaleString().slice(0, 16) : ""}</td>
-        <td>${b.modificadoPor || ""}</td>
-        <td>${b.formaPago || ""}</td>
-        <td>${selectForma}<br>${selectEstado}</td>
-        <td id="celda-${b.id}">${comprobanteHTML}</td>
-      </tr>`;
-  });
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
+  authDomain: "rifas-con-causa.firebaseapp.com",
+  projectId: "rifas-con-causa",
+  storageBucket: "rifas-con-causa.appspot.com",
+  messagingSenderId: "347417635634",
+  appId: "1:347417635634:web:3ddab8921d26707910452b"
 };
-</script>
 
+// Inicializar
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
+window.archivoSeleccionado = {};
+let rolActivo = "";
+let datosBoletos = [];
 
- <script type="module">
+const cuentasOficiales = ["Transferencia o deposito Spin OXXO 6160"];
+const opcionesFormaPago = ["Efectivo", ...cuentasOficiales, "Otro"];
+const audio = new Audio("https://notificationsounds.com/storage/sounds/file-sounds-1157-pristine.mp3");
+
 window.guardarAccion = async function(id) {
   const formaSelect = document.getElementById(`forma-${id}`);
   const estadoSelect = document.getElementById(`estado-${id}`);
@@ -210,20 +138,15 @@ window.guardarAccion = async function(id) {
     alert("Ocurrió un error al guardar los cambios.");
   }
 };
-</script>
 
-
- <script type="module">
 window.subirComprobante = async function(id, archivo) {
   if (!archivo) return;
-
   const extension = archivo.name.split('.').pop();
   const storageRef = ref(storage, `comprobantes/boletos/${id}.${extension}`);
 
   try {
     await uploadBytes(storageRef, archivo);
     const url = await getDownloadURL(storageRef);
-
     await updateDoc(doc(db, "BoletosRifa", id), { comprobanteUrl: url });
 
     Swal.fire({
@@ -235,17 +158,13 @@ window.subirComprobante = async function(id, archivo) {
     });
 
     await cargarBoletos();
-    document.getElementById("celda-" + id).style.backgroundColor = ""; 
+    document.getElementById("celda-" + id).style.backgroundColor = "";
   } catch (error) {
     console.error("❌ Error al subir comprobante:", error);
     alert("Error al subir comprobante.");
   }
 };
-</script>
 
-
-
- <script type="module">
 window.exportarExcel = function () {
   const precio = parseFloat(document.getElementById("precioUnitario").value);
   if (!precio || precio <= 0) return alert("⚠️ Ingresa un precio válido para calcular los totales.");
@@ -282,6 +201,8 @@ window.exportarExcel = function () {
   XLSX.writeFile(libro, "reporte_boletos.xlsx");
 };
 </script>
+
+  
 
 
 
