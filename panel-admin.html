@@ -455,42 +455,7 @@ let alarmaReproducida = false;
 
 const audio = new Audio("https://notificationsounds.com/storage/sounds/file-sounds-1157-pristine.mp3");
 
- async function guardarAccion(id) {
-  const forma = document.getElementById(`forma-${id}`).value;
-  const estado = document.getElementById(`estado-${id}`).value;
 
-  if (!forma || !estado || forma === "🧾 Elige forma de pago..." || estado === "🔄 Cambiar el status del boleto...") {
-    Swal.fire({
-      icon: 'warning',
-      text: 'Debes seleccionar tanto forma de pago como estado.',
-      timer: 2000,
-      showConfirmButton: false
-    });
-    return;
-  }
-
-  try {
-   await setDoc(doc(db, "BoletosRifa", id), {
-  formaPago: forma,
-  estado: estado,
-  modificadoPor: rolActivo
-}, { merge: true });
-
-
-    Swal.fire({
-      icon: 'success',
-      title: '¡Actualizado!',
-      text: 'Forma de pago y estado guardados correctamente.',
-      timer: 1800,
-      showConfirmButton: false
-    });
-
-    cargarBoletos();
-  } catch (error) {
-    console.error("❌ Error al guardar acción combinada:", error);
-    alert("Error al guardar los cambios. Intenta de nuevo.");
-  }
-}
 async function guardarAccion(id) {
   const formaSelect = document.getElementById(`forma-${id}`);
   const estadoSelect = document.getElementById(`estado-${id}`);
