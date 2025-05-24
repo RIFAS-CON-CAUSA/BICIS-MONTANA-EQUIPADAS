@@ -1,186 +1,118 @@
+<!-- Proyecto Rifa Bicis Montaña - Estructura base para continuar trabajo -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
   <meta charset="UTF-8">
-  <title>Panel Admin - Rifas con Causa</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rifa Bicis Montaña</title>
+  <link rel="stylesheet" href="estilos.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      // Tu configuración aquí
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function actualizarEstado(id, forma, estado, rolActivo, datosBoletos) {
+      try {
+        await updateDoc(doc(db, "BoletosRifa", id), {
+          formaPago: forma,
+          estado: estado,
+          modificadoPor: rolActivo,
+          fecha: serverTimestamp()
+        });
+
+        const b = datosBoletos.find(b => b.id === id);
+        if (estado === "pagado" && b) {
+          const oportunidades = Array.isArray(b.series) ? b.series.slice(0, 10) : [];
+          generarBoleto(
+            b.nombre || "Participante",
+            b.poblacion || "",
+            b.boleto || "000",
+            oportunidades,
+            b.telefono || ""
+          );
+
+          const mensaje = "📩 ¡Gracias por apoyar la causa! Aquí tienes tu boleto #" + b.boleto +
+            " de la rifa de bicicletas.\n\n✅ Participas con 10 oportunidades.\n\nMás información en: https://rifas-con-causa.github.io/BICIS-MONTANA-EQUIPADAS/index.html";
+
+          const numeroLimpio = (b.telefono || "").replace(/\D/g, "");
+          if (numeroLimpio.length >= 10) {
+            const waURL = `https://wa.me/52${numeroLimpio}?text=${encodeURIComponent(mensaje)}`;
+            window.open(waURL, "_blank");
+          } else {
+            console.warn("📵 Teléfono no válido para WhatsApp:", b.telefono);
+          }
+        }
+
+        alert("✅ Guardado correctamente.");
+        cargarBoletos();
+      } catch (error) {
+        console.error("❌ Error al guardar:", error);
+        alert("❌ Ocurrió un error al guardar.");
+      }
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
+
+    function generarBoleto(nombre, poblacion, folio, oportunidades, telefono) {
+      const div = document.createElement("div");
+      div.id = "boletoRecibo";
+      div.style = `
+        width: 300px;
+        padding: 20px;
+        border: 2px solid #000;
+        border-radius: 10px;
+        background: #f8f9fa;
+        font-family: Arial;
+        color: #333;
+        text-align: center;
+      `;
+
+      div.innerHTML = `
+        <h2 style="margin-bottom: 10px;">🎟️ Boleto de Rifa</h2>
+        <p><strong>Nombre:</strong> ${nombre}</p>
+        <p><strong>Población:</strong> ${poblacion}</p>
+        <p><strong>Folio:</strong> ${folio}</p>
+        <p><strong>Oportunidades:</strong><br>${oportunidades.join(", ")}</p>
+        <p style="margin-top:15px; font-weight: bold;">¡Gracias por apoyar la causa!</p>
+      `;
+
+      document.body.appendChild(div);
+
+      html2canvas(div).then(canvas => {
+        const link = document.createElement("a");
+        link.download = `BOLETO-${folio}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+        document.body.removeChild(div);
+      });
     }
-    th, td {
-      padding: 8px;
-      border: 1px solid #ccc;
-      text-align: center;
-    }
-    th {
-      background-color: #f4f4f4;
-    }
-  </style>
+  </script>
 </head>
 <body>
-  <h1>Panel de Control de Boletos</h1>
+  <header>
+    <h1>🎉 Gran Rifa de Bicicletas de Montaña 🎉</h1>
+    <p>Participa con solo $160 pesos y obtén 10 oportunidades para ganar.</p>
+    <p>Basado en la Lotería Nacional - Sorteo 30 de mayo</p>
+  </header>
 
-  <table id="tablaBoletos">
-    <thead>
-      <tr>
-        <th>Boleto</th>
-        <th>Nombre</th>
-        <th>Teléfono</th>
-        <th>Estado</th>
-        <th>Fecha</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <section id="registro">
+    <h2>Reserva tu boleto</h2>
+    <!-- Aquí se insertará el formulario o panel de reserva -->
+  </section>
 
-  <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, getDocs, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-  import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+  <section id="boletos">
+    <h2>Boletos disponibles</h2>
+    <!-- Aquí se mostrará la lista dinámica de boletos -->
+  </section>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
-    authDomain: "rifas-con-causa.firebaseapp.com",
-    projectId: "rifas-con-causa",
-    storageBucket: "rifas-con-causa.appspot.com",
-    messagingSenderId: "347417635634",
-    appId: "1:347417635634:web:3ddab8921d26707910452b"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  const storage = getStorage(app);
-  let datosBoletos = [];
-
-  async function cargarBoletos() {
-    const querySnapshot = await getDocs(collection(db, "BoletosRifa"));
-    datosBoletos = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-    const tbody = document.querySelector("#tablaBoletos tbody");
-    tbody.innerHTML = "";
-
-    datosBoletos.forEach(b => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${b.boleto}</td>
-        <td>${b.nombre || ""}</td>
-        <td>${b.telefono || ""}</td>
-        <td>${b.estado || ""}</td>
-        <td>${b.fecha ? new Date(b.fecha.seconds * 1000).toLocaleString().slice(0, 16) : ""}</td>
-        <td>
-          <select id="forma-${b.id}">
-            <option disabled ${!b.formaPago ? "selected" : ""}>🧾 Elige forma de pago...</option>
-            <option value="Efectivo" ${b.formaPago === "Efectivo" ? "selected" : ""}>Efectivo</option>
-            <option value="Transferencia o deposito Spin OXXO 6160" ${b.formaPago === "Transferencia o deposito Spin OXXO 6160" ? "selected" : ""}>Transferencia o deposito Spin OXXO 6160</option>
-            <option value="Otro" ${b.formaPago === "Otro" ? "selected" : ""}>Otro</option>
-          </select>
-        </td>
-        <td>
-          <select id="estado-${b.id}">
-            <option disabled ${!b.estado ? "selected" : ""}>🔄 Cambiar el status del boleto...</option>
-            <option value="libre" ${b.estado === "libre" ? "selected" : ""}>Libre</option>
-            <option value="apartado" ${b.estado === "apartado" ? "selected" : ""}>Apartado</option>
-            <option value="pagado" ${b.estado === "pagado" ? "selected" : ""}>Pagado</option>
-          </select>
-        </td>
-        <td>
-          <button onclick="guardarAccion('${b.id}')">💾 Guardar</button>
-        </td>
-      `;
-      tbody.appendChild(row);
-    });
-  }
-
-  window.guardarAccion = async function(id) {
-    const forma = document.getElementById(`forma-${id}`).value;
-    const estado = document.getElementById(`estado-${id}`).value;
-
-    if (!forma || !estado) {
-      alert("⚠️ Debes elegir forma de pago y estado.");
-      return;
-    }
-
-  async function actualizarEstado(id, forma, estado, rolActivo, datosBoletos) {
-    try {
-      await updateDoc(doc(db, "BoletosRifa", id), {
-        formaPago: forma,
-        estado: estado,
-        modificadoPor: rolActivo,
-        fecha: serverTimestamp()
-      });
-
-      const b = datosBoletos.find(b => b.id === id);
-      if (estado === "pagado" && b) {
-        const oportunidades = Array.isArray(b.series) ? b.series.slice(0, 10) : [];
-        generarBoleto(
-          b.nombre || "Participante",
-          b.poblacion || "",
-          b.boleto || "000",
-          oportunidades,
-          b.telefono || ""
-        );
-
-        const mensaje = "📩 ¡Gracias por apoyar la causa! Aquí tienes tu boleto #" + b.boleto +
-          " de la rifa de bicicletas.\n\n✅ Participas con 10 oportunidades.\n\nMás información en: https://rifas-con-causa.github.io/BICIS-MONTANA-EQUIPADAS/index.html";
-
-        const numeroLimpio = (b.telefono || "").replace(/\D/g, "");
-        if (numeroLimpio.length >= 10) {
-          const waURL = `https://wa.me/52${numeroLimpio}?text=${encodeURIComponent(mensaje)}`;
-          window.open(waURL, "_blank");
-        } else {
-          console.warn("📵 Teléfono no válido para WhatsApp:", b.telefono);
-        }
-      }
-
-      alert("✅ Guardado correctamente.");
-      cargarBoletos();
-    } catch (error) {
-      console.error("❌ Error al guardar:", error);
-      alert("❌ Ocurrió un error al guardar.");
-    }
-  }
-
-  function generarBoleto(nombre, poblacion, folio, oportunidades, telefono) {
-    const div = document.createElement("div");
-    div.id = "boletoRecibo";
-    div.style = `
-      width: 300px;
-      padding: 20px;
-      border: 2px solid #000;
-      border-radius: 10px;
-      background: #f8f9fa;
-      font-family: Arial;
-      color: #333;
-      text-align: center;
-    `;
-
-    div.innerHTML = `
-      <h2 style="margin-bottom: 10px;">🎟️ Boleto de Rifa</h2>
-      <p><strong>Nombre:</strong> ${nombre}</p>
-      <p><strong>Población:</strong> ${poblacion}</p>
-      <p><strong>Folio:</strong> ${folio}</p>
-      <p><strong>Oportunidades:</strong><br>${oportunidades.join(", ")}</p>
-      <p style="margin-top:15px; font-weight: bold;">¡Gracias por apoyar la causa!</p>
-    `;
-
-    document.body.appendChild(div);
-
-    html2canvas(div).then(canvas => {
-      const link = document.createElement("a");
-      link.download = `BOLETO-${folio}.png`;
-      link.href = canvas.toDataURL();
-      link.click();
-      document.body.removeChild(div);
-    });
-  }
-</script>
+  <footer>
+    <p>📞 Informes al WhatsApp: <a href="https://wa.me/527327777777" target="_blank">327 777 7777</a></p>
+    <p>Sistema desarrollado por Rifas con Causa</p>
+  </footer>
 </body>
 </html>
