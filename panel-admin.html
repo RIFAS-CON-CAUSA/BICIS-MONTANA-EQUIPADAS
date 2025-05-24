@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
   <meta charset="UTF-8">
   <title>Panel Admin - Rifas con Causa</title>
   <style>
@@ -121,6 +123,38 @@
   };
 
   cargarBoletos();
+
+    <script>
+function generarBoleto(nombre, poblacion, folio, oportunidades, telefono) {
+  // Crear elemento temporal
+  const div = document.createElement("div");
+  div.id = "boletoRecibo";
+  div.style = `
+    width: 300px;
+    padding: 20px;
+    border: 2px solid #000;
+    text-align: center;
+    font-family: Arial;
+    background: #f8f9fa;
+  `;
+  div.innerHTML = `
+    <h3>🎟️ Boleto de Rifa</h3>
+    <p><strong>Nombre:</strong> ${nombre}</p>
+    <p><strong>Población:</strong> ${poblacion}</p>
+    <p><strong>Folio:</strong> ${folio}</p>
+    <p><strong>Oportunidades:</strong><br>${oportunidades.join(", ")}</p>
+    <p style="margin-top:15px;">¡Gracias por apoyar la causa!</p>
+  `;
+  document.body.appendChild(div);
+
+  html2canvas(div).then(canvas => {
+    const link = document.createElement("a");
+    link.download = `BOLETO-${folio}.png`;
+    link.href = canvas.toDataURL();
+    link.click();
+    document.body.removeChild(div);
+  });
+}
   </script>
 </body>
 </html>
