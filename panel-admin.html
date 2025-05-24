@@ -40,132 +40,87 @@
   </table>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
- import { getFirestore, collection, getDocs, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
-    import { getStorage } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+  const firebaseConfig = {
+    apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
+    authDomain: "rifas-con-causa.firebaseapp.com",
+    projectId: "rifas-con-causa",
+    storageBucket: "rifas-con-causa.appspot.com",
+    messagingSenderId: "347417635634",
+    appId: "1:347417635634:web:3ddab8921d26707910452b"
+  };
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
-      authDomain: "rifas-con-causa.firebaseapp.com",
-      projectId: "rifas-con-causa",
-      storageBucket: "rifas-con-causa.appspot.com",
-      messagingSenderId: "347417635634",
-      appId: "1:347417635634:web:3ddab8921d26707910452b"
-    };
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
+  let datosBoletos = [];
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
+  async function cargarBoletos() {
+    const querySnapshot = await getDocs(collection(db, "BoletosRifa"));
+    datosBoletos = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-    let datosBoletos = [];
-
-    async function cargarBoletos() {
-      const querySnapshot = await getDocs(collection(db, "BoletosRifa"));
-      datosBoletos = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-      const tbody = document.querySelector("#tablaBoletos tbody");
-      tbody.innerHTML = "";
+    const tbody = document.querySelector("#tablaBoletos tbody");
+    tbody.innerHTML = "";
 
     datosBoletos.forEach(b => {
-  const row = document.createElement("tr");
-  row.innerHTML = `
-    <td>${b.boleto}</td>
-    <td>${b.nombre || ""}</td>
-    <td>${b.telefono || ""}</td>
-    <td>${b.estado || ""}</td>
-    <td>${b.fecha ? new Date(b.fecha.seconds * 1000).toLocaleString().slice(0, 16) : ""}</td>
-    <td>
-      <select id="forma-${b.id}">
-        <option disabled ${!b.formaPago ? "selected" : ""}>🧾 Elige forma de pago...</option>
-        <option value="Efectivo" ${b.formaPago === "Efectivo" ? "selected" : ""}>Efectivo</option>
-        <option value="Transferencia o deposito Spin OXXO 6160" ${b.formaPago === "Transferencia o deposito Spin OXXO 6160" ? "selected" : ""}>Transferencia o deposito Spin OXXO 6160</option>
-        <option value="Otro" ${b.formaPago === "Otro" ? "selected" : ""}>Otro</option>
-      </select>
-    </td>
-    <td>
-      <select id="estado-${b.id}">
-        <option disabled ${!b.estado ? "selected" : ""}>🔄 Cambiar el status del boleto...</option>
-        <option value="libre" ${b.estado === "libre" ? "selected" : ""}>Libre</option>
-        <option value="apartado" ${b.estado === "apartado" ? "selected" : ""}>Apartado</option>
-        <option value="pagado" ${b.estado === "pagado" ? "selected" : ""}>Pagado</option>
-      </select>
-    </td>
-    <td>
-      <button onclick="guardarAccion('${b.id}')">💾 Guardar</button>
-    </td>
-  `;
-  tbody.appendChild(row);
-      }); // ← cierre de datosBoletos.forEach
-} // ← cierre de la función cargarBoletos
-
-
-    cargarBoletos();
-    window.guardarAccion = async function(id) {
-  const forma = document.getElementById(`forma-${id}`).value;
-  const estado = document.getElementById(`estado-${id}`).value;
-
-  if (!forma || !estado) {
-    alert("⚠️ Selecciona forma de pago y estado antes de guardar.");
-    return;
-  }
-
-  try {
-    await updateDoc(doc(db, "BoletosRifa", id), {
-      
-      formaPago: forma,
-      estado: estado
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${b.boleto}</td>
+        <td>${b.nombre || ""}</td>
+        <td>${b.telefono || ""}</td>
+        <td>${b.estado || ""}</td>
+        <td>${b.fecha ? new Date(b.fecha.seconds * 1000).toLocaleString().slice(0, 16) : ""}</td>
+        <td>
+          <select id="forma-${b.id}">
+            <option disabled ${!b.formaPago ? "selected" : ""}>🧾 Elige forma de pago...</option>
+            <option value="Efectivo" ${b.formaPago === "Efectivo" ? "selected" : ""}>Efectivo</option>
+            <option value="Transferencia o deposito Spin OXXO 6160" ${b.formaPago === "Transferencia o deposito Spin OXXO 6160" ? "selected" : ""}>Transferencia o deposito Spin OXXO 6160</option>
+            <option value="Otro" ${b.formaPago === "Otro" ? "selected" : ""}>Otro</option>
+          </select>
+        </td>
+        <td>
+          <select id="estado-${b.id}">
+            <option disabled ${!b.estado ? "selected" : ""}>🔄 Cambiar el status del boleto...</option>
+            <option value="libre" ${b.estado === "libre" ? "selected" : ""}>Libre</option>
+            <option value="apartado" ${b.estado === "apartado" ? "selected" : ""}>Apartado</option>
+            <option value="pagado" ${b.estado === "pagado" ? "selected" : ""}>Pagado</option>
+          </select>
+        </td>
+        <td>
+          <button onclick="guardarAccion('${b.id}')">💾 Guardar</button>
+        </td>
+      `;
+      tbody.appendChild(row);
     });
-
-    // Paso extra: si fue marcado como pagado, generar boleto y WhatsApp
-if (estado === "pagado") {
-  const b = datosBoletos.find(b => b.id === id);
-  const oportunidades = Array.isArray(b.series) ? b.series.slice(0, 10) : [];
-  generarBoleto(b.nombre || "Participante", b.poblacion || "", b.boleto || "000", oportunidades, b.telefono || "");
-
-  const mensaje = `📩 ¡Gracias por apoyar la causa! Aquí tienes tu boleto #${b.boleto} de la rifa de bicicletas.\n\n✅ Participas con 10 oportunidades.\n\nMás información en: https://rifas-con-causa.github.io/BICIS-MONTANA-EQUIPADAS/index.html`;
-  const numeroLimpio = (b.telefono || "").replace(/\D/g, "");
-  if (numeroLimpio.length >= 10) {
-    const waURL = `https://wa.me/52${numeroLimpio}?text=${encodeURIComponent(mensaje)}`;
-    window.open(waURL, "_blank");
-  } else {
-    console.warn("📵 Teléfono no válido para WhatsApp:", b.telefono);
   }
-}
 
-    alert("✅ Guardado correctamente.");
-    
-    cargarBoletos();
-  } catch (error) {
-    console.error("Error al guardar:", error);
-    alert("❌ Ocurrió un error al guardar.");
-  }
-};
+  window.guardarAccion = async function(id) {
+    const forma = document.getElementById(`forma-${id}`).value;
+    const estado = document.getElementById(`estado-${id}`).value;
 
-    function generarBoleto(nombre, poblacion, folio, oportunidades = [], telefono = "") {
-  const boletoDiv = document.createElement("div");
-  boletoDiv.style = "width: 300px; padding: 15px; border: 2px dashed #333; font-family: Arial; text-align: center; background: #fefefe;";
-  boletoDiv.innerHTML = `
-    <h3>🎟️ Boleto Digital</h3>
-    <p><strong>Nombre:</strong> ${nombre}</p>
-    <p><strong>Población:</strong> ${poblacion}</p>
-    <p><strong>Folio:</strong> ${folio}</p>
-    <p><strong>Oportunidades:</strong><br>${oportunidades.join(" | ")}</p>
-    <small style="font-size: 0.75em;">Gracias por apoyar la causa 🙌</small>
-  `;
+    if (!forma || !estado) {
+      alert("⚠️ Debes elegir forma de pago y estado.");
+      return;
+    }
 
-  document.body.appendChild(boletoDiv);
+    try {
+      await updateDoc(doc(db, "BoletosRifa", id), {
+        formaPago: forma,
+        estado: estado,
+        fecha: serverTimestamp()
+      });
+      alert("✅ Guardado correctamente.");
+      cargarBoletos();
+    } catch (error) {
+      console.error("❌ Error al guardar:", error);
+      alert("Ocurrió un error al guardar.");
+    }
+  };
 
-  html2canvas(boletoDiv).then(canvas => {
-    const link = document.createElement("a");
-    link.href = canvas.toDataURL();
-    link.download = `boleto-${folio}.png`;
-    link.click();
-    boletoDiv.remove();
-  });
-}
-
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js">
+  cargarBoletos();
   </script>
 </body>
 </html>
