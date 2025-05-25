@@ -89,6 +89,35 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
+      // Mostrar contador visual de actualización
+      const contador = document.createElement("div");
+      contador.id = "contadorRefresco";
+      contador.style = `
+        position: fixed;
+        bottom: 10px;
+        left: 10px;
+        background: rgba(0,0,0,0.7);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 1em;
+        font-family: Arial;
+        z-index: 9999;
+      `;
+      document.body.appendChild(contador);
+
+      let segundosRestantes = 240;
+      const intervaloContador = setInterval(() => {
+        segundosRestantes--;
+        const min = Math.floor(segundosRestantes / 60);
+        const sec = (segundosRestantes % 60).toString().padStart(2, '0');
+        contador.textContent = `🔄 Refresco automático en: ${min}:${sec}`;
+
+        if (segundosRestantes <= 0) {
+          clearInterval(intervaloContador);
+        }
+      }, 1000);
+
       setInterval(() => {
         const audio = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
         audio.play().catch(() => {});
