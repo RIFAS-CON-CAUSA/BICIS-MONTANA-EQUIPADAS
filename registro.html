@@ -118,8 +118,8 @@
       }, { merge: true });
 
       Swal.fire({
-        title: `✅ ¡Boleto #${numBoleto} registrado correctamente!`,
-        html: `
+  title: `✅ ¡Boleto #${numBoleto} registrado correctamente!`,
+  html: `
   <div style="max-width:100%; font-size:1em;">
     <p>GRACIAS... El sistema te da 4 horas para pagar, y lo pone disponible otra vez si no se paga.</p>
     <p>Envía comprobante de pago al WhatsApp <strong>3311571619</strong>.</p>
@@ -136,16 +136,16 @@
       </a>
     </p>
   </div>`,
-        icon: 'success',
-        showConfirmButton: false,
-        width: window.innerWidth < 768 ? '90%' : '600px'
-      });
+  icon: 'success',
+  showConfirmButton: false,
+  width: window.innerWidth < 768 ? '90%' : '600px',
+  timer: 6000,
+  timerProgressBar: true,
+  didClose: () => {
+    window.location.href = "panel-boletos-rifa.html";
+  }
+});
 
-    } catch (error) {
-      console.error("❌ Error al registrar el boleto:", error);
-      alert("Ocurrió un error al registrar el boleto. Intenta nuevamente.");
-    }
-  });
 </script>
 
 </body>
