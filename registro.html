@@ -146,11 +146,10 @@
             opacity: 0;
             animation: emerger 1s ease-out forwards, desaparecer 1s ease-in-out 6s forwards;
           `;
-          sonidoEmergente.play().catch(e => console.warn("🔇 Sonido no permitido automáticamente:", e));
-          document.body.appendChild(mensaje);
-        }, 2000);
-    });
-  </script>
+
+      sonidoEmergente.play().catch(e => console.warn("🔇 Sonido no permitido automáticamente:", e));
+      document.body.appendChild(mensaje);
+    }, 2000);
 
 
 
