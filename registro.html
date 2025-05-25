@@ -98,6 +98,29 @@
   document.addEventListener("DOMContentLoaded", () => {
     const params = new URLSearchParams(window.location.search);
     const numBoleto = params.get("boleto") || "???";
+
+import { getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// Verificar si el boleto ya está pagado
+const refBoleto = doc(db, "BoletosRifa", numBoleto);
+const snap = await getDoc(refBoleto);
+
+if (snap.exists()) {
+  const datos = snap.data();
+  if (datos.estado === "pagado") {
+    Swal.fire({
+      icon: "error",
+      title: "❌ Este boleto ya fue pagado",
+      text: "Selecciona otro disponible desde el panel.",
+      confirmButtonText: "Ir al Panel"
+    }).then(() => {
+      window.location.href = "panel-boletos-rifa.html";
+    });
+    return;
+  }
+}
+
+    
     document.getElementById("boletoTitulo").innerText = `Boleto #${numBoleto}`;
 
     document.getElementById("formRegistro").addEventListener("submit", async function(e){
