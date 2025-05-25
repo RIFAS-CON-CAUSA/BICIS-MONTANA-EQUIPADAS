@@ -89,68 +89,67 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      // Mostrar contador visual de actualización
-      const contador = document.createElement("div");
-      contador.id = "contadorRefresco";
-      contador.style = `
-        position: fixed;
-        bottom: 10px;
-        left: 10px;
-        background: rgba(0,0,0,0.7);
+  let interaccion = false;
+  window.addEventListener("click", () => { interaccion = true; });
+
+  const contador = document.createElement("div");
+  contador.id = "contadorRefresco";
+  contador.style = `
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 1em;
+    font-family: Arial;
+    z-index: 9999;
+  `;
+  document.body.appendChild(contador);
+
+  let segundosRestantes = 240;
+  const intervaloContador = setInterval(() => {
+    segundosRestantes--;
+    const min = Math.floor(segundosRestantes / 60);
+    const sec = (segundosRestantes % 60).toString().padStart(2, '0');
+    contador.textContent = `🔄 Refresco automático en: ${min}:${sec}`;
+    if (segundosRestantes <= 0) {
+      clearInterval(intervaloContador);
+    }
+  }, 1000);
+
+  setInterval(() => {
+    if (interaccion) {
+      const audio = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
+      audio.play().catch(() => {});
+    }
+    location.reload();
+  }, 240000);
+
+  if (!performance.getEntriesByType("navigation")[0].type.includes("reload")) {
+    setTimeout(() => {
+      const mensaje = document.createElement("div");
+      mensaje.id = "bienvenidaPanel";
+      mensaje.innerHTML = "<strong>✅ BIENVENIDO.</strong><br>LOS BOLETOS VERDES SON LOS DISPONIBLES.<br><br><strong>TÓCALO Y SE ACTIVARÁ PARA TI.</strong>";
+      mensaje.style = `
+        position: absolute;
+        top: 200px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #2ecc71;
         color: white;
-        padding: 8px 12px;
-        border-radius: 6px;
-        font-size: 1em;
-        font-family: Arial;
+        padding: 60px 30px;
+        font-size: 4.5em;
+        line-height: 1.4;
+        text-align: center;
+        font-weight: bold;
         z-index: 9999;
+        opacity: 0;
+        animation: emerger 1s ease-out forwards, desaparecer 1s ease-in-out 6s forwards;
       `;
-      document.body.appendChild(contador);
-
-      let segundosRestantes = 240;
-      const intervaloContador = setInterval(() => {
-        segundosRestantes--;
-        const min = Math.floor(segundosRestantes / 60);
-        const sec = (segundosRestantes % 60).toString().padStart(2, '0');
-        contador.textContent = `🔄 Refresco automático en: ${min}:${sec}`;
-
-        if (segundosRestantes <= 0) {
-          clearInterval(intervaloContador);
-        }
-      }, 1000);
-
-      setInterval(() => {
-        const audio = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
-        audio.play().catch(() => {});
-        location.reload();
-      }, 240000);
-      cargarBoletos();
-
-      if (!performance.getEntriesByType("navigation")[0].type.includes("reload")) {
-        setTimeout(() => {
-          const mensaje = document.createElement("div");
-          mensaje.id = "bienvenidaPanel";
-          mensaje.innerHTML = "<strong>✅ BIENVENIDO.</strong><br>LOS BOLETOS VERDES SON LOS DISPONIBLES.<br><br><strong>TÓCALO Y SE ACTIVARÁ PARA TI.</strong>";
-          mensaje.style = `
-            position: absolute;
-            top: 200px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: #2ecc71;
-            color: white;
-            padding: 60px 30px;
-            font-size: 4.5em;
-            line-height: 1.4;
-            text-align: center;
-            font-weight: bold;
-            z-index: 9999;
-            opacity: 0;
-            animation: emerger 1s ease-out forwards, desaparecer 1s ease-in-out 6s forwards;
-          `;
-
       sonidoEmergente.play().catch(e => console.warn("🔇 Sonido no permitido automáticamente:", e));
       document.body.appendChild(mensaje);
     }, 2000);
-
-
-
-  
+  }
+});
