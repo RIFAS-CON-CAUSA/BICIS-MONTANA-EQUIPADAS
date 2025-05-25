@@ -81,7 +81,7 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getFirestore, doc, setDoc, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
@@ -95,33 +95,29 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", async () => {
     const params = new URLSearchParams(window.location.search);
     const numBoleto = params.get("boleto") || "???";
-
-import { getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-// Verificar si el boleto ya está pagado
-const refBoleto = doc(db, "BoletosRifa", numBoleto);
-const snap = await getDoc(refBoleto);
-
-if (snap.exists()) {
-  const datos = snap.data();
-  if (datos.estado === "pagado") {
-    Swal.fire({
-      icon: "error",
-      title: "❌ Este boleto ya fue pagado",
-      text: "Selecciona otro disponible desde el panel.",
-      confirmButtonText: "Ir al Panel"
-    }).then(() => {
-      window.location.href = "panel-boletos-rifa.html";
-    });
-    return;
-  }
-}
-
-    
     document.getElementById("boletoTitulo").innerText = `Boleto #${numBoleto}`;
+
+    // Verificar si el boleto ya está pagado
+    const refBoleto = doc(db, "BoletosRifa", numBoleto);
+    const snap = await getDoc(refBoleto);
+
+    if (snap.exists()) {
+      const datos = snap.data();
+      if (datos.estado === "pagado") {
+        Swal.fire({
+          icon: "error",
+          title: "❌ Este boleto ya fue pagado",
+          text: "Selecciona otro disponible desde el panel.",
+          confirmButtonText: "Ir al Panel"
+        }).then(() => {
+          window.location.href = "panel-boletos-rifa.html";
+        });
+        return;
+      }
+    }
 
     document.getElementById("formRegistro").addEventListener("submit", async function(e){
       e.preventDefault();
@@ -130,59 +126,27 @@ if (snap.exists()) {
       const telefono = document.getElementById("telefono").value.trim();
       const poblacion = document.getElementById("poblacion").value.trim();
 
-      if (!/^[0-9]{10}$/.test(telefono)) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Número inválido',
-          text: 'El teléfono debe tener exactamente 10 dígitos.',
-          confirmButtonColor: '#004aad'
-        });
-        return;
-      }
-
       try {
         await setDoc(doc(db, "BoletosRifa", numBoleto), {
-          nombre,
-          telefono,
-          poblacion,
+          nombre: nombre,
+          telefono: telefono,
+          poblacion: poblacion,
           estado: "apartado",
           formaPago: "pendiente",
           fecha: serverTimestamp()
         }, { merge: true });
 
         Swal.fire({
-          title: `✅ ¡Boleto #${numBoleto} registrado correctamente!`,
-          html: `
-          <div style="max-width:100%; font-size:1.6em;">
-            <p>GRACIAS... El sistema te da 4 horas para pagar, y lo pone disponible otra vez si no se paga.</p>
-            <p>Envía comprobante de pago al WhatsApp <strong>3311571619</strong>.</p>
-            <p><strong>Cuenta Spin OXXO:</strong> 4217 4701 5601 6160<br>
-               <strong>CLABE:</strong> 7289 6900 0143 3179 21</p>
-            <p>📸📂 TOMA UNA CAPTURA SI DESEAS....</p>
-            <p>📌 Si pagaste por OXXO, anota tu nombre con lapicera en el ticket antes de tomarle foto.<br>
-               <b>Si pagaste por transferencia, en concepto solo pon tu nombre</b> o contacta a tu promotor y acuerda si le pagas en efectivo.</p>
-            <p style="margin-top:20px; font-weight:bold; text-align:center; font-size:1.2em;">
-              <span style="font-size:1.4em;">🎯 <strong>YA APARTÉ MI BOLETO, Y CREO QUE ES EL GANADOR 🥇🎉</strong></span><br><br>
-              <button id="btnWhatsapp" style="background:#25D366; color:white; padding:12px 24px; border-radius:8px; font-size:1.2em; border:none; cursor:pointer;">
-                ✅ ACEPTAR Y ENVIAR
-              </button>
-            </p>
-          </div>`,
           icon: 'success',
-          showConfirmButton: false,
-          width: window.innerWidth < 768 ? '100%' : '800px',
-          padding: '2em',
-          didOpen: () => {
-            document.getElementById("btnWhatsapp").addEventListener("click", () => {
-              const url = `https://wa.me/523311571619?text=Hola,%20ya%20apart%C3%A9%20mi%20boleto%20n%C3%BAmero%20${numBoleto}.%20En%20cuanto%20pueda%20te%20mando%20el%20comprobante%20de%20pago.%20%C2%A1Gracias!%20%F0%9F%99%8F%0A%0A%F0%9F%92%B3%20Datos%20para%20el%20pago%3A%0ACuenta%20Spin%20OXXO%3A%204217%204701%205601%206160%0ACLABE%3A%207289%206900%200143%203179%2021%0A%0A%F0%9F%94%B5%20%C2%BFTe%20gustar%C3%ADa%20hacer%20una%20rifa%20con%20control%20profesional%20como%20esta?%20Nosotros%20te%20armamos%20todo%20el%20sistema%20f%C3%A1cil,%20r%C3%A1pido%20y%20econ%C3%B3mico.%0AM%C3%A1s%20info%20aqu%C3%AD%3A%20https%3A%2F%2Fwww.facebook.com%2Fshare%2Fp%2F1APcHVjtJz%2F`;
-              window.open(url, '_blank');
-              window.location.href = "panel-boletos-rifa.html";
-            });
-          }
+          title: `✅ ¡Boleto #${numBoleto} registrado correctamente!`,
+          text: 'Gracias. Tienes 4 horas para pagar antes de que se libere.',
+          confirmButtonText: 'Aceptar'
+        }).then(() => {
+          window.location.href = "panel-boletos-rifa.html";
         });
 
       } catch (error) {
-        console.error("❌ Error al registrar el boleto:", error);
+        console.error("Error al registrar:", error);
         alert("Ocurrió un error al registrar el boleto. Intenta nuevamente.");
       }
     });
