@@ -150,19 +150,22 @@
             <p>🔹 Si pagaste por OXXO, anota tu nombre con lapicera en el ticket antes de tomarle foto.<br>
                <b>Si pagaste por transferencia, en concepto solo pon tu nombre</b> o contacta a tu promotor y acuerda si le pagas en efectivo.</p>
             <p style="margin-top:20px; font-weight:bold; text-align:center;">
-              <a href="${whatsURL}"
-                 target="_blank"
-                 style="display:inline-block; background:#25D366; color:white; padding:12px 24px; border-radius:8px; text-decoration:none; font-size:1.1em;">
+              <button id="btnIrWhatsapp"
+                 style="background:#25D366; color:white; padding:12px 24px; border-radius:8px; text-decoration:none; font-size:1.1em; border:none; cursor:pointer;">
                  ✅ ACEPTAR Y ENVIAR
-              </a>
+              </button>
             </p>
           </div>`,
           icon: 'success',
           showConfirmButton: false,
-          didDestroy: () => {
-            setTimeout(() => {
-              window.location.href = "panel-boletos-rifa.html";
-            }, 1000);
+          didOpen: () => {
+            document.getElementById("btnIrWhatsapp").addEventListener("click", () => {
+              window.open(whatsURL, '_blank');
+              Swal.close();
+              setTimeout(() => {
+                window.location.href = "panel-boletos-rifa.html";
+              }, 1000);
+            });
           },
           width: window.innerWidth < 768 ? '90%' : '600px'
         });
