@@ -346,6 +346,35 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 </script>
+<script type="module">
+const accesos = {
+  "Sergio A V": "sb28",
+  "admin": "admin2024",
+  "miriam": "mc24",
+  "sergio alvares v.": "ser01",
+  "diane": "dn26",
+  "steven": "sv27",
+  "manuel": "admin2024"
+};
+
+setTimeout(() => {
+  const clave = prompt("🔐 Ingresa tu clave de acceso:");
+  const usuario = Object.keys(accesos).find(k => accesos[k] === clave);
+  if (usuario) {
+    rolActivo = usuario;
+    document.title = "Panel - Bienvenido " + usuario.charAt(0).toUpperCase() + usuario.slice(1);
+    document.getElementById("tituloPanel").innerText = "Bienvenido " + usuario.charAt(0).toUpperCase() + usuario.slice(1);
+    document.querySelectorAll(".solo-" + usuario).forEach(el => el.style.display = "inline-block");
+    document.querySelectorAll(".solo-admin").forEach(el => {
+      if (usuario === "admin") el.style.display = "inline-block";
+    });
+    cargarBoletos();  // ✅ Ejecuta inmediatamente después de validarse
+  } else {
+    alert("❌ Clave incorrecta. No tienes acceso.");
+    document.body.innerHTML = "<h2 style='color:red;text-align:center;'>ACCESO DENEGADO</h2>";
+  }
+}, 100);
+</script>
 
 </body>
 </html>
