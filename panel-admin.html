@@ -96,6 +96,96 @@ storageBucket: "rifas-con-causa.firebasestorage.app",
 
 messagingSenderId: "347417635634",
 appId: "1:347417635634:web:3ddab8921d26707910452b"
+
+
+ 
+let tiempoRestante = 180;
+const contador = document.getElementById("contadorActualizacion");
+
+setInterval(() => {
+  const activo = document.activeElement;
+  const esEditable = activo && (activo.tagName === 'INPUT' || activo.tagName === 'SELECT' || activo.tagName === 'TEXTAREA');
+
+  tiempoRestante--;
+
+  if (tiempoRestante <= 40) {
+    contador.style.display = "block";
+    contador.textContent = esEditable
+      ? "⏸️ Editando..."
+      : `Actualización en: ${tiempoRestante}s`;
+  }
+
+  if (tiempoRestante <= 0) {
+    if (!esEditable) {
+      cargarBoletos();
+      console.log("🔁 Tabla actualizada automáticamente");
+    } else {
+      console.log("⏸️ Pausa: el usuario está interactuando");
+    }
+    tiempoRestante = 180;
+    contador.style.display = "none";
+  }
+}, 1000);
+
+
+ 
+let tiempoRestante = 180;
+let segundosSinMover = 0;
+const contador = document.getElementById("contadorActualizacion");
+let alarmaReproducida = false;
+
+const audio = new Audio("https://notificationsounds.com/storage/sounds/file-sounds-1157-pristine.mp3");
+
+ function exportarExcelConResumen(datosBoletos) {
+  const precio = parseFloat(document.getElementById("precioUnitario").value);
+  if (!precio || precio <= 0) return alert("⚠️ Ingresa un precio válido para calcular los totales.");
+
+  const boletosDetallados = datosBoletos.map(b => ({
+    Boleto: b.boleto,
+    Nombre: b.nombre || "",
+    Teléfono: b.telefono || "",
+    Población: b.poblacion || "",
+    Estado: b.estado || "",
+    Fecha: b.fecha ? new Date(b.fecha.seconds * 1000).toLocaleString().slice(0, 16) : "",
+    "Modificado por": b.modificadoPor || "",
+    "Forma Pago": b.formaPago || ""
+  }));
+
+  const roles = {};
+  const efectivo = datosBoletos.filter(b => b.formaPago === "efectivo");
+  efectivo.forEach(b => {
+    const rol = b.modificadoPor || "(sin rol)";
+    roles[rol] = (roles[rol] || 0) + 1;
+  });
+  const tablaRol = Object.entries(roles).map(([rol, cantidad]) => ({
+    Rol: rol,
+    "Boletos Efectivo": cantidad
+  }));
+
+  const resumen = {};
+  datosBoletos.forEach(b => {
+    if (b.estado === "pagado" && b.modificadoPor) {
+      resumen[b.modificadoPor] = (resumen[b.modificadoPor] || 0) + 1;
+    }
+  });
+
+  const resumenFinal = Object.keys(resumen).map(rol => ({
+    Rol: rol,
+    "Boletos Pagados": resumen[rol],
+    "Total a entregar": "$" + (resumen[rol] * precio).toFixed(2)
+  }));
+
+  const libro = XLSX.utils.book_new();
+  const hojaResumen = XLSX.utils.json_to_sheet([], { header: ["Rol", "Boletos Pagados", "Total a entregar"] });
+  XLSX.utils.sheet_add_json(hojaResumen, resumenFinal, { skipHeader: true, origin: "A2" });
+
+  XLSX.utils.book_append_sheet(libro, XLSX.utils.json_to_sheet(boletosDetallados), "Detalle Boletos");
+  XLSX.utils.book_append_sheet(libro, hojaResumen, "Resumen por Rol");
+  XLSX.utils.book_append_sheet(libro, XLSX.utils.json_to_sheet(tablaRol), "Efectivo x Rol");
+
+  XLSX.writeFile(libro, "reporte-completo-rifa.xlsx");
+}
+
 };
  
 const app = initializeApp(firebaseConfig);
@@ -446,96 +536,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-</script>
-
-<script type="module">
-let tiempoRestante = 180;
-const contador = document.getElementById("contadorActualizacion");
-
-setInterval(() => {
-  const activo = document.activeElement;
-  const esEditable = activo && (activo.tagName === 'INPUT' || activo.tagName === 'SELECT' || activo.tagName === 'TEXTAREA');
-
-  tiempoRestante--;
-
-  if (tiempoRestante <= 40) {
-    contador.style.display = "block";
-    contador.textContent = esEditable
-      ? "⏸️ Editando..."
-      : `Actualización en: ${tiempoRestante}s`;
-  }
-
-  if (tiempoRestante <= 0) {
-    if (!esEditable) {
-      cargarBoletos();
-      console.log("🔁 Tabla actualizada automáticamente");
-    } else {
-      console.log("⏸️ Pausa: el usuario está interactuando");
-    }
-    tiempoRestante = 180;
-    contador.style.display = "none";
-  }
-}, 1000);
-</script>
-<script type="module">
-let tiempoRestante = 180;
-let segundosSinMover = 0;
-const contador = document.getElementById("contadorActualizacion");
-let alarmaReproducida = false;
-
-const audio = new Audio("https://notificationsounds.com/storage/sounds/file-sounds-1157-pristine.mp3");
-
- function exportarExcelConResumen(datosBoletos) {
-  const precio = parseFloat(document.getElementById("precioUnitario").value);
-  if (!precio || precio <= 0) return alert("⚠️ Ingresa un precio válido para calcular los totales.");
-
-  const boletosDetallados = datosBoletos.map(b => ({
-    Boleto: b.boleto,
-    Nombre: b.nombre || "",
-    Teléfono: b.telefono || "",
-    Población: b.poblacion || "",
-    Estado: b.estado || "",
-    Fecha: b.fecha ? new Date(b.fecha.seconds * 1000).toLocaleString().slice(0, 16) : "",
-    "Modificado por": b.modificadoPor || "",
-    "Forma Pago": b.formaPago || ""
-  }));
-
-  const roles = {};
-  const efectivo = datosBoletos.filter(b => b.formaPago === "efectivo");
-  efectivo.forEach(b => {
-    const rol = b.modificadoPor || "(sin rol)";
-    roles[rol] = (roles[rol] || 0) + 1;
-  });
-  const tablaRol = Object.entries(roles).map(([rol, cantidad]) => ({
-    Rol: rol,
-    "Boletos Efectivo": cantidad
-  }));
-
-  const resumen = {};
-  datosBoletos.forEach(b => {
-    if (b.estado === "pagado" && b.modificadoPor) {
-      resumen[b.modificadoPor] = (resumen[b.modificadoPor] || 0) + 1;
-    }
-  });
-
-  const resumenFinal = Object.keys(resumen).map(rol => ({
-    Rol: rol,
-    "Boletos Pagados": resumen[rol],
-    "Total a entregar": "$" + (resumen[rol] * precio).toFixed(2)
-  }));
-
-  const libro = XLSX.utils.book_new();
-  const hojaResumen = XLSX.utils.json_to_sheet([], { header: ["Rol", "Boletos Pagados", "Total a entregar"] });
-  XLSX.utils.sheet_add_json(hojaResumen, resumenFinal, { skipHeader: true, origin: "A2" });
-
-  XLSX.utils.book_append_sheet(libro, XLSX.utils.json_to_sheet(boletosDetallados), "Detalle Boletos");
-  XLSX.utils.book_append_sheet(libro, hojaResumen, "Resumen por Rol");
-  XLSX.utils.book_append_sheet(libro, XLSX.utils.json_to_sheet(tablaRol), "Efectivo x Rol");
-
-  XLSX.writeFile(libro, "reporte-completo-rifa.xlsx");
-}
-
-
 </script>
 
 </body>
