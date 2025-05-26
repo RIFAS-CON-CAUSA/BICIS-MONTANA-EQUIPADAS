@@ -322,11 +322,7 @@ const resumenFinal = Object.keys(resumen).map(rol => ({
   "Boletos Pagados": resumen[rol],
   "Total a entregar": "$" + (resumen[rol] * precio).toFixed(2)
 }));
-
-Rol: rol,
-"Boletos Pagados": resumen[rol],
-"Total a entregar": "$" + (resumen[rol] * precio).toFixed(2)
-}));
+ 
 const libro = XLSX.utils.book_new();
 XLSX.utils.book_append_sheet(libro, XLSX.utils.json_to_sheet(boletosDetallados), "Detalle Boletos");
 const hojaResumen = XLSX.utils.json_to_sheet([], { header: ["Rol", "Boletos Pagados", "Total a entregar"] });
