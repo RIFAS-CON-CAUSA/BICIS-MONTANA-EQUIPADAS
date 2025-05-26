@@ -250,33 +250,6 @@ async function subirComprobante(id, archivo) {
   }
 }
 
-window.cargarBoletos = cargarBoletos;
-window.subirComprobante = subirComprobante;
-
-async function cambiarEstado(id, estado) {
-  const forma = document.getElementById("forma-" + id).value;
-  if (estado === "pagado") {
-    if (!forma || forma.includes("elige")) {
-      alert("⚠️ Primero selecciona una forma de pago válida.");
-      return;
-    }
-    const confirmacion = confirm("¿Estás seguro de marcar este boleto como pagado?");
-    if (!confirmacion) return;
-  }
-  try {
-    await updateDoc(doc(db, "BoletosRifa", id), {
-      formaPago: forma,
-      estado: estado,
-      modificadoPor: rolActivo,
-      fecha: serverTimestamp()
-    });
-    cargarBoletos();
-  } catch (error) {
-    console.error("❌ Error al guardar:", error);
-    alert("❌ Ocurrió un error al guardar.");
-  }
-}
-
 window.exportarExcelConResumen = function exportarExcelConResumen(datosBoletos) {
   const wb = XLSX.utils.book_new();
   const precio = parseFloat(document.getElementById("precioUnitario").value);
