@@ -315,7 +315,6 @@ function exportarExcelConResumen(boletos) {
 
   XLSX.writeFile(wb, "reporte-completo-rifa.xlsx");
 }
-const resumen = {};
 const resumenFinal = Object.keys(resumen).map(rol => ({
 const resumen = {}; // crea el objeto vacío
 
