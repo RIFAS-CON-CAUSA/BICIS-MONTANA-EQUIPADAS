@@ -140,17 +140,7 @@ const audio = new Audio("https://notificationsounds.com/storage/sounds/file-soun
   const precio = parseFloat(document.getElementById("precioUnitario").value);
   if (!precio || precio <= 0) return alert("⚠️ Ingresa un precio válido para calcular los totales.");
 
-  const boletosDetallados = datosBoletos.map(b => ({
-    Boleto: b.boleto,
-    Nombre: b.nombre || "",
-    Teléfono: b.telefono || "",
-    Población: b.poblacion || "",
-    Estado: b.estado || "",
-    Fecha: b.fecha ? new Date(b.fecha.seconds * 1000).toLocaleString().slice(0, 16) : "",
-    "Modificado por": b.modificadoPor || "",
-    "Forma Pago": b.formaPago || ""
-  }));
-
+ 
   const roles = {};
   const efectivo = datosBoletos.filter(b => b.formaPago === "efectivo");
   efectivo.forEach(b => {
