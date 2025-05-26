@@ -327,7 +327,6 @@ const hojaResumen = XLSX.utils.json_to_sheet([], { header: ["Rol", "Boletos Paga
 XLSX.utils.sheet_add_json(hojaResumen, resumenFinal, { skipHeader: true, origin: "A2" });
 XLSX.utils.book_append_sheet(libro, hojaResumen, "Resumen por Rol");
 XLSX.writeFile(libro, "reporte_boletos.xlsx");
-};
 </script>
  <!-- 🎟️ Plantilla oculta para generar boleto -->
 <div id="boletoPreview" style="position:relative; width:720px; height:1280px; display:none; font-family:sans-serif;">
