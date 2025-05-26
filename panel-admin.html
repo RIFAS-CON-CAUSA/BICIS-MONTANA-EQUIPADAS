@@ -315,16 +315,14 @@ function exportarExcelConResumen(boletos) {
 
   XLSX.writeFile(wb, "reporte-completo-rifa.xlsx");
 }
+
+ const resumen = {}; // crea el objeto vacío
 const resumenFinal = Object.keys(resumen).map(rol => ({
-const resumen = {}; // crea el objeto vacío
+  Rol: rol,
+  "Boletos Pagados": resumen[rol],
+  "Total a entregar": "$" + (resumen[rol] * precio).toFixed(2)
+}));
 
-datosBoletos.forEach(b => {
-  if (b.estado === "pagado" && b.modificadoPor) {
-    resumen[b.modificadoPor] = (resumen[b.modificadoPor] || 0) + 1;
-  }
-});
-
- 
 Rol: rol,
 "Boletos Pagados": resumen[rol],
 "Total a entregar": "$" + (resumen[rol] * precio).toFixed(2)
