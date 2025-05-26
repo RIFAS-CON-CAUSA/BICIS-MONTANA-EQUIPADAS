@@ -95,34 +95,37 @@
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  document.addEventListener("DOMContentLoaded", async () => {
-    const params = new URLSearchParams(window.location.search);
-    const numBoleto = params.get("boleto") || "???";
-    const idTemporal = Date.now().toString() + Math.random().toString(36).substring(2, 8);
-    document.getElementById("boletoTitulo").innerText = `Boleto #${numBoleto}`;
+ document.addEventListener("DOMContentLoaded", async () => {
+  const params = new URLSearchParams(window.location.search);
+  const numBoleto = params.get("boleto") || "???";
+  const idTemporal = Date.now().toString() + Math.random().toString(36).substring(2, 8);
+  document.getElementById("boletoTitulo").innerText = `Boleto #${numBoleto}`;
 
-    const refBoleto = doc(db, "BoletosRifa", numBoleto);
-    const snap = await getDoc(refBoleto);
+  const refBoleto = doc(db, "BoletosRifa", numBoleto);
+  const snap = await getDoc(refBoleto);
 
-    if (snap.exists()) {
-      const datos = snap.data();
-      if (datos.estado === "pagado") {
-        Swal.fire({
-          icon: "error",
-          title: "❌ Este boleto ya fue pagado",
-          text: "Selecciona otro disponible desde el panel.",
-          confirmButtonText: "Ir al Panel"
-        }).then(() => {
-          window.location.href = "panel-boletos-rifa.html";
+  if (snap.exists()) {
+    const datos = snap.data();
+
+    // Validación de expiración si está en_proceso
+    if (datos.estado === "en_proceso" && datos.timestamp?.toDate) {
+      const creado = datos.timestamp.toDate();
+      const ahora = new Date();
+      const minutosPasados = (ahora - creado) / 60000;
+
+      if (minutosPasados > 4) {
+        // Liberar automáticamente el boleto si ya expiró el proceso
+        await updateDoc(refBoleto, {
+          estado: "disponible",
+          idTemporal: "",
+          timestamp: serverTimestamp()
         });
-        return;
-      }
-
-      if (datos.estado === "apartado" || datos.estado === "en_proceso") {
+      } else {
+        // Todavía dentro del tiempo, no permitir registrar
         Swal.fire({
           icon: "error",
-          title: "⏳ Este boleto ya está en proceso en este momento o apartado",
-          text: "Selecciona otro desde el panel.",
+          title: "⏳ Este boleto ya está en proceso",
+          text: "Intenta con otro o vuelve a intentar más tarde.",
           confirmButtonText: "Regresar"
         }).then(() => {
           window.location.href = "panel-boletos-rifa.html";
@@ -131,29 +134,26 @@
       }
     }
 
-    // Reservar temporalmente el boleto
-    await updateDoc(refBoleto, {
-      estado: "en_proceso",
-      idTemporal: idTemporal,
-      timestamp: serverTimestamp()
-    });
+    if (datos.estado === "pagado" || datos.estado === "apartado") {
+      Swal.fire({
+        icon: "error",
+        title: "❌ Este boleto ya está ocupado",
+        text: "Selecciona otro desde el panel.",
+        confirmButtonText: "Regresar"
+      }).then(() => {
+        window.location.href = "panel-boletos-rifa.html";
+      });
+      return;
+    }
+  }
 
-    document.getElementById("formRegistro").addEventListener("submit", async function(e){
-      e.preventDefault();
+  // Reservar temporalmente el boleto
+  await updateDoc(refBoleto, {
+    estado: "en_proceso",
+    idTemporal: idTemporal,
+    timestamp: serverTimestamp()
+  });
 
-      const nombre = document.getElementById("nombre").value.trim();
-      const telefono = document.getElementById("telefono").value.trim();
-      const poblacion = document.getElementById("poblacion").value.trim();
-
-      try {
-        const snapFinal = await getDoc(refBoleto);
-        const datosFinal = snapFinal.data();
-
-        if (datosFinal.estado !== "en_proceso" || datosFinal.idTemporal !== idTemporal) {
-          Swal.fire("❌ Este boleto ya fue tomado por otra persona", "Selecciona otro disponible.", "error")
-          .then(() => window.location.href = "panel-boletos-rifa.html");
-          return;
-        }
 
         await setDoc(refBoleto, {
           nombre: nombre,
