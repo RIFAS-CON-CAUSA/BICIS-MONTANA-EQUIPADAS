@@ -143,68 +143,6 @@ setInterval(() => {
   }
 }, 1000);
 
-<script type="module">
-if (!location.origin.includes("https://rifas-con-causa.github.io")) {
-  alert("⚠️ Estás abriendo este archivo fuera del entorno web oficial. Algunas funciones como subida de archivos no funcionarán correctamente.\n\nPor favor, accede desde:\nhttps://rifas-con-causa.github.io/BICIS-MONTANA-EQUIPADAS/panel-admin.html");
-}
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, getDocs, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-import * as XLSX from "https://cdn.sheetjs.com/xlsx-0.20.0/package/xlsx.mjs";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
-  authDomain: "rifas-con-causa.firebaseapp.com",
-  projectId: "rifas-con-causa",
-  storageBucket: "rifas-con-causa.firebasestorage.app",
-  messagingSenderId: "347417635634",
-  appId: "1:347417635634:web:3ddab8921d26707910452b"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage();
-
-window.archivoSeleccionado = {};
-let rolActivo = "";
-let datosBoletos = [];
-
-const cuentasOficiales = [
-  "Transferencia o deposito Spin OXXO 6162"
-];
-
-const opcionesFormaPago = [
-  "Efectivo",
-  ...cuentasOficiales,
-  "Otro"
-];
-
-let tiempoRestante = 180;
-const contador = document.getElementById("contadorActualizacion");
-
-setInterval(() => {
-  const activo = document.activeElement;
-  const esEditable = activo && (activo.tagName === 'INPUT' || activo.tagName === 'SELECT' || activo.tagName === 'TEXTAREA');
-
-  tiempoRestante--;
-
-  if (tiempoRestante <= 40) {
-    contador.style.display = "block";
-    contador.textContent = esEditable ? "⏸️ Editando..." : `Actualización en: ${tiempoRestante}s`;
-  }
-
-  if (tiempoRestante <= 0) {
-    if (!esEditable) {
-      cargarBoletos();
-      console.log("🔁 Tabla actualizada automáticamente");
-    } else {
-      console.log("⏸️ Pausa: el usuario está interactuando");
-    }
-    tiempoRestante = 180;
-    contador.style.display = "none";
-  }
-}, 1000);
 
 async function cargarBoletos() {
   const querySnapshot = await getDocs(collection(db, "BoletosRifa"));
@@ -296,68 +234,6 @@ async function cambiarEstado(id, estado) {
   }
 }
 
-<script type="module">
-if (!location.origin.includes("https://rifas-con-causa.github.io")) {
-  alert("⚠️ Estás abriendo este archivo fuera del entorno web oficial. Algunas funciones como subida de archivos no funcionarán correctamente.\n\nPor favor, accede desde:\nhttps://rifas-con-causa.github.io/BICIS-MONTANA-EQUIPADAS/panel-admin.html");
-}
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, getDocs, updateDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-import * as XLSX from "https://cdn.sheetjs.com/xlsx-0.20.0/package/xlsx.mjs";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
-  authDomain: "rifas-con-causa.firebaseapp.com",
-  projectId: "rifas-con-causa",
-  storageBucket: "rifas-con-causa.firebasestorage.app",
-  messagingSenderId: "347417635634",
-  appId: "1:347417635634:web:3ddab8921d26707910452b"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const storage = getStorage();
-
-window.archivoSeleccionado = {};
-let rolActivo = "";
-let datosBoletos = [];
-
-const cuentasOficiales = [
-  "Transferencia o deposito Spin OXXO 6162"
-];
-
-const opcionesFormaPago = [
-  "Efectivo",
-  ...cuentasOficiales,
-  "Otro"
-];
-
-let tiempoRestante = 180;
-const contador = document.getElementById("contadorActualizacion");
-
-setInterval(() => {
-  const activo = document.activeElement;
-  const esEditable = activo && (activo.tagName === 'INPUT' || activo.tagName === 'SELECT' || activo.tagName === 'TEXTAREA');
-
-  tiempoRestante--;
-
-  if (tiempoRestante <= 40) {
-    contador.style.display = "block";
-    contador.textContent = esEditable ? "⏸️ Editando..." : `Actualización en: ${tiempoRestante}s`;
-  }
-
-  if (tiempoRestante <= 0) {
-    if (!esEditable) {
-      cargarBoletos();
-      console.log("🔁 Tabla actualizada automáticamente");
-    } else {
-      console.log("⏸️ Pausa: el usuario está interactuando");
-    }
-    tiempoRestante = 180;
-    contador.style.display = "none";
-  }
-}, 1000);
 
 async function cargarBoletos() {
   const querySnapshot = await getDocs(collection(db, "BoletosRifa"));
