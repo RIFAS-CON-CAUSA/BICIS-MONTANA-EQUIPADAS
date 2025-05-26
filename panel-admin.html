@@ -54,9 +54,10 @@
 el cambio de estado <u>debe hacerlo el ADMIN</u>,<br/>
 ya que ese monto no entrará a tu cuenta de ingresos.
 </p>
-<button class="solo-admin" onclick="exportarExcel()" style="margin-top: 15px; display: none;">
-📥 Exportar a Excel
-</button><div class="solo-admin" style="margin-top: 10px; display: none;">
+<button class="solo-admin" onclick="exportarExcelConResumen(boletos)" style="margin-top: 15px; display: none;">
+  📊 Exportar reporte completo
+</button>
+<div class="solo-admin" style="margin-top: 10px; display: none;">
 <label for="precioUnitario"><strong>💰 Precio unitario por boleto:</strong></label>
 <input id="precioUnitario" min="0" step="1" style="width: 100px;" type="number" value="0"/>
 </div><table border="1" id="tablaBoletos">
@@ -77,7 +78,7 @@ ya que ese monto no entrará a tu cuenta de ingresos.
 <tbody></tbody>
 </table>
  <!-- Espacio extra para margen inferior -->
-<div style="height: 60px;"></div>
+<div style="height: 80px;"></div>
 
 <script type="module">
 if (!location.origin.includes("https://rifas-con-causa.github.io")) {
@@ -263,25 +264,58 @@ document.body.innerHTML = "<h2 style='color:red;text-align:center;'>ACCESO DENEG
 }
 }, 100);  
   
-window.exportarExcel = function () {
-const precio = parseFloat(document.getElementById("precioUnitario").value);
-if (!precio || precio <= 0) return alert("⚠️ Ingresa un precio válido para calcular los totales.");
-const boletosDetallados = datosBoletos.map(b => ({
-Boleto: b.boleto,
-Nombre: b.nombre || "",
-Teléfono: b.telefono || "",
-Población: b.poblacion || "",
-Estado: b.estado || "",
-Fecha: b.fecha ? (b.fecha.toDate ? b.fecha.toDate().toLocaleString() : new Date(b.fecha).toLocaleString()) : "",
-"Modificado por": b.modificadoPor || "",
-"Forma Pago": b.formaPago || ""
-}));
-const resumen = {};
-datosBoletos.forEach(b => {
-if (b.estado === "pagado" && b.modificadoPor) {
-resumen[b.modificadoPor] = (resumen[b.modificadoPor] || 0) + 1;
+function exportarExcelConResumen(boletos) {
+  const wb = XLSX.utils.book_new();
+
+  const hoja1 = XLSX.utils.json_to_sheet(boletos);
+  XLSX.utils.book_append_sheet(wb, hoja1, "Todos");
+
+  const disponibles = boletos.filter(b => b.estado === "libre");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(disponibles), "Disponibles");
+
+  const apartados = boletos.filter(b => b.estado === "apartado");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(apartados), "Apartados");
+
+  const pagados = boletos.filter(b => b.estado === "pagado");
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(pagados), "Pagados");
+
+  const spin = pagados.filter(b =>
+    (b.formaPago || "").toLowerCase().includes("oxxo") ||
+    (b.formaPago || "").toLowerCase().includes("spin") ||
+    (b.formaPago || "").includes("4217") ||
+    (b.formaPago || "").includes("6160") ||
+    (b.formaPago || "").includes("6162")
+  );
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(spin), "Pagados SPIN");
+
+  const efectivo = pagados.filter(b =>
+    (b.formaPago || "").toLowerCase().includes("efectivo")
+  );
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(efectivo), "Pagados Efectivo");
+
+  const resumen = [
+    { Categoria: "Disponibles", Cantidad: disponibles.length },
+    { Categoria: "Apartados", Cantidad: apartados.length },
+    { Categoria: "Pagados", Cantidad: pagados.length },
+    { Categoria: "→ Por Spin/OXXO", Cantidad: spin.length },
+    { Categoria: "→ Por Efectivo", Cantidad: efectivo.length }
+  ];
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(resumen), "Resumen");
+
+  const roles = {};
+  efectivo.forEach(b => {
+    const rol = b.modificadoPor || "(sin rol)";
+    roles[rol] = (roles[rol] || 0) + 1;
+  });
+  const tablaRol = Object.entries(roles).map(([rol, cantidad]) => ({
+    Rol: rol,
+    "Boletos Efectivo": cantidad
+  }));
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(tablaRol), "Efectivo x Rol");
+
+  XLSX.writeFile(wb, "reporte-completo-rifa.xlsx");
 }
-});
+
 const resumenFinal = Object.keys(resumen).map(rol => ({
 Rol: rol,
 "Boletos Pagados": resumen[rol],
