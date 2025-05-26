@@ -142,20 +142,6 @@ setInterval(() => {
     contador.style.display = "none";
   }
 }, 1000);
-
-
-async function subirComprobante(id, archivo) {
-  if (!archivo) return;
-  const extension = archivo.name.split('.').pop();
-  const storageRef = ref(storage, `comprobantes/boletos/${id}.${extension}`);
-  try {
-    await uploadBytes(storageRef, archivo);
-    const url = await getDownloadURL(storageRef);
-    await updateDoc(doc(db, "BoletosRifa", id), { comprobanteUrl: url });
-    cargarBoletos();
-  } catch (e) {
-    console.error("❌ Error al subir comprobante:", e);
-    alert("Error al subir comprobante. Intenta de nuevo.");
   }
 }
 
