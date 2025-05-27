@@ -96,27 +96,30 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    async function limpiarBoletosCongelados() {
-      const boletosRef = collection(db, "BoletosRifa");
-      const querySnapshot = await getDocs(boletosRef);
-      const ahora = new Date();
+   async function limpiarBoletosCongelados() {
+  const boletosRef = collection(db, "BoletosRifa");
+  const querySnapshot = await getDocs(boletosRef);
+  const ahora = new Date();
 
-      for (const docSnap of querySnapshot.docs) {
-        const data = docSnap.data();
-        if (data.estado === "en_proceso" && data.timestamp?.toDate) {
-          const creado = data.timestamp.toDate();
-          if ((ahora - creado) > 30000) {
-            await updateDoc(doc(db, "BoletosRifa", docSnap.id), {
-  estado: "libre",
-  idTemporal: "",
-  timestamp: serverTimestamp()
-});
+  for (const docSnap of querySnapshot.docs) {
+    const data = docSnap.data();
+    if (data.estado === "en_proceso" && data.timestamp?.toDate) {
+      const creado = data.timestamp.toDate();
+      const tiempoPasado = ahora - creado;
 
-            console.log(`🔓 Boleto ${docSnap.id} liberado automáticamente`);
-          }
-        }
+      // ✅ Aquí cambia 30_000 por 240_000 si ya vas a usar 4 minutos
+      if (tiempoPasado > 30000) {
+        await updateDoc(doc(db, "BoletosRifa", docSnap.id), {
+          estado: "libre",
+          idTemporal: "",
+          timestamp: serverTimestamp()
+        });
+        console.log(`🔓 Boleto ${docSnap.id} liberado automáticamente`);
       }
     }
+  }
+}
+
 
     async function cargarBoletos() {
       const querySnapshot = await getDocs(collection(db, "BoletosRifa"));
