@@ -107,10 +107,11 @@
           const creado = data.timestamp.toDate();
           if ((ahora - creado) > 30000) {
             await updateDoc(doc(db, "BoletosRifa", docSnap.id), {
-              estado: "disponible",
-              idTemporal: "",
-              timestamp: serverTimestamp()
-            });
+  estado: "libre",
+  idTemporal: "",
+  timestamp: serverTimestamp()
+});
+
             console.log(`🔓 Boleto ${docSnap.id} liberado automáticamente`);
           }
         }
@@ -142,12 +143,13 @@
           </div>
           <h3>#${boleto.boleto}</h3>
         `;
-        if (boleto.estado === "libre") {
-          div.style.cursor = "pointer";
-          div.addEventListener("click", () => {
-            window.location.href = `registro.html?boleto=${boleto.boleto}`;
-          });
-        }
+        if (boleto.estado === "libre" || boleto.estado === "disponible") {
+  div.style.cursor = "pointer";
+  div.addEventListener("click", () => {
+    window.location.href = `registro.html?boleto=${boleto.boleto}`;
+  });
+}
+
         grid.appendChild(div);
       });
     }
