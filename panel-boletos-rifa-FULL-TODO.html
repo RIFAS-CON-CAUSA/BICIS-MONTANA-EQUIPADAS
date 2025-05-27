@@ -1,0 +1,211 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rifa Bicis Montaña - Boletos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0 0 200px 0;
+      background: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .barra-navegacion, .pie-de-pagina {
+      width: 100%;
+      text-align: center;
+      background: #004aad;
+      color: white;
+      padding: 10px;
+      font-weight: bold;
+      font-size: 1.8em;
+    }
+    .instrucciones {
+      text-align: center;
+      padding: 10px;
+      font-size: 1.15em;
+      max-width: 600px;
+    }
+    .instrucciones p:last-child {
+      font-size: 2.2em;
+    }
+    #boletosGrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      gap: 8px;
+      padding: 10px;
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 160px;
+    }
+    .boletoCard {
+      border: 2px solid #004aad;
+      border-radius: 8px;
+      padding: 5px;
+      color: white;
+      text-align: center;
+      font-weight: bold;
+    }
+    .seriesGrid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2px;
+      margin-bottom: 5px;
+    }
+    .seriesGrid span {
+      background: rgba(255,255,255,0.2);
+      padding: 2px;
+      border-radius: 4px;
+      font-size: 0.7em;
+    }
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="barra-navegacion">
+    <a href="index.html" style="color:white; text-decoration:none;">Regresar a Inicio</a>
+  </div>
+
+  <h2>Rifa Bicis Montaña - Boletos</h2>
+  <div class="instrucciones">
+    <p>🔽 Da clic en un boleto verde para registrarlo. Tienes 4 horas para hacer el pago antes de que se libere de nuevo.</p>
+    <p>✅ Verde = Disponible | 🟡 Amarillo = Apartado | 🔴Rojo = Pagado</p>
+  </div>
+
+  <div id="boletosGrid"></div>
+
+  <div class="pie-de-pagina">
+    <p>Gracias por apoyar esta causa. Tu apoyo impulsa la cultura del deporte y fortalece a nuestra comunidad.</p>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      doc,
+      updateDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC-9BVF6sfbA1IcmawTtxFiwHOyHv0Qa3g",
+      authDomain: "rifas-con-causa.firebaseapp.com",
+      projectId: "rifas-con-causa",
+      storageBucket: "rifas-con-causa.appspot.com",
+      messagingSenderId: "347417635634",
+      appId: "1:347417635634:web:3ddab8921d26707910452b"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function limpiarBoletosCongelados() {
+      const boletosRef = collection(db, "BoletosRifa");
+      const querySnapshot = await getDocs(boletosRef);
+      const ahora = new Date();
+
+      for (const docSnap of querySnapshot.docs) {
+        const data = docSnap.data();
+        if (data.estado === "en_proceso" && data.timestamp?.toDate) {
+          const creado = data.timestamp.toDate();
+          const tiempoPasado = ahora - creado;
+
+          if (tiempoPasado > 30000) {
+            await updateDoc(doc(db, "BoletosRifa", docSnap.id), {
+              estado: "libre",
+              idTemporal: "",
+              timestamp: serverTimestamp()
+            });
+            console.log(`🔓 Boleto ${docSnap.id} liberado automáticamente`);
+          }
+        }
+      }
+    }
+
+    async function cargarBoletos() {
+      const querySnapshot = await getDocs(collection(db, "BoletosRifa"));
+      const boletos = [];
+      querySnapshot.forEach((doc) => boletos.push(doc.data()));
+      boletos.sort((a, b) => parseInt(a.boleto) - parseInt(b.boleto));
+      mostrarBoletos(boletos);
+    }
+
+    function mostrarBoletos(lista) {
+      const grid = document.getElementById("boletosGrid");
+      if (!grid) {
+        console.error("❌ No se encontró el contenedor con id='boletosGrid'");
+        return;
+      }
+      grid.innerHTML = "";
+
+      lista.forEach((boleto) => {
+        let color = "#2ecc71"; // libre
+        if (boleto.estado === "apartado") color = "#f1c40f";
+        if (boleto.estado === "pagado") color = "#e74c3c";
+        if (boleto.estado === "en_proceso") color = "#95a5a6";
+
+        const div = document.createElement("div");
+        div.className = "boletoCard";
+        div.style.backgroundColor = color;
+        div.innerHTML = `
+          <div class="seriesGrid">
+            ${(boleto.series || ["01","02","03","04","05","06","07","08","09","10"])
+              .map(num => `<span>${num}</span>`).join("")}
+          </div>
+          <h3>#${boleto.boleto}</h3>
+        `;
+
+        if (boleto.estado === "libre") {
+          div.style.cursor = "pointer";
+          div.addEventListener("click", () => {
+            window.location.href = \`registro.html?boleto=\${boleto.boleto}\`;
+          });
+        } else if (boleto.estado === "en_proceso") {
+          div.title = "⏳ EN PROCESO DE APARTADO";
+        }
+
+        grid.appendChild(div);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      await limpiarBoletosCongelados();
+      setTimeout(() => cargarBoletos(), 200);
+
+      setTimeout(() => {
+        const mensaje = document.createElement("div");
+        mensaje.id = "bienvenidaPanel";
+        mensaje.innerHTML = "<strong>✅ BIENVENIDO.</strong><br>LOS BOLETOS VERDES ESTÁN DISPONIBLES.";
+        mensaje.style = `
+          position: absolute;
+          top: 80px;
+          left: 50%;
+          transform: translateX(-50%);
+          background-color: #2ecc71;
+          color: white;
+          padding: 20px 40px;
+          border-radius: 12px;
+          font-size: 1.5em;
+          font-weight: bold;
+          z-index: 9999;
+          animation: fadeOut 0.5s ease-in-out 2.5s forwards;
+          text-align: center;
+        `;
+        document.body.appendChild(mensaje);
+        setTimeout(() => mensaje.remove(), 3000);
+      }, 300);
+    });
+  </script>
+</body>
+</html>
