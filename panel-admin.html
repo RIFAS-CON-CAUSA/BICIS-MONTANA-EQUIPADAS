@@ -218,7 +218,7 @@ if (nuevoEstado === "pagado" && b) {
  const oportunidades = Array.isArray(b.series) ? b.series.slice(0, 10) : [];
 generarBoleto(b.nombre || "Participante", b.poblacion || "", b.boleto || "000", oportunidades, b.telefono || "");
    // WhatsApp link directo al número del participante
-  const mensaje = "📩 ¡Gracias por apoyar la causa! Aquí tienes tu boleto #" + b.boleto + " de la rifa de bicicletas.\n\n✅ Participas con 10 oportunidades.\n\nMás información en: https://rifas-con-causa.github.io/BICIS-MONTANA-EQUIPADAS/index.html";
+  const mensaje = "📩 ¡Gracias por apoyar la causa! Aquí tienes tu boleto PAGADO #" + b.boleto + " de la rifa de bicicletas.\n\n✅ Participas con 10 oportunidades.\n\nMás información en: https://rifas-con-causa.github.io/BICIS-MONTANA-EQUIPADAS/index.html";
   const numeroLimpio = (b.telefono || "").replace(/\D/g, "");
   if (numeroLimpio.length >= 10) {
     const waURL = `https://wa.me/52${numeroLimpio}?text=${encodeURIComponent(mensaje)}`;
