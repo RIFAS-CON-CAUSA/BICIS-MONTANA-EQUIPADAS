@@ -153,8 +153,9 @@
     }
 
     document.addEventListener("DOMContentLoaded", async () => {
-      await limpiarBoletosCongelados();
-      await cargarBoletos();
+    await limpiarBoletosCongelados();  // libera si es necesario
+setTimeout(() => cargarBoletos(), 200);  // recarga luego de liberar
+
     });
   </script>
 </head>
