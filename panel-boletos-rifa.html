@@ -121,7 +121,8 @@
           const creado = data.timestamp.toDate();
           const tiempoPasado = ahora - creado;
 
-          if (tiempoPasado > 30000) {
+           if (tiempoPasado > 180000) // 3 minutos en milisegundos
+
             await updateDoc(doc(db, "BoletosRifa", docSnap.id), {
               estado: "libre",
               idTemporal: "",
@@ -214,6 +215,21 @@
         document.body.appendChild(mensaje);
         setTimeout(() => mensaje.remove(), 3000);
       }, 300);
+      // 🔁 AUTORREFRESCO CADA 3 MINUTOS CON PAUSA SI EL USUARIO INTERACTÚA
+let enInteraccion = false;
+
+document.addEventListener("mousedown", () => enInteraccion = true);
+document.addEventListener("mouseup", () => enInteraccion = false);
+
+setInterval(() => {
+  if (!enInteraccion) {
+    console.log("🔁 Auto-refresh activado");
+    cargarBoletos();
+  } else {
+    console.log("⏸ Auto-refresh pausado por interacción");
+  }
+}, 180000); // 3 minutos
+
     });
   </script>
 </body>
