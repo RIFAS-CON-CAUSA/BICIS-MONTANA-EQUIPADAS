@@ -179,20 +179,21 @@
         const mensaje = document.createElement("div");
         mensaje.id = "bienvenidaPanel";
         mensaje.innerHTML = "<strong>✅ BIENVENIDO.</strong><br>LOS BOLETOS VERDES ESTÁN DISPONIBLES.";
-        mensaje.style = \`
-          position: absolute;
-          top: 200px;
-          left: 50%;
-          transform: translateX(-50%);
-          background-color: #2ecc71;
-          color: white;
-          padding: 10px 30px;
-          border-radius: 10px;
-          font-size: 1.1em;
-          font-weight: bold;
-          z-index: 9999;
-          animation: fadeOut 0.5s ease-in-out 2.5s forwards;
-        \`;
+        mensaje.style = `
+  position: absolute;
+  top: 200px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #2ecc71;
+  color: white;
+  padding: 10px 30px;
+  border-radius: 10px;
+  font-size: 1.1em;
+  font-weight: bold;
+  z-index: 9999;
+  animation: fadeOut 0.5s ease-in-out 2.5s forwards;
+`;
+
         document.body.appendChild(mensaje);
         setTimeout(() => mensaje.remove(), 3000);
       }, 300);
