@@ -168,9 +168,17 @@
 
         if (boleto.estado === "libre") {
   div.style.cursor = "pointer";
-  div.addEventListener("click", () => {
+          
+ div.addEventListener("click", async () => {
+  div.style.backgroundColor = "#95a5a6"; // gris inmediato
+  div.title = "⏳ EN PROCESO DE APARTADO";
+  div.style.cursor = "default";
+  setTimeout(() => {
     window.location.href = `registro.html?boleto=${boleto.boleto}`;
-  });
+  }, 100); // leve retardo para que se vea el cambio
+});
+
+          
 } else if (boleto.estado === "en_proceso") {
   div.title = "⏳ EN PROCESO DE APARTADO";
 }
