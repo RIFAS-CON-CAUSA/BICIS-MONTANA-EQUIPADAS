@@ -167,13 +167,14 @@
         `;
 
         if (boleto.estado === "libre") {
-          div.style.cursor = "pointer";
-          div.addEventListener("click", () => {
-            window.location.href = \`registro.html?boleto=\${boleto.boleto}\`;
-          });
-        } else if (boleto.estado === "en_proceso") {
-          div.title = "⏳ EN PROCESO DE APARTADO";
-        }
+  div.style.cursor = "pointer";
+  div.addEventListener("click", () => {
+    window.location.href = `registro.html?boleto=${boleto.boleto}`;
+  });
+} else if (boleto.estado === "en_proceso") {
+  div.title = "⏳ EN PROCESO DE APARTADO";
+}
+
 
         grid.appendChild(div);
       });
