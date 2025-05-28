@@ -170,18 +170,51 @@
           <h3>#${boleto.boleto}</h3>
         `;
 
-        if (boleto.estado === "libre") {
+        
+
+        
+    if (boleto.estado === "libre") {
   div.style.cursor = "pointer";
-          
- div.addEventListener("click", async () => {
-  div.style.backgroundColor = "#95a5a6"; // gris inmediato
-  div.title = "⏳ EN PROCESO DE APARTADO";
-  div.style.cursor = "default";
+
+  div.addEventListener("click", async () => {
+    div.style.backgroundColor = "#95a5a6"; // gris inmediato
+    div.title = "⏳ EN PROCESO DE APARTADO";
+    div.style.cursor = "default";
+
+    // Mensaje visible para móviles
+    const aviso = document.createElement("div");
+    aviso.innerText = "⏳ En proceso...";
+    aviso.style.fontSize = "0.7em";
+    aviso.style.backgroundColor = "#555";
+    aviso.style.color = "white";
+    aviso.style.borderRadius = "5px";
+    aviso.style.padding = "2px 5px";
+    aviso.style.marginTop = "4px";
+    aviso.style.display = "inline-block";
+    div.appendChild(aviso);
+
+    // ✅ Guardar como en_proceso con timestamp
+    const boletoRef = doc(db, "BoletosRifa", boleto.id || boleto.boleto.toString().padStart(3, '0'));
+    await updateDoc(boletoRef, {
+      estado: "en_proceso",
+      timestamp: serverTimestamp(),
+    });
+
+    setTimeout(() => {
+      window.location.href = `registro.html?boleto=${boleto.boleto}`;
+    }, 150);
+  });
+}
+
+
+   
   setTimeout(() => {
     window.location.href = `registro.html?boleto=${boleto.boleto}`;
   }, 100); // leve retardo para que se vea el cambio
 });
 
+
+          
           
 } else if (boleto.estado === "en_proceso") {
   div.title = "⏳ EN PROCESO DE APARTADO";
