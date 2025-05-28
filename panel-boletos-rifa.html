@@ -200,17 +200,29 @@
         document.body.appendChild(mensaje);
         setTimeout(() => mensaje.remove(), 3000);
       }, 300);
-      let enInteraccion = false;
-      document.addEventListener("mousedown", () => enInteraccion = true);
-      document.addEventListener("mouseup", () => enInteraccion = false);
-      setInterval(() => {
-        if (!enInteraccion) {
-          console.log("🔁 Auto-refresh activado");
-          cargarBoletos();
-        } else {
-          console.log("⏸ Auto-refresh pausado por interacción");
-        }
-      }, 75000);
+
+      
+    let enInteraccion = false;
+
+document.addEventListener("mousedown", () => enInteraccion = true);
+document.addEventListener("mouseup", () => enInteraccion = false);
+
+setInterval(async () => {
+  if (!enInteraccion) {
+    console.log("🔁 Auto-refresh activado");
+
+    try {
+      await limpiarBoletosCongelados(); // ✅ Libera boletos grises
+      await cargarBoletos();             // ✅ Actualiza la vista
+    } catch (err) {
+      console.error("❌ Error en auto-refresh:", err);
+    }
+
+  } else {
+    console.log("⏸ Auto-refresh pausado por interacción");
+  }
+}, 75000); // ⏱️ Cada 75 segundos
+
     });
   </script>
 </body>
