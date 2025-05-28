@@ -245,26 +245,27 @@ setInterval(async () => {
 
   <!-- 🔽 Aquí va el botón con el modal -->
 
-  <button onclick="document.getElementById('modalBases').style.display='block'"
-  style="margin: 20px; background:#27ae60; color:white; border:none; border-radius:30px; font-weight:bold; font-size:14px; cursor:pointer;">
+  
+  <!-- 🔽 Botón y Modal actualizado -->
+<button onclick="document.getElementById('modalBases').style.display='block'" style="margin: 30px auto; background:#27ae60; color:white; border:none; border-radius:30px; font-weight:bold; font-size:20px; padding:12px 24px; cursor:pointer;">
   📄 Bases del sorteo
 </button>
 
-  
-  <div id="modalBases" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
-    <div style="background:white; max-width:1500px; margin:4% auto; padding:40px; border-radius:20px; box-shadow:0 6px 18px rgba(0,0,0,0.3); font-family:Arial;">
-
-    <h3 style="margin-top:0; color:#2d72d3;">📜 Bases del sorteo</h3>
-      <ul style="padding-left:20px; line-height:1.5;">
-        <li>🔁 Si el número ganador no fue pagado, la rifa se repite en un máximo de 8 días.</li>
-        <li>📅 Si no se vendió el 80%, se puede reprogramar hasta por 15 días más.</li>
-        <li>💳 LA CUENTA DE PAGOS  Spin OXXO: 4217 4701 5601 6160 CLABE: 7289 6900 0143 3179 21</li>
-        <li>📲 Los comprobantes de pago son al WhatsApp 3311571619 o tu promotor te registrará tu boleto</li>
-      </ul>
-      <p style="margin-top:20px; font-style:italic; color:#555;">*Gracias. Nuestra misión: transparencia, respeto y calidad.*</p>
-      <button onclick="document.getElementById('modalBases').style.display='none'" style="margin-top:10px; background:#e53935; color:white; border:none; padding:8px 16px; border-radius:20px; font-weight:bold; cursor:pointer;">Cerrar</button>
-    </div>
+<div id="modalBases" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
+  <div style="background:white; max-width:800px; margin:5% auto; padding:40px; border-radius:20px; box-shadow:0 6px 18px rgba(0,0,0,0.4); font-family:Arial; font-size:1.4em;">
+    <h3 style="margin-top:0; color:#2d72d3; font-size:1.6em;">📜 Bases del sorteo</h3>
+    <ul style="padding-left:30px; line-height:1.7;">
+      <li>🔁 Si el número ganador no fue pagado, la rifa se repite en un máximo de 8 días.</li>
+      <li>📅 Si no se vendió el 80%, se puede reprogramar hasta por 15 días más.</li>
+      <li>💳 LA CUENTA DE PAGOS: Spin OXXO: <strong>4217 4701 5601 6160</strong> CLABE: <strong>7289 6900 0143 3179 21</strong></li>
+      <li>📲 Los comprobantes de pago son al WhatsApp <strong>3311571619</strong> o tu promotor te registrará tu boleto.</li>
+    </ul>
+    <p style="margin-top:30px; font-style:italic; color:#555;">*Gracias. Nuestra misión: transparencia, respeto y calidad.*</p>
+    <button onclick="document.getElementById('modalBases').style.display='none'" style="margin-top:20px; background:#e53935; color:white; border:none; padding:12px 24px; font-size:1em; border-radius:20px; font-weight:bold; cursor:pointer;">
+      ❌ Cerrar
+    </button>
   </div>
+</div>
 
 </body>
 </html>
