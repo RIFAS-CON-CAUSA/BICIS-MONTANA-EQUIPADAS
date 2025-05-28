@@ -221,15 +221,15 @@ let enInteraccion = false;
 document.addEventListener("mousedown", () => enInteraccion = true);
 document.addEventListener("mouseup", () => enInteraccion = false);
 
-setInterval(() => {
+setInterval(async () => {
   if (!enInteraccion) {
-    console.log("🔁 Auto-refresh activado");
+    console.log("🔁 Auto-refresh: limpieza + recarga");
+    await limpiarBoletosCongelados();
     cargarBoletos();
   } else {
-    console.log("⏸ Auto-refresh pausado por interacción");
+    console.log("⏸ Pausado por interacción");
   }
-}, 180000); // 3 minutos
-
+}, 180000); // cada 3 minutos
     });
   </script>
 </body>
