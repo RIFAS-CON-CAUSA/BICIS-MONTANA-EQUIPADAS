@@ -121,7 +121,7 @@
           const creado = data.timestamp.toDate();
           const tiempoPasado = ahora - creado;
 
-           if (tiempoPasado > 180000) // 3 minutos en milisegundos
+           if (tiempoPasado > 60000) // 1 minutos en milisegundos
 
             await updateDoc(doc(db, "BoletosRifa", docSnap.id), {
               estado: "libre",
