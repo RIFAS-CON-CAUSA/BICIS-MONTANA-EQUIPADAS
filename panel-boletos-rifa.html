@@ -200,9 +200,7 @@
     }, 150);
   });
 }
-
-
-
+}
     document.addEventListener("DOMContentLoaded", async () => {
       await limpiarBoletosCongelados();
       setTimeout(() => cargarBoletos(), 200);
@@ -230,8 +228,6 @@
         setTimeout(() => mensaje.remove(), 3000);
       }, 300);
 
-   
-
 // ⏲️ AUTORREFRESCO CADA 3 MINUTOS CON PAUSA SI EL USUARIO INTERACTÚA
 let enInteraccion = false;
 
@@ -247,8 +243,7 @@ setInterval(async () => {
     console.log("⏸ Pausado por interacción");
   }
 }, 180000); // cada 3 minutos
-
-});      
+    
 </script>
 </body>
 </html>
