@@ -227,7 +227,9 @@
         document.body.appendChild(mensaje);
         setTimeout(() => mensaje.remove(), 3000);
       }, 300);
-      // 🔁 AUTORREFRESCO CADA 3 MINUTOS CON PAUSA SI EL USUARIO INTERACTÚA
+
+      
+    // ⏲️ AUTORREFRESCO CADA 3 MINUTOS CON PAUSA SI EL USUARIO INTERACTÚA
 let enInteraccion = false;
 
 document.addEventListener("mousedown", () => enInteraccion = true);
@@ -235,13 +237,14 @@ document.addEventListener("mouseup", () => enInteraccion = false);
 
 setInterval(async () => {
   if (!enInteraccion) {
-    console.log("🔁 Auto-refresh: limpieza + recarga");
+    console.log("🔁 Actualización automática: limpieza + recarga");
     await limpiarBoletosCongelados();
     cargarBoletos();
   } else {
     console.log("⏸ Pausado por interacción");
   }
 }, 180000); // cada 3 minutos
+
 </script>
 </body>
 </html>
