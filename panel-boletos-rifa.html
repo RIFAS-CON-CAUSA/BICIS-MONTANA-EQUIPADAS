@@ -118,7 +118,7 @@
         if (data.estado === "en_proceso" && data.timestamp?.toDate) {
           const creado = data.timestamp.toDate();
           const tiempoPasado = ahora - creado;
-          if (tiempoPasado > 180000) {
+          if (tiempoPasado > 60000) {
             await updateDoc(doc(db, "BoletosRifa", docSnap.id), {
               estado: "libre",
               idTemporal: "",
