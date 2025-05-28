@@ -228,8 +228,9 @@
         setTimeout(() => mensaje.remove(), 3000);
       }, 300);
 
-      
-    // ⏲️ AUTORREFRESCO CADA 3 MINUTOS CON PAUSA SI EL USUARIO INTERACTÚA
+   
+
+// ⏲️ AUTORREFRESCO CADA 3 MINUTOS CON PAUSA SI EL USUARIO INTERACTÚA
 let enInteraccion = false;
 
 document.addEventListener("mousedown", () => enInteraccion = true);
@@ -245,6 +246,7 @@ setInterval(async () => {
   }
 }, 180000); // cada 3 minutos
 
+      
 </script>
 </body>
 </html>
