@@ -132,18 +132,31 @@
               idTemporal: "",
               timestamp: serverTimestamp()
             });
-            console.log(`🔓 Boleto ${docSnap.id} libera
-          padding: 20px 40px;
-          border-radius: 12px;
-          font-size: 1.5em;
-          font-weight: bold;
-          z-index: 9999;
-          animation: fadeOut 0.5s ease-in-out 2.5s forwards;
-          text-align: center;
-        `;
-        document.body.appendChild(mensaje);
-        setTimeout(() => mensaje.remove(), 3000);
-      }, 300);
+          
+           console.log(`🔓 Boleto ${docSnap.id} liberado automáticamente`);
+
+// Si lo que querías era mostrar visualmente este mensaje:
+const mensaje = document.createElement("div");
+mensaje.id = "liberacionAviso";
+mensaje.innerHTML = `🔓 Boleto #${docSnap.id} fue liberado automáticamente`;
+mensaje.style = `
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #e67e22;
+  color: white;
+  padding: 20px 40px;
+  border-radius: 12px;
+  font-size: 1.5em;
+  font-weight: bold;
+  z-index: 9999;
+  animation: fadeOut 0.5s ease-in-out 2.5s forwards;
+  text-align: center;
+`;
+document.body.appendChild(mensaje);
+setTimeout(() => mensaje.remove(), 3000);
+
 
 // ⏲️ AUTORREFRESCO CADA 3 MINUTOS CON PAUSA SI EL USUARIO INTERACTÚA
 let enInteraccion = false;
