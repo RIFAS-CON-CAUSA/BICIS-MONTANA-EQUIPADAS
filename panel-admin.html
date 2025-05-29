@@ -264,35 +264,79 @@ document.body.innerHTML = "<h2 style='color:red;text-align:center;'>ACCESO DENEG
 }, 100);  
   
 window.exportarExcel = function () {
-const precio = parseFloat(document.getElementById("precioUnitario").value);
-if (!precio || precio <= 0) return alert("⚠️ Ingresa un precio válido para calcular los totales.");
-const boletosDetallados = datosBoletos.map(b => ({
-Boleto: b.boleto,
-Nombre: b.nombre || "",
-Teléfono: b.telefono || "",
-Población: b.poblacion || "",
-Estado: b.estado || "",
-Fecha: b.fecha ? (b.fecha.toDate ? b.fecha.toDate().toLocaleString() : new Date(b.fecha).toLocaleString()) : "",
-"Modificado por": b.modificadoPor || "",
-"Forma Pago": b.formaPago || ""
-}));
-const resumen = {};
-datosBoletos.forEach(b => {
-if (b.estado === "pagado" && b.modificadoPor) {
-resumen[b.modificadoPor] = (resumen[b.modificadoPor] || 0) + 1;
-}
-});
-const resumenFinal = Object.keys(resumen).map(rol => ({
-Rol: rol,
-"Boletos Pagados": resumen[rol],
-"Total a entregar": "$" + (resumen[rol] * precio).toFixed(2)
-}));
-const libro = XLSX.utils.book_new();
-XLSX.utils.book_append_sheet(libro, XLSX.utils.json_to_sheet(boletosDetallados), "Detalle Boletos");
-const hojaResumen = XLSX.utils.json_to_sheet([], { header: ["Rol", "Boletos Pagados", "Total a entregar"] });
-XLSX.utils.sheet_add_json(hojaResumen, resumenFinal, { skipHeader: true, origin: "A2" });
-XLSX.utils.book_append_sheet(libro, hojaResumen, "Resumen por Rol");
-XLSX.writeFile(libro, "reporte_boletos.xlsx");
+  const precio = parseFloat(document.getElementById("precioUnitario").value || "0");
+  if (isNaN(precio) || precio <= 0) return alert("⚠️ Especifica un precio unitario válido antes de exportar.");
+
+  const libro = XLSX.utils.book_new();
+  const ahora = new Date();
+  const fechaHoy = ahora.toLocaleDateString();
+
+  // 1. Detalle completo
+  XLSX.utils.book_append_sheet(libro, XLSX.utils.json_to_sheet(datosBoletos), "Detalle Boletos");
+
+  // 2. Resumen por Rol
+  const resumen = {};
+  datosBoletos.forEach(b => {
+    if (b.estado === "pagado") {
+      const rol = b.modificadoPor || "Sin rol";
+      if (!resumen[rol]) resumen[rol] = 0;
+      resumen[rol]++;
+    }
+  });
+  const resumenArray = Object.entries(resumen).map(([rol, cantidad]) => ({
+    Rol: rol,
+    "Boletos Pagados": cantidad,
+    "Total a entregar": cantidad * precio
+  }));
+  const hojaResumen = XLSX.utils.json_to_sheet([], { header: ["Rol", "Boletos Pagados", "Total a entregar"] });
+  XLSX.utils.sheet_add_json(hojaResumen, resumenArray, { skipHeader: true, origin: "A2" });
+  XLSX.utils.book_append_sheet(libro, hojaResumen, "Resumen por Rol");
+
+  // 3. Boletos Pagados
+  const pagados = datosBoletos.filter(b => b.estado === "pagado");
+  XLSX.utils.book_append_sheet(libro, XLSX.utils.json_to_sheet(pagados), "Boletos Pagados");
+
+  // 4. Apartados
+  const apartados = datosBoletos.filter(b => b.estado === "apartado");
+  XLSX.utils.book_append_sheet(libro, XLSX.utils.json_to_sheet(apartados), "Boletos Apartados");
+
+  // 5. En Proceso
+  const enProceso = datosBoletos.filter(b => b.estado === "en_proceso");
+  XLSX.utils.book_append_sheet(libro, XLSX.utils.json_to_sheet(enProceso), "Boletos en Proceso");
+
+  // 6. Libres
+  const libres = datosBoletos.filter(b => b.estado === "libre");
+  XLSX.utils.book_append_sheet(libro, XLSX.utils.json_to_sheet(libres), "Boletos Disponibles");
+
+  // 7. Pagados en efectivo
+  const efectivo = datosBoletos.filter(b => b.estado === "pagado" && b.formaPago === "Efectivo");
+  XLSX.utils.book_append_sheet(libro, XLSX.utils.json_to_sheet(efectivo), "Pagados Efectivo");
+
+  // 8. Pagados por SPIN
+  const spin = datosBoletos.filter(b => b.estado === "pagado" && b.formaPago?.includes("6160"));
+  XLSX.utils.book_append_sheet(libro, XLSX.utils.json_to_sheet(spin), "Pagados SPIN 6160");
+
+  // 9. Total general pagados
+  const hojaTotalPagados = XLSX.utils.json_to_sheet([], { header: ["Total Pagados", "Monto"] });
+  const totalPagados = pagados.length;
+  XLSX.utils.sheet_add_json(
+    hojaTotalPagados,
+    [{ "Total Pagados": totalPagados, "Monto": totalPagados * precio }],
+    { skipHeader: true, origin: "A2" }
+  );
+  XLSX.utils.book_append_sheet(libro, hojaTotalPagados, "Total Pagados");
+
+  // 10. Apartados de hoy
+  const hoy = new Date().toISOString().slice(0, 10);
+  const apartadosHoy = apartados.filter(b => {
+    if (!b.fecha || !b.fecha.seconds) return false;
+    const fechaBoleto = new Date(b.fecha.seconds * 1000).toISOString().slice(0, 10);
+    return fechaBoleto === hoy;
+  });
+  XLSX.utils.book_append_sheet(libro, XLSX.utils.json_to_sheet(apartadosHoy), "Apartados Hoy");
+
+  // Guardar archivo
+  XLSX.writeFile(libro, `REPORTE_RIFA_${fechaHoy}.xlsx`);
 };
 </script>
  <!-- 🎟️ Plantilla oculta para generar boleto -->
